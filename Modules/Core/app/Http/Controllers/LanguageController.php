@@ -119,6 +119,11 @@ class LanguageController extends Controller
                 $language->save();
             }
 
+            // update env file
+            $envFile = app()->environmentFilePath();
+            $env = file_get_contents($envFile);
+            $env = preg_replace('/APP_LOCALE=(.*)/', 'APP_LOCALE='.$languages->where('id', $request->id)->first()->code, $env);
+
             $html = view('core::languages._lang-table', compact('languages'))->render();
             return response()->json(['html' => $html]);
 
