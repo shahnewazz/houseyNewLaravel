@@ -51,35 +51,7 @@
                 </li>
                 <!-- search button -->
 
-                <!-- Language -->
-                <li class="header-nav-item header-language me-2">
-                    <a class="header-nav-link" href="javascript:void(0);" data-bs-toggle="dropdown">
-                        <img src="../assets/img/flag/flag-1.png" alt="">
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <a class="dropdown-item active" href="javascript:void(0);">
-                                English
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="javascript:void(0);">
-                                French
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="javascript:void(0);">
-                                Arabic
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="javascript:void(0);">
-                                German
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <!-- Language -->
+                @include('core::layouts.partials._headerLang')
 
                 <!-- Style switcher -->
                 <li class="header-nav-item header-style-switcher me-2">

@@ -5,7 +5,7 @@
     <div class="d-flex align-items-start row">
         <div class="col-sm-12">
             <div class="card-body">
-                <h5 class="card-title text-primary mb-3">@lang('profile.welcome') {{auth()->user()->full_name}} 🎉</h5>
+                <h5 class="card-title text-primary mb-3">{{ (__('profile.welcome')) }} {{auth()->user()->full_name}} 🎉</h5>
                 <p class="mb-6">
                     You have done 72% more sales today.<br>Check your new badge in your profile.
                 </p>

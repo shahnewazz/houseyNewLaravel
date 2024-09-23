@@ -4,6 +4,7 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Core\Models\Language;
 
 class DashboardController extends Controller
 {
@@ -13,7 +14,8 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
-        return view('core::index', compact('user'));
+        $languages = Language::all();
+        return view('core::index', compact('user', 'languages'));
     }
 
     /**

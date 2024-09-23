@@ -30,8 +30,10 @@ Route::get('/languages/edit/{id}', [LanguageController::class, 'edit'])->name('l
 Route::put('/languages/update/{id}', [LanguageController::class, 'update'])->name('languages.update');
 Route::delete('/languages/delete/{id}', [LanguageController::class, 'destroy'])->name('languages.destroy');
 
-// Route::post('/languages', [LanguageController::class, 'store'])->name('languages.store');
-// Route::get('/languages/edit/{locale}', [LanguageController::class, 'edit'])->name('languages.edit');
-// Route::post('/languages/update/{locale}', [LanguageController::class, 'update'])->name('languages.update');
+Route::get('/languages/translate/{code}', [LanguageController::class, 'translate'])->name('languages.translate');
+//
+Route::get('/languages/translate/{lang}/{file}', [LanguageController::class, 'showTranslations'])->name('translations.show');
+
+Route::post('/languages/translate/{lang}/{file}', [LanguageController::class, 'updateTranslation'])->name('translations.update');
 
 require __DIR__.'/auth.php';

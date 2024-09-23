@@ -15,7 +15,7 @@
 
 
     <!-- favicon -->
-    <link rel="shortcut icon" href="../assets/img/logo/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="" type="image/x-icon">
 
     <!-- global style sheet for all pages -->
     <link rel="stylesheet" href="{{asset('backend/assets/vendor/css/core.css')}}">
@@ -70,6 +70,15 @@
     <script src="{{asset('js/toastr.min.js')}}"></script>
 
     <script>
+        'use strict';
+
+        // ajax setup
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
         @if($errors->any())
             toastr.options = {
                 "closeButton": true,

@@ -25,26 +25,7 @@
                         <div class="form-text text-danger">{{ $message }}</div>
                     @enderror
                 </div>
-                <div class="col-md-3">
-                    <label for="status" class="form-label">Status</label>
-                    <div class="form-check form-switch">
-                        <input type="hidden" name="status" value="0">
-                        <input class="form-check-input" type="checkbox" role="switch" name="status" id="status_{{$language->id}}" @if ($language->status == 1) checked @endif>
-                    </div> 
-                    @error('status')
-                        <div class="form-text text-danger">{{ $message }}</div>
-                    @enderror
-                </div>
-                <div class="col-md-3">
-                    <label for="default_{{$language->id}}" class="form-label">Default</label>
-                    <div class="form-check form-switch">
-                        <input type="hidden" name="isDefault" value="0">
-                        <input class="form-check-input" type="checkbox" role="switch" name="isDefault" id="default_{{$language->id}}" @if ($language->isDefault == 1) checked @endif>
-                    </div>   
-                    @error('isDefault')
-                        <div class="form-text text-danger">{{ $message }}</div>
-                    @enderror
-                </div>
+
                 <div class="col-md-3">
                     <div>
                         <label for="code" class="form-label">Direction</label>
