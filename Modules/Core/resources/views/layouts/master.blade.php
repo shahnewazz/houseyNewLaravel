@@ -67,6 +67,7 @@
     <script src="{{asset('backend/assets/js/conca-sidebar.js')}}"></script>
     <script src="{{asset('backend/assets/js/conca.js')}}"></script>
 
+
     <script src="{{asset('js/toastr.min.js')}}"></script>
 
     <script>
@@ -99,6 +100,23 @@
         @if(Session::has('error'))
             toastr.error("{{ Session::get('error') }}");
         @endif
+
+
+        $(document).ready(function() {
+            $(document).on('click', '.lang-btn', function() {
+                var lang = $(this).data('lang');
+                $.ajax({
+                    url: "{{ route('language.change', ':lang') }}".replace(':lang', lang),
+                    type: 'POST',
+                    data: {
+                        lang: lang,
+                    },
+                    success: function(data) {
+                        location.reload();
+                    }
+                });
+            })
+        });
         
     </script>
 

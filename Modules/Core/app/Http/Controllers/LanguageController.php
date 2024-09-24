@@ -2,12 +2,13 @@
 
 namespace Modules\Core\Http\Controllers;
 
-use DB;
+
 use Illuminate\Http\Request;
+use Modules\Core\Models\Language;
+use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
 use Modules\Core\Http\Requests\LanguageRequest;
-use Modules\Core\Models\Language;
 
 class LanguageController extends Controller
 {
@@ -15,6 +16,7 @@ class LanguageController extends Controller
     public function index()
     {
         $languages = Language::all();
+
         return view('core::languages.index', compact('languages'));
     }
 
@@ -75,6 +77,14 @@ class LanguageController extends Controller
             }
 
             File::deleteDirectory($source);
+
+            // update the defalt language in env file
+            $envFile = app()->environmentFilePath();
+            $env = file_get_contents($envFile);
+            $env = preg_replace('/APP_LOCALE=(.*)/', 'APP_LOCALE='.$request->code, $env);
+            file_put_contents($envFile, $env);
+
+
         }
 
         $language->name = $request->name;
@@ -119,10 +129,14 @@ class LanguageController extends Controller
                 $language->save();
             }
 
+            $code = $languages->where('id', $request->id)->first()->code;
+
             // update env file
             $envFile = app()->environmentFilePath();
             $env = file_get_contents($envFile);
-            $env = preg_replace('/APP_LOCALE=(.*)/', 'APP_LOCALE='.$languages->where('id', $request->id)->first()->code, $env);
+            $env = preg_replace('/APP_LOCALE=(.*)/', 'APP_LOCALE='.$code, $env);
+            file_put_contents($envFile, $env);
+            
 
             $html = view('core::languages._lang-table', compact('languages'))->render();
             return response()->json(['html' => $html]);
@@ -160,16 +174,13 @@ class LanguageController extends Controller
 
     public function showTranslations($lang, $file)
     {
-        // Path to the JSON file inside the lang directory
+
         $filePath = resource_path("lang/{$lang}/{$file}.php");
 
-        // Check if the file exists
+
         if (File::exists($filePath)) {
-            // Read and decode the JSON file
-            // $translations = json_decode(File::get($filePath), true);
             $translations = include $filePath;
         } else {
-            // Return an empty array or error if the file is not found
             $translations = [];
         }
 
@@ -203,29 +214,42 @@ class LanguageController extends Controller
             'file' => 'required|string'
         ]);
 
-        // Define the path of the JSON file dynamically
+
         $filePath = resource_path("lang/{$request->lang}/{$request->file}.php");
 
-        // Check if the file exists
+
         if (!File::exists($filePath)) {
             return response()->json(['error' => 'File not found'], 404);
         }
 
-        // Get the file contents and decode the JSON
-        $translations = json_decode(File::get($filePath), true);
+        $translations = include $filePath;
 
-        // Update the translation key with the new value
         if (array_key_exists($request->key, $translations)) {
             $translations[$request->key] = $request->value;
             
-            // Write the updated translations back to the JSON file
-            // File::put($filePath, json_encode($translations, JSON_PRETTY_PRINT));
+           
             $content = "<?php\n\nreturn ".var_export($translations, true).";\n";
             
-            return response()->json(['success' => true]);
+            $path = resource_path("lang/$request->lang/$request->file.php");
+
+            File::put($path, $content);
+
+            if(File::exists($path)){
+                return response()->json(['success' => 'Translation updated successfully']);
+            }
         }
 
         return response()->json(['error' => 'Key not found'], 400);
     }
     
+
+    public function changeLanguage($code)
+    {
+        if(setLanguage($code)){
+            return redirect()->back();
+        }
+
+        return redirect()->back()->with('error', 'Language not found');
+    }
+
 }

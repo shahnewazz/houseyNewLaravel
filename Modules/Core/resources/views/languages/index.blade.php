@@ -25,11 +25,10 @@
                 </tr>
             </thead>
             <tbody id="lang_body">
-               
                 @include('core::languages._lang-table', ['languages' => $languages])
             </tbody>
         </table>
-        <div id="test"></div>
+        
     </div>
 </div>
 @endsection
@@ -37,7 +36,6 @@
 @push('scripts')
 <script>
     "use strict";
-
 
     $(document).ready(function(){
 

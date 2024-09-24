@@ -10,8 +10,6 @@
                     You have done 72% more sales today.<br>Check your new badge in your profile.
                 </p>
 
-                <!-- load all available lang -->
-
                 <a href="{{route('languages.index')}}" class="btn btn-outline-primary">Languages</a>
             </div>
         </div>

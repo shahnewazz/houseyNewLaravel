@@ -35,5 +35,12 @@ Route::get('/languages/translate/{code}', [LanguageController::class, 'translate
 Route::get('/languages/translate/{lang}/{file}', [LanguageController::class, 'showTranslations'])->name('translations.show');
 
 Route::post('/languages/translate/{lang}/{file}', [LanguageController::class, 'updateTranslation'])->name('translations.update');
+Route::post('/languages/change/{lang}', [LanguageController::class, 'changeLanguage'])->name('language.change');
+
+Route::get('/get', function(){
+    return view('core::locale');
+});
+
+Route::post('/update', [LanguageController::class, 'test'])->name('locale');
 
 require __DIR__.'/auth.php';

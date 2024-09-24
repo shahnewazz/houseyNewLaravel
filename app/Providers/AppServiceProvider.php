@@ -2,6 +2,11 @@
 
 namespace App\Providers;
 
+use Session;
+use Illuminate\Routing\Route;
+use Modules\Core\Models\Language;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,7 +24,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $locale = session('app_lang', env('APP_LOCALE', 'en'));
-        app()->setLocale($locale);
+        
     }
 }

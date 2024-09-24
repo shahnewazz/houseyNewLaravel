@@ -2,9 +2,12 @@
 
 namespace Modules\Core\Providers;
 
+use Modules\Core\Models\Language;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
+use Modules\Core\Http\Middleware\LanguageMiddleware;
 
 class CoreServiceProvider extends ServiceProvider
 {
@@ -25,6 +28,14 @@ class CoreServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+
+        // add all the middleware
+        $this->app->make('router')->aliasMiddleware('language', LanguageMiddleware::class);
+
+        View::composer('core::layouts.partials._headerLang', function ($view) {
+            $view->with('languages', Language::where('status', 1)->get());
+        });
+
     }
 
     /**

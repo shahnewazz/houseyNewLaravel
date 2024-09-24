@@ -22,11 +22,12 @@
                     <td>{{ $key }}</td>
                     <td>
                         <span class="value-display" data-key="{{ $key }}">{{ $value }}</span>
-                        <input type="text" class="value-edit" data-key="{{ $key }}" value="{{ $value }}" style="display: none;">
+                        <input type="text" class="value-edit d-none" data-key="{{ $key }}" value="{{ $value }}">
                     </td>
                     <td>
                         <button class="edit-btn btn btn-sm btn-primary" data-key="{{ $key }}">Edit</button>
-                        <button class="save-btn btn btn-sm btn-success" data-key="{{ $key }}" style="display: none;">Save</button>
+                        <button class="save-btn btn btn-sm btn-success d-none" data-key="{{ $key }}">Save</button>
+                        
                     </td>
                 </tr>
                 @endforeach
@@ -44,9 +45,9 @@
         $('.edit-btn').on('click', function () {
             var key = $(this).data('key');
             $('span.value-display[data-key="' + key + '"]').hide();
-            $('input.value-edit[data-key="' + key + '"]').show();
+            $('input.value-edit[data-key="' + key + '"]').removeClass('d-none');
             $(this).hide();
-            $('.save-btn[data-key="' + key + '"]').show();
+            $('.save-btn[data-key="' + key + '"]').removeClass('d-none');
         });
     
         // Handle save button click (AJAX request)
@@ -55,9 +56,9 @@
             var newValue = $('input.value-edit[data-key="' + key + '"]').val();
             var lang = "{{ $lang }}";
             var file = "{{ $file }}";
-    
+
             $.ajax({
-                url: "{{ route('translations.update') }}",
+                url: "{{ route('translations.update', ['lang' => $lang, 'file' => $file]) }}",
                 type: 'POST',
                 data: {
                     key: key,
@@ -82,6 +83,7 @@
                 }
             });
         });
+
     });
-    </script>
+</script>
 @endpush

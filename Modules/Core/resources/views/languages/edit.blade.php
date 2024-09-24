@@ -5,7 +5,14 @@
 
 <div class="card">
     <div class="card-body">
-        <h4>Edit Language {{$language->name}}</h4>
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-6">
+                <h4 class="m-0">Edit Language {{$language->name}}</h4>
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="{{ route('languages.index') }}" class="btn btn-primary">Back</a>
+            </div>
+        </div>
 
         <form action="{{ route('languages.update', ['id' => $language->id]) }}" method="POST">
             @csrf

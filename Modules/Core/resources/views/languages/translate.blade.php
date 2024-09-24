@@ -18,7 +18,7 @@
             <tbody>
                 @foreach($files as $key => $file)
                     <tr>
-                        <td>{{ $key }}</td>
+                        <td>{{ $loop->iteration }}</td>
                         <td>{{ ucwords($file) }}</td>
                         <td>
                            <a class="btn btn-primary" href="{{ route('translations.show', ['file' => $file, 'lang' => $code]) }}">Edit</a>
