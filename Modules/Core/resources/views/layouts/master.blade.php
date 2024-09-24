@@ -69,6 +69,7 @@
 
 
     <script src="{{asset('js/toastr.min.js')}}"></script>
+    <script src="{{asset('js/language.js')}}"></script>
 
     <script>
         'use strict';

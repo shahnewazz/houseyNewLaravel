@@ -21,6 +21,14 @@ Route::get('core', function () {
 }); 
 
 
+// create group base on controllers
+
+Route::group(['prefix' => 'admin', 'as' => 'admin.', ], function(){
+    Route::get('test', function(){
+        return "Hello from admin";
+    })->name('test');
+});
+
 Route::get('/languages', [LanguageController::class, 'index'])->name('languages.index');
 Route::get('/languages/create', [LanguageController::class, 'create'])->name('languages.create');
 Route::post('/languages/store', [LanguageController::class, 'store'])->name('languages.store');
