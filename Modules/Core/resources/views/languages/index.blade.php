@@ -8,7 +8,7 @@
                 <h4 class="m-0">Languages</h4>
             </div>
             <div class="col-md-6 text-end">
-                <a href="{{ route('languages.create') }}" class="btn btn-primary">Add Language</a>
+                <a href="{{ route('admin.languages.create') }}" class="btn btn-primary">Add Language</a>
             </div>
         </div>
         <table class="table">
@@ -42,8 +42,9 @@
         $(document).on('change', 'input[name="isDefault"]',  function(){
             var id = $(this).attr('id').split('_')[1];
             var status = $(this).prop('checked') ? 1 : 0;
+            
             $.ajax({
-                url: "{{ route('languages.default') }}",
+                url: "{{ route('admin.languages.default') }}",
                 type: 'POST',
                 data: {
                     id: id,
@@ -64,7 +65,7 @@
             var id = $(this).attr('id').split('_')[1];
             var status = $(this).prop('checked') ? 1 : 0;
             $.ajax({
-                url: "{{ route('languages.status') }}",
+                url: "{{ route('admin.languages.status') }}",
                 type: 'POST',
                 data: {
                     id: id,

@@ -8,11 +8,11 @@
                 <h4 class="m-0">Add Language</h4>
             </div>
             <div class="col-md-6 text-end">
-                <a href="{{ route('languages.index') }}" class="btn btn-primary">Back</a>
+                <a href="{{ route('admin.languages.index') }}" class="btn btn-primary">Back</a>
             </div>
         </div>
 
-        <form action="{{ route('languages.store') }}" method="POST">
+        <form action="{{ route('admin.languages.store') }}" method="POST">
             @csrf
             <div class="row g-6">
                 <div class="col-md-6">

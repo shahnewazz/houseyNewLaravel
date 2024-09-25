@@ -107,7 +107,7 @@
             $(document).on('click', '.lang-btn', function() {
                 var lang = $(this).data('lang');
                 $.ajax({
-                    url: "{{ route('language.change', ':lang') }}".replace(':lang', lang),
+                    url: "{{ route('admin.languages.change', ':lang') }}".replace(':lang', lang),
                     type: 'POST',
                     data: {
                         lang: lang,

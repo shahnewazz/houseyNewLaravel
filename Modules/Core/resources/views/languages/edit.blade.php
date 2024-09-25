@@ -10,11 +10,11 @@
                 <h4 class="m-0">Edit Language {{$language->name}}</h4>
             </div>
             <div class="col-md-6 text-end">
-                <a href="{{ route('languages.index') }}" class="btn btn-primary">Back</a>
+                <a href="{{ route('admin.languages.index') }}" class="btn btn-primary">Back</a>
             </div>
         </div>
 
-        <form action="{{ route('languages.update', ['id' => $language->id]) }}" method="POST">
+        <form action="{{ route('admin.languages.update', ['id' => $language->id]) }}" method="POST">
             @csrf
             @method('PUT')
             <div class="row g-6">

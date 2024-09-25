@@ -54,7 +54,7 @@ class LanguageController extends Controller
             File::copy($file, $destination.'/'.basename($file));
         }
 
-        return redirect()->route('languages.index')->with('success', 'Language created successfully');
+        return redirect()->route('admin.languages.index')->with('success', 'Language created successfully');
 
     }
 
@@ -92,7 +92,7 @@ class LanguageController extends Controller
         $language->direction = $request->direction;
         $language->save();
 
-        return redirect()->route('languages.index')->with('success', 'Language updated successfully');
+        return redirect()->route('admin.languages.index')->with('success', 'Language updated successfully');
     }
 
     public function destroy($id)
@@ -101,7 +101,7 @@ class LanguageController extends Controller
         
 
         if($language->isDefault == 1){
-            return redirect()->route('languages.index')->with('error', 'Default language can not be deleted');
+            return redirect()->route('admin.languages.index')->with('error', 'Default language can not be deleted');
         }
 
         // delete the transalation folder if exits
@@ -113,7 +113,7 @@ class LanguageController extends Controller
 
 
         $language->delete();
-        return redirect()->route('languages.index')->with('success', 'Language deleted successfully');
+        return redirect()->route('admin.languages.index')->with('success', 'Language deleted successfully');
     }
 
     public function default(Request $request)

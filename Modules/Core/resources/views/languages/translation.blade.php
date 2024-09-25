@@ -6,7 +6,7 @@
     <div class="card-body">
         <div class="d-flex mb-5 align-items-center">
             <h2 class="card-title m-0">Translations ({{ $lang }})</h2>
-            <a href="{{ route('languages.translate', ['code' => $lang]) }}" class="btn btn-primary ms-auto">Back</a>
+            <a href="{{ route('admin.languages.translate', ['code' => $lang]) }}" class="btn btn-primary ms-auto">Back</a>
         </div>
         <table class="table">
             <thead class="table-light">
@@ -58,7 +58,7 @@
             var file = "{{ $file }}";
 
             $.ajax({
-                url: "{{ route('translations.update', ['lang' => $lang, 'file' => $file]) }}",
+                url: "{{ route('admin.languages.translations.update', ['lang' => $lang, 'file' => $file]) }}",
                 type: 'POST',
                 data: {
                     key: key,

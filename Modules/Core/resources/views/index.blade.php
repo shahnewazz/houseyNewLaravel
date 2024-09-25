@@ -9,8 +9,6 @@
                 <p class="mb-6">
                     You have done 72% more sales today.<br>Check your new badge in your profile.
                 </p>
-
-                <a href="{{route('languages.index')}}" class="btn btn-outline-primary">Languages</a>
             </div>
         </div>
     </div>

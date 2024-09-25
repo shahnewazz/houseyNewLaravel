@@ -62,4 +62,5 @@ class CoreController extends Controller
     {
         //
     }
+
 }
