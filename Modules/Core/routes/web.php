@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Core\Http\Controllers\CoreController;
+use Modules\Core\Http\Controllers\RoleController;
+use Modules\Core\Http\Controllers\UserController;
 use Modules\Core\Http\Controllers\LanguageController;
 use Modules\Core\Http\Controllers\DashboardController;
 
@@ -28,6 +30,28 @@ Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'v
     // dashboard route
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+
+    // users routes
+    Route::group(['prefix' => 'users', 'as' => 'users.'], function(){
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('/show/{username}', [UserController::class, 'show'])->name('show');
+        Route::get('/create', [UserController::class, 'create'])->name('create');
+        Route::post('/store', [UserController::class, 'store'])->name('store');
+        Route::get('/edit/{username}', [UserController::class, 'edit'])->name('edit');
+        Route::put('/update/{username}', [UserController::class, 'update'])->name('update');
+        Route::delete('/delete/{username}', [UserController::class, 'destroy'])->name('destroy');
+    });
+
+    // roles routes
+
+    Route::group(['prefix' => 'roles', 'as' => 'roles.'], function(){
+        Route::get('/', [RoleController::class, 'index'])->name('index');
+        Route::get('/create', [RoleController::class, 'create'])->name('create');
+        Route::post('/store', [RoleController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [RoleController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [RoleController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [RoleController::class, 'destroy'])->name('destroy');
+    });
 
     // lanugages routes
     Route::group(['prefix' => 'languages', 'as' => 'languages.'], function(){

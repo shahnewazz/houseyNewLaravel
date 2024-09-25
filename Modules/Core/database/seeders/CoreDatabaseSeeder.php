@@ -18,6 +18,7 @@ class CoreDatabaseSeeder extends Seeder
             'username' => 'admin',
             'email' => 'admin@gmail.com',
             'password' =>  bcrypt('password'),
+            'status' => 'active',
         ]);
 
         $this->call([
