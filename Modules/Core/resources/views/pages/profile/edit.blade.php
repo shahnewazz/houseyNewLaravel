@@ -6,7 +6,7 @@
         @csrf
         @php
 
-            $user_profile_picture = $user->profile_picture == null ? asset('backend/assets/img/avatar/avatar-placeholder.jpg') : asset('storage/'.$user->profile_picture);
+            $user_profile_picture = $user->profile_picture == null ? $user->getInitialsAttribute() : asset('storage/'.$user->profile_picture);
         @endphp
 
         <div class="card-body">
@@ -16,7 +16,10 @@
                     <img width="120" class="profile-photo" src="{{asset('storage/'.$user->profile_picture)}}" alt="">
                 @else
                     <!-- placeholder photo -->
-                    <img width="120" class="profile-photo" src="{{$user_profile_picture}}" alt="">
+                    <div class="avatar avatar-lg rounded">
+                        <img width="120" class="profile-photo position-absolute start-0 top-0 z-1 visually-hidden" src="" alt="">
+                        <div class="avatar-text bg-label-success">{{$user_profile_picture}}</div>
+                    </div>
                 @endisset
             
 
@@ -149,7 +152,7 @@
 
 @push('scripts')
 <script>
-    
+    "use strict";
 
     $(document).ready(function() {
 
@@ -165,7 +168,7 @@
             if (input.files && input.files[0] && (ext == "png" || ext == "jpeg" || ext == "jpg")) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
-                    $('.profile-photo').attr('src', e.target.result);
+                    $('.profile-photo').attr('src', e.target.result).removeClass('visually-hidden');
                 }
                 reader.readAsDataURL(input.files[0]);
 
@@ -179,7 +182,7 @@
 
         // Profile Picture Reset
         $('.profile-picture-reset').on('click' ,function() {
-            $('.profile-photo').attr('src', '{{ $user_profile_picture }}');
+            $('.profile-photo').attr('src', '{{ $user_profile_picture }}').addClass('visually-hidden');
             $('.profile-picture-upload').val('');
         });
     });

@@ -2,25 +2,36 @@
 @isset($users)
 @forelse ($users as $user)
     @php
-        $user->profile_picture = $user->profile_picture ? asset('storage/'.$user->profile_picture) : asset('backend/assets/img/avatar/avatar-placeholder.jpg');
+        $user_profile_picture = $user->profile_picture != null ? asset('storage/'.$user->profile_picture) : $user->getInitialsAttribute();
     @endphp
 
     <tr>
         <td>
-            <a href="{{route('admin.users.show', ['username' => $user->username])}}" class="text-decoration-none text-black">
-                <div class="d-flex align-items-center">
-                    <div class="avatar avatar-md me-2">
-                        <img src="{{$user->profile_picture}}" class="rounded-circle" alt="{{$user->full_name}}">
+            <div class="d-flex align-items-center">
+                <div class="avatar avatar-md me-2">
+
+                    @isset($user->profile_picture)
+                        <div class="avatar avatar-status-online rounded-pill">
+                            <img src="{{$user_profile_picture}}" class="rounded-circle" alt="{{$user->full_name}}">
+                        </div>
+                    @else
+                    <div class="avatar rounded-pill">
+                        <div class="avatar-text fs-3 bg-label-success">{{$user_profile_picture}}</div>
                     </div>
-                    <span>{{ $user->full_name }}</span>
+                    @endisset
+                    
                 </div>
-            </a>
+                <span class="text-decoration-none text-black">{{ $user->full_name }}</span>
+            </div>
         </td>
         <td>
-        {{ $user->email }}
+            {{ $user->email }}
         </td>
         <td>
-            Admin
+            @foreach ($user->roles as $role)
+                {{ucwords(Str::replaceFirst('_', ' ', $role->name))}}
+                <br />
+            @endforeach
         </td>
         <td>
             {{ $user->created_at->format('F j, Y') }}
@@ -39,12 +50,12 @@
 
         <td>
             <div class="d-flex align-items-center">
-                <a href="{{route('admin.users.show', ['username' => $user->username])}}" class="btn btn-sm btn-icon btn-icon-secondary rounded-pill" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="View">
+                <button class="btn btn-sm btn-icon btn-icon-secondary rounded-pill show-user-btn" data-username={{$user->username}} type="button">
                     <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M1 7.00001C1 7.00001 3.90909 1.18182 9 1.18182C14.0909 1.18182 17 7.00001 17 7.00001C17 7.00001 14.0909 12.8182 9 12.8182C3.90909 12.8182 1 7.00001 1 7.00001Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                         <path d="M9.00018 9.18181C10.2052 9.18181 11.182 8.20498 11.182 6.99999C11.182 5.79501 10.2052 4.81818 9.00018 4.81818C7.79519 4.81818 6.81836 5.79501 6.81836 6.99999C6.81836 8.20498 7.79519 9.18181 9.00018 9.18181Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                </a>
+                </button>
                 <button class="btn btn-sm btn-icon btn-icon-secondary rounded-pill" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="Edit">
                     <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M9.9516 2.31982C10.4732 1.75466 10.734 1.47208 11.0112 1.30725C11.6799 0.909531 12.5034 0.897164 13.1833 1.27463C13.465 1.43106 13.7339 1.70568 14.2715 2.25493C14.8092 2.80418 15.078 3.07881 15.2312 3.36665C15.6007 4.06118 15.5886 4.90235 15.1992 5.58549C15.0379 5.86861 14.7613 6.13504 14.208 6.66791L7.62544 13.008C6.57701 14.0178 6.0528 14.5227 5.39764 14.7786C4.74248 15.0345 4.02224 15.0157 2.58176 14.978L2.38576 14.9729C1.94723 14.9614 1.72797 14.9557 1.60051 14.811C1.47305 14.6664 1.49045 14.443 1.52526 13.9963L1.54415 13.7538C1.64211 12.4965 1.69108 11.8678 1.9366 11.3028C2.18211 10.7377 2.6056 10.2788 3.4526 9.36115L9.9516 2.31982Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path>
@@ -68,8 +79,17 @@
     @empty
     <tr>
         <td colspan="6">
-            {{__('users.no_users_found')}}
+            {{__('users.user_not_found')}}
         </td>
     </tr>
     @endforelse
+
+    <tr>
+        <td colspan="6">
+            <div class="d-flex justify-content-end">
+                {!! $users->links('core::components.pagination') !!}
+
+            </div>
+        </td>
+    </tr>
 @endisset

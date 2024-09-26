@@ -370,7 +370,7 @@ button {
   width: 100%;
   height: 100%;
   background-color: var(--bs-black);
-  z-index: 99;
+  z-index: 9999;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease-in-out;
@@ -378,10 +378,6 @@ button {
 .app-backdrop.show {
   opacity: 0.5;
   visibility: visible;
-}
-
-label.error{
-  color: var(--bs-danger);
 }
 
 /*# sourceMappingURL=conca.css.map */

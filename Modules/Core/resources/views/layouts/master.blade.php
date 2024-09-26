@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="{{asset('backend/assets/vendor/css/perfect-scrollbar.css')}}">
     <link rel="stylesheet" href="{{asset('backend/assets/css/conca.css')}}">
 
-    <link rel="stylesheet" href="{{asset('css/toastr.min.css')}}">
+    <link rel="stylesheet" href="{{asset('backend/assets/vendor/libs/toastr/toastr.css')}}">
 
     @stack('styles')
 </head>
@@ -68,8 +68,7 @@
     <script src="{{asset('backend/assets/js/conca.js')}}"></script>
 
 
-    <script src="{{asset('js/toastr.min.js')}}"></script>
-    <script src="{{asset('js/language.js')}}"></script>
+    <script src="{{asset('backend/assets/vendor/libs/toastr/toastr.js')}}"></script>
 
     <script>
         'use strict';

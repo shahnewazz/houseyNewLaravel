@@ -8,6 +8,7 @@
         "Modules\\Core\\Providers\\CoreServiceProvider"
     ],
     "files": [
-        "app/Helpers/LanguageHelper.php"
+        "app/Helpers/LanguageHelper.php",
+        "app/Helpers/CoreHelper.php"
     ]
 }

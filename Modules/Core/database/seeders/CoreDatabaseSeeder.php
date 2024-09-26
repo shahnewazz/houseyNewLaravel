@@ -4,6 +4,7 @@ namespace Modules\Core\Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Modules\Core\Database\Seeders\RolePermissionSeeder;
 
 class CoreDatabaseSeeder extends Seeder
 {
@@ -12,17 +13,12 @@ class CoreDatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
-            'first_name' => 'Shahnewaz',
-            'last_name' => 'Sakil',
-            'username' => 'admin',
-            'email' => 'admin@gmail.com',
-            'password' =>  bcrypt('password'),
-            'status' => 'active',
-        ]);
+    
+        User::factory()->count(10)->create();
 
         $this->call([
             LanguageSeeder::class,
+            RolePermissionSeeder::class
         ]);
     }
 }

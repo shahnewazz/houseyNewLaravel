@@ -5,15 +5,35 @@ namespace Modules\Core\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Modules\Core\Http\Requests\User\UserStoreRequest;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
+
+
+        // Search filters
+        $query = User::query();
+
+        
+
+        if($request->has('search')) {
+            $query->where('first_name', 'like', '%' . $request->search . '%')
+                ->orWhere('last_name', 'like', '%' . $request->search . '%')
+                ->orWhere('email', 'like', '%' . $request->search . '%');
+        }
+
+        $users = $query->orderBy('created_at','desc')->paginate(10);
+
+
+        if ($request->ajax()) {
+            return view('core::pages.users.partials._users-table', compact('users'))->render();
+        }
+
         return view('core::pages.users.users-list', compact('users'));
     }
 
@@ -28,9 +48,11 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(UserStoreRequest $request)
     {
-        //
+        User::create($request->validated());
+
+        return redirect()->route('admin.users.index')->with('success', 'User created successfully');
     }
 
     /**
@@ -38,8 +60,9 @@ class UserController extends Controller
      */
     public function show($username)
     {
+        
         $user = User::where('username', $username)->first();
-        return view('core::pages.users.user-single', compact('user'));
+        return view('core::pages.users.user-single', compact('user'))->render();
     }
 
     /**

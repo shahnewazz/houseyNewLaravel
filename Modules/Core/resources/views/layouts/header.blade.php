@@ -51,6 +51,34 @@
                 </li>
                 <!-- search button -->
 
+                <!-- Style switcher -->
+                <li class="header-nav-item header-style-switcher me-2">
+                    <a class="header-nav-link" href="javascript:void(0);" data-bs-toggle="dropdown">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.99844 15.8499C13.2293 15.8499 15.8484 13.2308 15.8484 9.9999C15.8484 6.76904 13.2293 4.1499 9.99844 4.1499C6.76757 4.1499 4.14844 6.76904 4.14844 9.9999C4.14844 13.2308 6.76757 15.8499 9.99844 15.8499Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            <path opacity="0.4" d="M16.426 16.426L16.309 16.309M16.309 3.691L16.426 3.574L16.309 3.691ZM3.574 16.426L3.691 16.309L3.574 16.426ZM10 1.072V1V1.072ZM10 19V18.928V19ZM1.072 10H1H1.072ZM19 10H18.928H19ZM3.691 3.691L3.574 3.574L3.691 3.691Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0);" data-bs-theme-value="light">
+                                Light
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0);" data-bs-theme-value="dark">
+                                Dark
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0);" data-bs-theme-value="auto">
+                                System
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- Style switcher -->
+
                 @include('core::layouts.partials.header._headerLang')
 
                 @include('core::layouts.partials.header._headerProfile')

@@ -2,15 +2,18 @@
 
 @section('content')
 <div class="card mb-5">
-    <form id="profile_form" action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
+    <form id="profile_form" action="{{ route('admin.users.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         @php
-            $user_profile_picture = asset('backend/assets/img/avatar/avatar-placeholder.jpg');
+            $user_profile_picture = "IMG";
         @endphp
         <div class="card-body">
             <div class="d-flex align-items-start align-items-sm-center gap-6 pb-4 border-bottom">
 
-                <img width="120" class="profile-photo" src="{{$user_profile_picture}}" alt="">
+                <div class="avatar avatar-lg rounded">
+                    <img width="120" class="profile-photo position-absolute start-0 top-0 z-1 visually-hidden" src="" alt="">
+                    <div class="avatar-text fs-4 bg-label-success">{{$user_profile_picture}}</div>
+                </div>
 
                 <div class="button-wrapper">
                     <label for="profile_picture" class="btn btn-primary me-3 mb-3" tabindex="0">
@@ -34,70 +37,75 @@
         <div class="card-body pt-4">
             <div class="row g-6">
                 <div class="col-md-6">
-                    <label for="first_name" class="form-label">First Name</label>
-                    <input class="form-control" type="text" id="first_name" name="first_name" value="{{ old('first_name') }}">
-                    @error('first_name')<div class="form-text text-danger">{{ $message }}</div>  @enderror
+                    <x-core::form.input-label :value="__('First Name')" />
+                    <x-core::form.input type="text" id="first_name" name="first_name" value="{{ old('first_name') }}" />
+                    <x-core::form.input-error field="first_name" />
                 </div>
                 <div class="col-md-6">
-                    <label for="last_name" class="form-label">Last Name</label>
-                    <input class="form-control" type="text" name="last_name" id="last_name" value="{{ old( 'last_name') }}">
-                    @error('last_name')<div class="form-text text-danger">{{ $message }}</div>  @enderror
+                    <x-core::form.input-label for="last_name" :value="__('Last Name')" />
+                    <x-core::form.input type="text" id="last_name" name="last_name" value="{{ old('last_name') }}" />
+                    <x-core::form.input-error field="last_name" />
                 </div>
                 <div class="col-md-6">
-                    <label for="email" class="form-label">E-mail</label>
-                    <input class="form-control" type="text" id="email" name="email" value="{{ old('email') }}">
-                    @error('email')<div class="form-text text-danger">{{ $message }}</div>  @enderror
+                    <x-core::form.input-label for="email" :value="__('E-mail')" />
+                    <x-core::form.input type="email" id="email" name="email" value="{{ old('email') }}" />
+                    <x-core::form.input-error field="email" />
                 </div>
                 <div class="col-md-6">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" name="username">
-                    @error('username')<div class="form-text text-danger">{{ $message }}</div>  @enderror
+                    <x-core::form.input-label for="username" :value="__('Username')" />
+                    <x-core::form.input type="text" id="username" name="username" value="{{ old('username') }}" />
+                    <x-core::form.input-error field="username" />
                 </div>
+                @php
+                    $roles = \Spatie\Permission\Models\Role::all();
+                    
+                @endphp
                 <div class="col-md-6">
-                    <label for="role" class="form-label">Role</label>
+                    <x-core::form.input-label for="role" :value="__('Role')" />
                     <select class="form-select" name="role" aria-label="Role">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                        @foreach ($roles as $role)
+                        <option value="{{$role->id}}">{{ucwords(Str::replaceFirst('_', ' ', $role->name))}}</option>
+                        @endforeach
                     </select>
-                    @error('status')<div class="form-text text-danger">{{ $message }}</div>  @enderror
+                    <x-core::form.input-error field="role" />
                 </div>
                 <div class="col-md-6">
-                    <label for="status" class="form-label">Status</label>
+                    <x-core::form.input-label for="status" :value="__('Status')" />
                     <select class="form-select" name="status" aria-label="Status">
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
                     </select>
-                    @error('status')<div class="form-text text-danger">{{ $message }}</div>  @enderror
+                    <x-core::form.input-error field="status" />
                 </div>
                 <div class="col-md-6">
-                    <label for="phone" class="form-label">Phone Number</label>
-                    <input type="text" class="form-control " id="phone" name="phone" value="{{ old('phone') }}">
-                    @error('phone')<div class="form-text text-danger">{{ $message }}</div>  @enderror
+                    <x-core::form.input-label for="phone" :value="__('Phone Number')" />
+                    <x-core::form.input type="text" id="phone" name="phone" value="{{ old('phone') }}" />
+                    <x-core::form.input-error field="phone" />
                 </div>
                 <div class="col-md-6">
-                    <label for="address" class="form-label">Address</label>
-                    <input type="text" class="form-control" id="address" name="address" value="{{ old('address') }}">
-                    @error('address')<div class="form-text text-danger">{{ $message }}</div>  @enderror
+                    <x-core::form.input-label for="address" :value="__('Address')" />
+                    <x-core::form.input type="text" id="address" name="address" value="{{ old('address') }}" />
+                    <x-core::form.input-error field="address" />
                 </div>
                 <div class="col-md-6">
-                    <label for="city" class="form-label">City</label>
-                    <input class="form-control" type="text" id="city" name="city" value="{{ old('city') }}">
-                    @error('city')<div class="form-text text-danger">{{ $message }}</div>  @enderror
+                    <x-core::form.input-label for="city" :value="__('City')" />
+                    <x-core::form.input type="text" id="city" name="city" value="{{ old('city') }}" />
+                    <x-core::form.input-error field="city" />
                 </div>
                 <div class="col-md-6">
-                    <label for="state" class="form-label">State</label>
-                    <input class="form-control" type="text" id="state" name="state" value="{{ old('state') }}">
-                    @error('state')<div class="form-text text-danger">{{ $message }}</div>  @enderror
+                    <x-core::form.input-label for="state" :value="__('State')" />
+                    <x-core::form.input type="text" id="state" name="state" value="{{ old('state') }}" />
+                    <x-core::form.input-error field="state" />
                 </div>
                 <div class="col-md-6">
-                    <label for="zipCode" class="form-label">Zip Code</label>
-                    <input type="text" class="form-control" id="zipCode" name="zipCode" maxlength="6" value="{{ old('zipCode') }}">
-                    @error('zipCode')<div class="form-text text-danger">{{ $message }}</div>  @enderror
+                    <x-core::form.input-label for="zipCode" :value="__('Zip Code')" />
+                    <x-core::form.input type="text" id="zipCode" name="zipCode" value="{{ old('zipCode') }}" />
+                    <x-core::form.input-error field="zipCode" />
                 </div>
                 <div class="col-md-6">
-                    <label for="country" class="form-label">Country</label>
-                    <input type="text" class="form-control" id="country" name="country" value="{{ old('country') }}">
-                    @error('country')<div class="form-text text-danger">{{ $message }}</div>  @enderror
+                    <x-core::form.input-label for="country" :value="__('Country')" />
+                    <x-core::form.input type="text" id="country" name="country" value="{{ old('country') }}" />
+                    <x-core::form.input-error field="country" />
                 </div>
             </div>
 
@@ -108,16 +116,16 @@
             </div>     
             <div class="row mb-6">
                 <div class="col-md-6">
-                    <label for="password" class="form-label">Password</label>
-                    <input class="form-control" type="password" name="password" id="password">
-                    @error('password') <div class="form-text text-danger">{{ $message }}</div> @enderror
+                    <x-core::form.input-label for="password" :value="__('Password')" />
+                    <x-core::form.input type="text" id="password" name="password" />
+                    <x-core::form.input-error field="password" />
                 </div>
             </div>
             <div class="row mb-6">
                 <div class="col-md-6">
-                    <label for="password_confirmation" class="form-label">Confirm Password</label>
+                    <x-core::form.input-label for="password_confirmation" :value="__('Confirm Password')" />
                     <input class="form-control" type="password" name="password_confirmation" id="password_confirmation">
-                    @error('password_confirmation') <div class="form-text text-danger">{{ $message }}</div>  @enderror
+                    <x-core::form.input-error field="password_confirmation" />
                 </div>
             </div>
 
@@ -149,7 +157,7 @@
             if (input.files && input.files[0] && (ext == "png" || ext == "jpeg" || ext == "jpg")) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
-                    $('.profile-photo').attr('src', e.target.result);
+                    $('.profile-photo').attr('src', e.target.result).removeClass('visually-hidden');;
                 }
                 reader.readAsDataURL(input.files[0]);
 
@@ -163,7 +171,7 @@
 
         // Profile Picture Reset
         $('.profile-picture-reset').on('click' ,function() {
-            $('.profile-photo').attr('src', '{{ $user_profile_picture }}');
+            $('.profile-photo').attr('src', '{{ $user_profile_picture }}').addClass('visually-hidden');;
             $('.profile-picture-upload').val('');
         });
     });

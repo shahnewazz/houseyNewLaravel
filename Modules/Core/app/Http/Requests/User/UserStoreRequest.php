@@ -1,13 +1,13 @@
 <?php
 
-namespace Modules\Core\Http\Requests\Auth;
+namespace Modules\Core\Http\Requests\User;
 
 use App\Models\User;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class RegisterRequest extends FormRequest
+class UserStoreRequest extends FormRequest
 {
-    
     /**
      * Prepare the data for validation.
      *
@@ -21,7 +21,7 @@ class RegisterRequest extends FormRequest
         ]);
     }
 
-    /**
+     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
@@ -37,9 +37,18 @@ class RegisterRequest extends FormRequest
         return [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'unique:'.User::class],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', 'min:8'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)],
+            'username' => ['required', 'string', 'max:255', Rule::unique(User::class)],
+            'phone' => ['required', 'numeric', '', Rule::unique(User::class)],
+            'status' => ['required', 'string','in:active,inactive'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'city' => ['nullable', 'string', 'max:255'],
+            'state' => ['nullable', 'string', 'max:255'],
+            'zipCode' => ['nullable', 'string', 'max:255'],
+            'country' => ['nullable', 'string', 'max:255'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
     }
+
+   
 }
