@@ -4,63 +4,80 @@
 
 @section('content')
 
-
-
 <div class="card shadow rounded-md">
     <div class="card-body">
-        <div class="row">
-           <div class="col-xl-4 col-lg-6 col-md-6">
-                <div class="card">
+        <div class="row align-items-sm-stretch">
+            @foreach ($roles as $role)
+            <div class="col-xl-4 col-lg-6 col-md-6">
+                <div class="card h-100">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h6 class="fw-normal mb-0 text-body">Total 3 users</h6>
-                            <div class="avatar-group d-flex">
-                                <div class="avatar rounded-circle">
-                                    <span class="avatar-text rounded-circle bg-label-success">KR</span>
-                                </div>
-                                <div class="avatar rounded-circle">
-                                    <span class="avatar-text rounded-circle bg-label-secondary">TY</span>
-                                </div>
-                                <div class="avatar rounded-circle">
-                                    <span class="avatar-text rounded-circle bg-label-warning">AQ</span>
-                                </div>
-                                <div class="avatar rounded-circle">
-                                    <span class="avatar-text rounded-circle bg-label-danger">NF</span>
-                                </div>
-                                <div class="avatar rounded-circle">
-                                    <span class="avatar-text rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="3 more">+3</span>
-                                </div>
+                        <h2 class="fw-medium mb-5 text-body">{{$role->name}}</h2>
+
+                        <p>{{__('role.total_users')}} {{$role->users_count}}</p>
+                        
+
+                        <h6 class="fw-medium mb-3 text-body">{{__('role.permissions')}}</h6>
+                        <div class="mb-6">
+                            @foreach ($role->permissions as $permission)
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="badge badge-dot bg-primary me-1"></span> {{ucfirst(explode('-', $permission->name)[1])}}
                             </div>
+                            @endforeach
                         </div>
-                        <h6>Permissions</h6>
-                        <ul>
-                            <li>
-                                User Panel
-                            </li>
-                            <li>
-                                User Panel
-                            </li>
-                            <li>
-                                User Panel
-                            </li>
-                            <li>
-                                User Panel
-                            </li>
-                            <li>
-                                User Panel
-                            </li>
-                        </ul>
-                        <div class="d-flex justify-content-between align-items-end">
-                            <div class="role-heading">
-                                <h5 class="mb-1">Support</h5>
-                                <a href="javascript:;" data-bs-toggle="modal" data-bs-target="#addRoleModal" class="role-edit-modal"><span>Edit Role</span></a>
-                            </div>
-                            <a href="javascript:void(0);"><i class="ti ti-copy ti-md text-heading"></i></a>
+
+                        <div class="d-flex align-items-end gap-3 mt-auto">
+                            <a href="{{route('admin.roles.edit', $role->id)}}" class="btn btn-primary">Edit</a>
+                            <form action="{{route('admin.roles.destroy', $role->id)}}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-label-danger role-del-btn">Delete</button>
+                            </form>
                         </div>
                     </div>
                 </div>
+            </div>
+            @endforeach
+            <div class="col-xl-4 col-lg-6 col-md-6">
+                <a href="{{route('admin.roles.create')}}" class="btn btn-primary">Add Role</a>
             </div>
         </div>
     </div>
 </div>
 @endsection
+
+@push('styles')
+<link href="{{ asset('backend/assets/vendor/libs/sweetalert2/sweetalert2.css') }}" rel="stylesheet">
+@endpush
+
+@push('scripts')
+<script src="{{ asset('backend/assets/vendor/libs/sweetalert2/sweetalert2.js') }}"></script>
+    
+<script>
+    "use strict";
+
+    $(function() {
+        $(document).on('click', '.role-del-btn', function(e) {
+            e.preventDefault();
+        
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $(this).closest('form').submit();
+                }
+            });
+        });
+    });
+
+</script>
+
+
+
+@endpush

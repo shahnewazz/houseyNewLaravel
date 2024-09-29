@@ -46,33 +46,24 @@ class XSSProtectionMiddleware
         'path' => ['d', 'fill', 'opacity', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin'],
         'nav' => ['class', 'id'],
     ];
-
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
+    
     public function handle(Request $request, Closure $next)
     {
-        // Ensure input values are in UTF-8
+        // Ensure input values are sanitized
         foreach ($request->input() as $key => $value) {
             if (is_string($value)) {
-                // Sanitize the value, ensuring proper UTF-8 encoding
+                // Sanitize the value using the custom sanitize method
                 $sanitizedValue = $this->sanitize($value);
-    
-                // Merge sanitized value back into the request
-                $request->merge([$key => trim(strip_tags($sanitizedValue))]);
+        
+                // Merge sanitized value back into the request without using strip_tags
+                $request->merge([$key => trim($sanitizedValue)]);
             }
         }
-    
-        // dd($request->all());
 
         return $next($request);
     }
-    
-    
+
+
     protected function sanitize($html)
     {
         // Ensure the input is in UTF-8 format
@@ -80,43 +71,44 @@ class XSSProtectionMiddleware
             $html = mb_convert_encoding($html, 'UTF-8', 'auto');
         }
     
-        // Add the UTF-8 declaration to prevent entity conversion
-        $html = '<?xml encoding="utf-8" ?>' . $html;
-    
-        // Initialize DOMDocument with proper error handling
+        // Initialize DOMDocument with UTF-8 encoding and suppress errors for cleaner output
         $dom = new \DOMDocument('1.0', 'UTF-8');
         libxml_use_internal_errors(true);
-        
-        // Load the HTML content while preserving UTF-8 characters
-        $dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    
+        // Wrap content in a div to prevent auto-wrapping by DOMDocument
+        $html = "<div>{$html}</div>";
+        $dom->loadHTML('<?xml encoding="utf-8" ?>' . $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         libxml_clear_errors();
     
-        // Sanitize by removing disallowed tags
+        // Sanitize by removing disallowed tags and attributes
         foreach ($dom->getElementsByTagName('*') as $element) {
             $tagName = $element->nodeName;
     
+            // If the tag is not in allowedTags, remove the element
             if (!array_key_exists($tagName, $this->allowedTags)) {
-                // Remove disallowed elements
                 $element->parentNode->removeChild($element);
                 continue;
             }
     
-            // Check allowed attributes
-            foreach (array_keys(iterator_to_array($element->attributes)) as $attr) {
-                if (!in_array($attr, $this->allowedTags[$tagName]) && !preg_match('/^data-/', $attr)) {
-                    $element->removeAttribute($attr);
+            // Remove dangerous attributes like onmouseover
+            foreach (iterator_to_array($element->attributes) as $attribute) {
+                $attrName = $attribute->nodeName;
+    
+                // If the attribute is not allowed or is an event handler, remove it
+                if (!in_array($attrName, $this->allowedTags[$tagName]) && !preg_match('/^data-/', $attrName)) {
+                    $element->removeAttribute($attrName);
                 }
             }
         }
     
-        // Save HTML without converting non-Latin characters to entities
-        $output = $dom->saveHTML();
-        
-        // Convert the content back to UTF-8 to avoid entity encoding
-        return mb_convert_encoding($output, 'UTF-8', 'HTML-ENTITIES');
+        // Extract content inside the div wrapper (without the div itself)
+        $output = '';
+        foreach ($dom->getElementsByTagName('div')->item(0)->childNodes as $child) {
+            $output .= $dom->saveHTML($child);
+        }
+    
+        // Return sanitized content without entity conversion, ensuring proper UTF-8
+        return trim($output);
     }
-    
-    
-    
-    
+     
 }

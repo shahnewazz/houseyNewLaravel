@@ -8,6 +8,17 @@ use Modules\Core\Models\Language;
 
 class DashboardController extends Controller
 {
+
+    public function getXss()
+    {
+        return view("core::xss-input");
+    }
+    public function xss(Request $request)
+    {
+        $data = $request->name;
+        return view("core::xss", compact('data'));
+    }
+
     /**
      * Display a listing of the resource.
      */

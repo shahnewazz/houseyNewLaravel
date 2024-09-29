@@ -16,8 +16,10 @@ class LanguageMiddleware
     {
 
         if(Session::has('lang')){
-            
             App::setLocale(Session::get('lang'));
+        }else{
+            session()->put('lang', config('app.locale')); 
+            session()->put('lang_dir', config('ltr'));
         }
         return $next($request);
     }

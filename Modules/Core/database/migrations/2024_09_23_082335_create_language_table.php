@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('code')->unique();
             $table->enum('direction', ['ltr', 'rtl'])->default('ltr');
+            $table->string('image')->nullable();
             $table->boolean('status')->default(1);
             $table->boolean('isDefault')->default(0);
             $table->timestamps();

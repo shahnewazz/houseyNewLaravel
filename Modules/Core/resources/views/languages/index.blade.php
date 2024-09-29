@@ -14,7 +14,6 @@
         <table class="table">
             <thead class="table-light">
                 <tr>
-                    <th scope="col">SN</th>
                     <th scope="col">Name</th>
                     <th scope="col">Code</th>
                     <th scope="col">Direction</th>

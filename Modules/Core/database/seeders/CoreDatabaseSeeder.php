@@ -14,11 +14,25 @@ class CoreDatabaseSeeder extends Seeder
     public function run(): void
     {
     
-        User::factory()->count(10)->create();
+        User::create([
+            'first_name' => 'Shahnewaz',
+            'last_name' => 'Sakil',
+            'username' => 'super_admin',
+            'email' => 'admin@gmail.com',
+            'password' =>  bcrypt('password'),
+            'status' => 'active',
+        ]);
 
         $this->call([
             LanguageSeeder::class,
             RolePermissionSeeder::class
         ]);
+
+        User::factory()
+            ->count(30)
+            ->afterCreating(function (User $user) {
+                $user->assignRole('default_user');
+            })
+            ->create();
     }
 }

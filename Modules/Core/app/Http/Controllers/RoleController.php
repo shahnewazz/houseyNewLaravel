@@ -2,41 +2,80 @@
 
 namespace Modules\Core\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
+use App\Http\Controllers\Controller;
+use Spatie\Permission\Models\Permission;
+use Modules\Core\Http\Requests\RoleStoreRequest;
+use Modules\Core\Http\Requests\RoleUpdateRequest;
 
 class RoleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
+    protected function checkRoleByID($id, $type = 'id'){
+
+        if($type == 'id'){
+            if($id == 1){
+                return ['status' => true, 'message'=> 'You can\'t edit Super Admin role'];
+            }elseif($id == 2){
+                return ['status' => true, 'message'=> 'You can\'t edit Default User role'];
+            }elseif($id == 3){
+                return ['status' => true, 'message'=> 'You can\'t edit Default Admin role'];
+            }else{
+                return ['status' => false];
+            }
+        }elseif($type == 'name'){
+            if($id == 'super_admin'){
+                return ['status' => true, 'message'=> 'You can\'t edit Super Admin role'];
+            }elseif($id == 'default_user'){
+                return ['status' => true, 'message'=> 'You can\'t edit Default User role'];
+            }elseif($id == 'default_admin'){
+                return ['status' => true, 'message'=> 'You can\'t edit Default Admin role'];
+            }else{
+                return ['status' => false];
+            }
+        }
+      
+    }
+
+
     public function index()
     {
-        return view('core::pages.roles.roles');
+        // get all roles expect super admin, default user and default admin
+        $roles = Role::whereNotIn('name', ['super_admin', 'default_user', 'default_admin'])->get();
+
+        // get users count for each role
+        foreach ($roles as $role) {
+            $role->users_count = $role->users()->count();
+        }
+        
+        return view('core::pages.roles.roles', compact('roles'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
-        return view('core::create');
+
+        return view('core::pages.roles.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function store(RoleStoreRequest $request)
     {
-        return view('core::show');
+
+        if($this->checkRoleByID($request->name, 'name')['status']){
+            return redirect()->route('admin.roles.index')->with('error',$this->checkRoleByID($request->name, 'name')['message']);
+        }
+
+        $role = Role::create(['name' => $request->name]);
+
+        if(!empty($request->permissions)) {
+            $role->syncPermissions($request->permissions);
+        }
+
+        return redirect()->route('admin.roles.index')->with('success','Role created successfully');
+        
+        
     }
 
     /**
@@ -44,15 +83,39 @@ class RoleController extends Controller
      */
     public function edit($id)
     {
-        return view('core::edit');
+        // if try to edit super admin role then redirect back with error message
+
+        if($this->checkRoleByID($id)['status']){
+            return redirect()->route('admin.roles.index')->with('error',$this->checkRoleByID($id)['message']);
+        }
+
+        $role = Role::findOrFail($id);
+        
+        
+        $permissions = Permission::all();
+        return view('core::pages.roles.edit', compact('role','permissions'));
+
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(RoleUpdateRequest $request, $id)
     {
-        //
+        if($this->checkRoleByID($id)['status']){
+            return redirect()->route('admin.roles.index')->with('error',$this->checkRoleByID($id)['message']);
+        }
+
+        $role = Role::findOrFail($id);        
+        $role->name = $request->name;
+        $role->save();
+
+        if (!empty($request->permissions)) {
+            $role->syncPermissions($request->permissions);
+        }
+
+        return redirect()->route('admin.roles.index')->with('success','Role updated successfully');
+
     }
 
     /**
@@ -60,6 +123,18 @@ class RoleController extends Controller
      */
     public function destroy($id)
     {
-        //
+
+        if($this->checkRoleByID($id)['status']){
+            return redirect()->route('admin.roles.index')->with('error',$this->checkRoleByID($id)['message']);
+        }
+        
+
+        $role = Role::findOrFail($id);
+        $role->permissions()->detach();
+
+        $role->delete();
+
+        return redirect()->route('admin.roles.index')->with('success','Role deleted successfully');
+        
     }
 }

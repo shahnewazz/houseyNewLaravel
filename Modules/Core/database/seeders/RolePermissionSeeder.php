@@ -15,23 +15,15 @@ class RolePermissionSeeder extends Seeder
     public function run(): void
     {
 
-        $super_admin = User::create([
-            'first_name' => 'Shahnewaz',
-            'last_name' => 'Sakil',
-            'username' => 'admin',
-            'email' => 'admin@gmail.com',
-            'password' =>  bcrypt('password'),
-            'status' => 'active',
-        ]);
+        $super_admin = User::findOrFail(1);
 
         $permissions = [
 
             // Users
-            'users-list',
+            'users-show',
             'users-create',
             'users-edit',
             'users-delete',
-            'users-show',
         ];
 
         foreach ($permissions as $permission) {
@@ -39,16 +31,20 @@ class RolePermissionSeeder extends Seeder
         }
 
         $roles = [
+            'super_admin',
             'default_user',
-            'admin',
-            'super_admin'
+            'default_admin',
         ];
 
         foreach ($roles as $role){
             Role::create(['name' => $role]);
         }
+        
+        $super_admin_role = Role::findByName('super_admin');
 
-        $super_admin->assignRole(['admin', 'super_admin', 'default_user']);
+        $super_admin_role->syncPermissions($permissions);
+
+        $super_admin->assignRole(['super_admin']);
            
     }
 }

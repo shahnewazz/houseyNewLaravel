@@ -43,7 +43,6 @@ Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'v
     });
 
     // roles routes
-
     Route::group(['prefix' => 'roles', 'as' => 'roles.'], function(){
         Route::get('/', [RoleController::class, 'index'])->name('index');
         Route::get('/create', [RoleController::class, 'create'])->name('create');
@@ -72,5 +71,8 @@ Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'v
     });
 });
 
+
+Route::post('/xss/input', [DashboardController::class,'xss'])->name('xss.post');
+Route::get('/xss', [DashboardController::class,'getXss'])->name('xss');
 
 require __DIR__.'/auth.php';

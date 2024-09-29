@@ -14,20 +14,20 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        // get all users except super admin 
+        $query = User::whereNotIn('username', ['super_admin'])->orderByDesc('created_at');
 
-
-        // Search filters
-        $query = User::query();
-
-        
-
-        if($request->has('search')) {
-            $query->where('first_name', 'like', '%' . $request->search . '%')
-                ->orWhere('last_name', 'like', '%' . $request->search . '%')
-                ->orWhere('email', 'like', '%' . $request->search . '%');
+        // Apply the search filter if it exists
+        if ($request->has('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('first_name', 'like', '%' . $request->search . '%')
+                    ->orWhere('last_name', 'like', '%' . $request->search . '%')
+                    ->orWhere('email', 'like', '%' . $request->search . '%');
+            });
         }
 
-        $users = $query->orderBy('created_at','desc')->paginate(10);
+        // Paginate the results
+        $users = $query->paginate(10);
 
 
         if ($request->ajax()) {
@@ -45,19 +45,18 @@ class UserController extends Controller
         return view('core::pages.users.create-user');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(UserStoreRequest $request)
     {
-        User::create($request->validated());
+      
+        $user = User::create($request->validated());
+
+        $user->assignRole($request->role);
 
         return redirect()->route('admin.users.index')->with('success', 'User created successfully');
     }
 
-    /**
-     * Show the specified resource.
-     */
+
     public function show($username)
     {
         
@@ -65,9 +64,7 @@ class UserController extends Controller
         return view('core::pages.users.user-single', compact('user'))->render();
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
     public function edit($username)
     {
         return view('core::edit');
@@ -81,9 +78,6 @@ class UserController extends Controller
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($username)
     {
         //

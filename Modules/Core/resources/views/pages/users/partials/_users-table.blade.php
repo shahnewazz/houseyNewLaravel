@@ -1,5 +1,8 @@
 
 @isset($users)
+@php
+    $init_classes = ['danger', 'success', 'warning', 'info', 'primary'];
+@endphp
 @forelse ($users as $user)
     @php
         $user_profile_picture = $user->profile_picture != null ? asset('storage/'.$user->profile_picture) : $user->getInitialsAttribute();
@@ -7,20 +10,18 @@
 
     <tr>
         <td>
-            <div class="d-flex align-items-center">
-                <div class="avatar avatar-md me-2">
+            <div class="d-flex align-items-center">               
 
-                    @isset($user->profile_picture)
-                        <div class="avatar avatar-status-online rounded-pill">
-                            <img src="{{$user_profile_picture}}" class="rounded-circle" alt="{{$user->full_name}}">
-                        </div>
-                    @else
-                    <div class="avatar rounded-pill">
-                        <div class="avatar-text fs-3 bg-label-success">{{$user_profile_picture}}</div>
-                    </div>
-                    @endisset
-                    
+                @isset($user->profile_picture)
+                <div class="avatar avatar-md me-2">
+                    <img src="{{$user_profile_picture}}" class="rounded-circle" alt="{{$user->full_name}}">
                 </div>
+                @else
+                <div class="avatar avatar-md rounded-pill me-2">
+                    <div class="avatar-text bg-label-{{$init_classes[array_rand($init_classes)]}}">{{$user_profile_picture}}</div>
+                </div>
+                @endisset
+                
                 <span class="text-decoration-none text-black">{{ $user->full_name }}</span>
             </div>
         </td>
@@ -28,10 +29,12 @@
             {{ $user->email }}
         </td>
         <td>
-            @foreach ($user->roles as $role)
-                {{ucwords(Str::replaceFirst('_', ' ', $role->name))}}
-                <br />
-            @endforeach
+            <div class="">
+                @foreach ($user->roles as $role)
+                    <span class="text-dark mb-2 me-2">{{ucwords(Str::replaceFirst('_', ' ', $role->name))}}</span>
+                    <br />
+                @endforeach
+            </div>
         </td>
         <td>
             {{ $user->created_at->format('F j, Y') }}
@@ -79,7 +82,9 @@
     @empty
     <tr>
         <td colspan="6">
-            {{__('users.user_not_found')}}
+            <div class="alert alert-danger">
+                {{__('users.user_not_found')}}
+            </div>
         </td>
     </tr>
     @endforelse

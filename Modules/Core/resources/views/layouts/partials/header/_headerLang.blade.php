@@ -10,7 +10,15 @@
 
             <li>
                 <a class="dropdown-item lang-btn @if (session('lang') == $language->code) active @endif  " data-lang="{{$language->code}}" href="javascript:void(0);">
-                   {{$language->name}}
+
+                    <div class="d-flex align-items-center gap-3">
+                        @isset($language->image)
+                        <div class="avatar avatar-xs rounded-pill">
+                            <img src="{{ asset('storage/'.$language->image) }}" alt="{{$language->name}}">
+                        </div>
+                        @endisset
+                       {{$language->name}}
+                    </div>
                 </a>
             </li>
         @endforeach

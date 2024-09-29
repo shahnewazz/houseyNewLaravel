@@ -35,11 +35,28 @@ class LanguageController extends Controller
     public function store(LanguageRequest $request)
     {
 
-        $language = new Language(); 
-        $language->name = $request->name;
-        $language->code = $request->code;
-        $language->direction = $request->direction;
-        $language->save();
+        if($request->code == 'en'){
+            return redirect()->route('admin.languages.index')->with('error', 'English language already exists');
+        }
+
+        $language = Language::create($request->validated());
+
+        // store the language image if exists
+        if($request->hasFile('lang_img')){
+            $request->validate([
+                'lang_img' => 'image|mimes:png,jpg,jpeg|max:512'
+            ]);
+
+            $image = $request->file('lang_img');
+            $imageName = $request->code.'.'.$image->getClientOriginalExtension();
+            
+            $imagePath = $image->storeAs('languages', $imageName, 'public');
+
+            $language->image = $imagePath;
+            $language->save();
+        }
+
+        
 
         $default_lang = Language::where('isDefault', 1)->first();
         $source = resource_path('lang/'.$default_lang->code);
@@ -60,35 +77,34 @@ class LanguageController extends Controller
 
     public function update(LanguageRequest $request, $id)
     {
+
         $language = Language::findOrFail($id);
-        $oldCode = $language->code;
 
-        if($oldCode != $request->code){
-            $source = resource_path('lang/'.$oldCode);
-            $destination = resource_path('lang/'.$request->code);
+        // if($oldCode != $request->code){
+        //     $source = resource_path('lang/'.$oldCode);
+        //     $destination = resource_path('lang/'.$request->code);
 
-            if(!File::exists($destination)){
-                File::makeDirectory($destination);
-            }
+        //     if(!File::exists($destination)){
+        //         File::makeDirectory($destination);
+        //     }
 
-            $files = File::allFiles($source);
-            foreach($files as $file){
-                File::copy($file, $destination.'/'.basename($file));
-            }
+        //     $files = File::allFiles($source);
+        //     foreach($files as $file){
+        //         File::copy($file, $destination.'/'.basename($file));
+        //     }
 
-            File::deleteDirectory($source);
+        //     File::deleteDirectory($source);
 
-            // update the defalt language in env file
-            $envFile = app()->environmentFilePath();
-            $env = file_get_contents($envFile);
-            $env = preg_replace('/APP_LOCALE=(.*)/', 'APP_LOCALE='.$request->code, $env);
-            file_put_contents($envFile, $env);
+        //     // update the defalt language in env file
+        //     $envFile = app()->environmentFilePath();
+        //     $env = file_get_contents($envFile);
+        //     $env = preg_replace('/APP_LOCALE=(.*)/', 'APP_LOCALE='.$request->code, $env);
+        //     file_put_contents($envFile, $env);
 
+        // }
 
-        }
 
         $language->name = $request->name;
-        $language->code = $request->code;
         $language->direction = $request->direction;
         $language->save();
 
@@ -213,7 +229,7 @@ class LanguageController extends Controller
             'lang' => 'required|string',
             'file' => 'required|string'
         ]);
-
+        
 
         $filePath = resource_path("lang/{$request->lang}/{$request->file}.php");
 

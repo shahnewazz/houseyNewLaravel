@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="{{asset('backend/assets/vendor/css/core.css')}}">
     <link rel="stylesheet" href="{{asset('backend/assets/vendor/css/perfect-scrollbar.css')}}">
     <link rel="stylesheet" href="{{asset('backend/assets/css/conca.css')}}">
+    <link rel="stylesheet" href="{{asset('backend/assets/css/elegant-icon.css')}}">
 
     <link rel="stylesheet" href="{{asset('backend/assets/vendor/libs/toastr/toastr.css')}}">
 

@@ -27,7 +27,10 @@
             {{ $user->email }}
         </li>
         <li>
-            {{ $user->roles}}
+            @foreach ($user->roles as $role)
+                <span class="badge badge-label-success">{{ucwords(Str::replaceFirst('_', ' ', $role->name))}}</span>
+                <br />
+            @endforeach
         </li>
         <li>
             {{ $user->created_at->format('F j, Y') }}

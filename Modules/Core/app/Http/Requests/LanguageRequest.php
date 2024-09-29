@@ -8,18 +8,6 @@ use Modules\Core\Models\Language;
 
 class LanguageRequest extends FormRequest
 {
-    /**
-     * Prepare the data for validation.
-     *
-     * This will sanitize the username before validation.
-     */
-    protected function prepareForValidation()
-    {
-        // Sanitize the username using the helper function before validation
-        $this->merge([
-            'code' => sanitize_username($this->username),
-        ]);
-    }
 
     /**
      * Determine if the user is authorized to make this request.
@@ -37,8 +25,26 @@ class LanguageRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:4', Rule::unique(Language::class)->ignore($this->route('id'))],
-            'direction' => ['required'],
+            'code' => ['required', 'string', 'max:4', 'unique:language,code'],
+            'lang_img' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:512'],
+            'direction' => ['required', 'in:ltr,rtl'],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'direction.in' => 'The direction must be either Left-to-Right (LTR) or Right-to-Left (RTL).',
+        ];
+    }
+
+    public function attributes()
+    {
+        return [
+            'name' => 'Language Name',
+            'code' => 'Language Code',
+            'lang_img' => 'Language Image',
+            'direction' => 'Direction',
         ];
     }
 

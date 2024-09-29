@@ -1,7 +1,15 @@
 @forelse ($languages as $lang)
     <tr>
-        <td>{{$lang->id}}</td>
-        <td>{{$lang->name}}</td>
+        <td>
+            <div class="d-flex align-items-center gap-3">
+                @isset($lang->image)
+                    <div class="avatar avatar-sm rounded-xl">
+                        <img src="{{ asset('storage/'.$lang->image) }}" alt="{{$lang->name}}">
+                    </div>
+                @endisset
+                {{$lang->name}}
+            </div>
+        </td>
         <td>{{$lang->code}}</td>
         <td>
             
