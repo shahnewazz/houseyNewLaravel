@@ -58,7 +58,6 @@
                 </div>
                 @php
                     $roles = \Spatie\Permission\Models\Role::whereNotIn('name', ['super_admin'])->get();
-                    
                 @endphp
                 <div class="col-md-6">
                     <x-core::form.input-label for="role" :value="'Role'" />
@@ -68,6 +67,14 @@
                         @endforeach
                     </select>
                     <x-core::form.input-error field="role" />
+                </div>
+                <div class="col-md-6">
+                    <x-core::form.input-label for="user_type" :value="'User Type'" />
+                    <select class="form-select user-type-select" name="user_type" aria-label="user_type">
+                        <option value="normal" selected>Normal</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <x-core::form.input-error field="user_type" />
                 </div>
                 <div class="col-md-6">
                     <x-core::form.input-label for="status" :value="'Status'" />
@@ -98,8 +105,8 @@
                     <x-core::form.input-error field="state" />
                 </div>
                 <div class="col-md-6">
-                    <x-core::form.input-label for="zipCode" :value="'Zip Code'" />
-                    <x-core::form.input type="text" id="zipCode" name="zipCode" value="{{ old('zipCode') }}" />
+                    <x-core::form.input-label for="zip_code" :value="'Zip Code'" />
+                    <x-core::form.input type="text" id="zip_code" name="zip_code" value="{{ old('zip_code') }}" />
                     <x-core::form.input-error field="zipCode" />
                 </div>
                 <div class="col-md-6">
@@ -117,7 +124,7 @@
             <div class="row mb-6">
                 <div class="col-md-6">
                     <x-core::form.input-label for="password" :value="'Password'" />
-                    <x-core::form.input type="text" id="password" name="password" />
+                    <x-core::form.input type="password" id="password" name="password" />
                     <x-core::form.input-error field="password" />
                 </div>
             </div>
@@ -139,15 +146,11 @@
 
 @endsection
 
-@push('styles')
-<link href="{{asset('backend/assets/vendor/libs/select2/select2.css')}}" rel="stylesheet">
-@endpush
-
 
 @push('scripts')
-<script src="{{asset('backend/assets/vendor/libs/select2/select2.js')}}"></script>
+
 <script>
-    
+    'use strict';
 
     $(document).ready(function() {
 
@@ -190,5 +193,4 @@
 
     
 </script>  
-
 @endpush

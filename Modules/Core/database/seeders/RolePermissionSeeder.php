@@ -28,19 +28,10 @@ class RolePermissionSeeder extends Seeder
 
         foreach ($permissions as $permission) {
             Permission::create(['name' => $permission]);
-        }
-
-        $roles = [
-            'super_admin',
-            'default_user',
-            'default_admin',
-        ];
-
-        foreach ($roles as $role){
-            Role::create(['name' => $role]);
-        }
+        }       
         
-        $super_admin_role = Role::findByName('super_admin');
+
+        $super_admin_role = Role::create(['name' => 'super_admin']);
 
         $super_admin_role->syncPermissions($permissions);
 

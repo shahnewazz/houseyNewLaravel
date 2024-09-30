@@ -19,7 +19,7 @@ class LanguageMiddleware
             App::setLocale(Session::get('lang'));
         }else{
             session()->put('lang', config('app.locale')); 
-            session()->put('lang_dir', config('ltr'));
+            session()->put('lang_dir', 'ltr');
         }
         return $next($request);
     }

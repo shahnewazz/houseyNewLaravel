@@ -38,7 +38,9 @@
 </div>
 @endsection
 
+
 @push('scripts')
+
 <script>
     $(document).ready(function () {
         // Handle edit button click
@@ -73,13 +75,24 @@
                         $('input.value-edit[data-key="' + key + '"]').hide();
                         $('.save-btn[data-key="' + key + '"]').hide();
                         $('.edit-btn[data-key="' + key + '"]').show();
-                        alert('Translation updated successfully.');
+                        
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'Translation updated successfully.'
+                        });
+
                     } else {
                         alert('Failed to update translation.');
                     }
                 },
                 error: function (xhr, status, error) {
-                    alert('An error occurred: ' + error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to update translation.'
+                    });
                 }
             });
         });

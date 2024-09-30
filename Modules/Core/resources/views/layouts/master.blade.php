@@ -24,6 +24,8 @@
     <link rel="stylesheet" href="{{asset('backend/assets/css/elegant-icon.css')}}">
 
     <link rel="stylesheet" href="{{asset('backend/assets/vendor/libs/toastr/toastr.css')}}">
+    <link href="{{asset('backend/assets/vendor/libs/sweetalert2/sweetalert2.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{asset('backend/assets/vendor/libs/select2/select2.css')}}" rel="stylesheet">
 
     @stack('styles')
 </head>
@@ -70,6 +72,8 @@
 
 
     <script src="{{asset('backend/assets/vendor/libs/toastr/toastr.js')}}"></script>
+    <script src="{{asset('backend/assets/vendor/libs/sweetalert2/sweetalert2.js')}}"></script>
+    <script src="{{asset('backend/assets/vendor/libs/select2/select2.js')}}"></script>
 
     <script>
         'use strict';

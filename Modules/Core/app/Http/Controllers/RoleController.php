@@ -108,11 +108,14 @@ class RoleController extends Controller
 
         $role = Role::findOrFail($id);        
         $role->name = $request->name;
-        $role->save();
-
         if (!empty($request->permissions)) {
             $role->syncPermissions($request->permissions);
+        }else{
+            $role->permissions()->detach();
         }
+        $role->save();
+
+        
 
         return redirect()->route('admin.roles.index')->with('success','Role updated successfully');
 

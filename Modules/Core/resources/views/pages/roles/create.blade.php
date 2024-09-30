@@ -4,8 +4,6 @@
 
 @section('content')
 
-
-
 <div class="card shadow rounded-md">
     <div class="card-body">
         <div class="row g-6">
@@ -46,8 +44,6 @@
                                             });
                                         @endphp
 
-                                      
-
                                         @foreach ($groupedPermissions as $group => $permissions)
                                         <tr>
                                             <td class="text-nowrap fw-medium text-heading">{{ ucfirst($group) }} Permissions</td>
@@ -81,3 +77,21 @@
     </div>
 </div>
 @endsection
+
+
+@push('scripts')
+
+<script>
+    "use strict";
+
+    // Select All Permissions
+    $('#selectAll').on('change', function() {
+        if($(this).is(':checked')) {
+            $('input[type="checkbox"]').prop('checked', true);
+        } else {
+            $('input[type="checkbox"]').prop('checked', false);
+        }
+    });
+</script>
+    
+@endpush

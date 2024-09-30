@@ -70,10 +70,19 @@
                     @error('username')<div class="form-text text-danger">{{ $message }}</div>  @enderror
                 </div>
                 <div class="col-md-6">
+                    <label for="role" class="form-label">Role</label>
+                    <select class="form-select user-profile-role" name="role" aria-label="Select Status" multiple disabled>
+                        @foreach ($user->roles as $role)
+                            <option value="{{ $role->id }}" selected>{{ucwords(Str::replaceFirst('_', ' ', $role->name))}}</option>
+                        @endforeach
+                    </select>
+                    @error('role')<div class="form-text text-danger">{{ $message }}</div>  @enderror
+                </div>
+                <div class="col-md-6">
                     <label for="status" class="form-label">Status</label>
                     <select class="form-select" name="status" aria-label="Select Status">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                        <option value="active" @if ($user->status == 'active') selected @endif>Active</option>
+                        <option value="inactive" @if ($user->status == 'inactive') selected @endif>Inactive</option>
                     </select>
                     @error('status')<div class="form-text text-danger">{{ $message }}</div>  @enderror
                 </div>
@@ -98,8 +107,8 @@
                     @error('state')<div class="form-text text-danger">{{ $message }}</div>  @enderror
                 </div>
                 <div class="col-md-6">
-                    <label for="zipCode" class="form-label">Zip Code</label>
-                    <input type="text" class="form-control" id="zipCode" name="zipCode" maxlength="6" value="{{ old('zipCode', $user->zipCode ) }}">
+                    <label for="zip_code" class="form-label">Zip Code</label>
+                    <input type="text" class="form-control" id="zip_code" name="zip_code" maxlength="6" value="{{ old('zip_code', $user->zip_code ) }}">
                     @error('zipCode')<div class="form-text text-danger">{{ $message }}</div>  @enderror
                 </div>
                 <div class="col-md-6">
@@ -156,9 +165,11 @@
 
     $(document).ready(function() {
 
-        $('#profile_form').on('submit', function(){
-            $('[name=username]').removeAttr('disabled');
-        })
+        $('.user-profile-role').wrap('<div class="position-relative"></div>').select2({
+            placeholder: 'Select Role',
+            allowClear: false,
+            dropdownParent: $('.user-profile-role').parent()
+        });
 
         // Profile Picture Upload
         $('.profile-picture-upload').on('change', function() {

@@ -21,6 +21,7 @@ class CoreDatabaseSeeder extends Seeder
             'email' => 'admin@gmail.com',
             'password' =>  bcrypt('password'),
             'status' => 'active',
+            'user_type' => 'admin',
         ]);
 
         $this->call([
@@ -28,11 +29,6 @@ class CoreDatabaseSeeder extends Seeder
             RolePermissionSeeder::class
         ]);
 
-        User::factory()
-            ->count(30)
-            ->afterCreating(function (User $user) {
-                $user->assignRole('default_user');
-            })
-            ->create();
+        User::factory()->count(30)->create();
     }
 }

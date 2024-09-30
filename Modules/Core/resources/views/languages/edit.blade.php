@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        <form action="{{ route('admin.languages.update', ['id' => $language->id]) }}" method="POST">
+        <form action="{{ route('admin.languages.update', ['id' => $language->id]) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             {{-- <div class="row g-6">
@@ -85,18 +85,28 @@
                 </div>
 
                 <div class="lang-avatar mb-3">
-                    <label for="lang_img" class="form-label"><span class="d-none d-sm-block">Upload Photo</span></label>
-                    @isset($language->image)
+                    <div class="row">
+                        <div class="col-sm-2">
+                            @isset($language->image)
 
-                        @php
-                            $image = asset('storage/'.$language->image);
-                        @endphp
-
-                        <div class="avatar avatar-lg rounded mb-3">
-                            <img class="lang-avatar" src="{{ $image }}" alt="{{$language->name}}">
+                            @php
+                                $image = asset('storage/'.$language->image);
+                            @endphp
+    
+                            <div class="avatar avatar-lg rounded mb-3">
+                                <img class="lang-avatar" src="{{ $image }}" alt="{{$language->name}}">
+                            </div>
+                        @endisset
                         </div>
-                    @endisset
-                    <input class="form-control" type="file" id="lang_img" name="lang_img">
+                        <div class="col-sm-4">
+                            <label for="lang_img" class="btn btn-primary me-3 mb-3" tabindex="0">
+                                <span class="d-none d-sm-block">Upload New Flag</span>
+                                <i class="bx bx-upload d-block d-sm-none"></i>
+                                <input type="file" id="lang_img" name="lang_img" id="lang_img" hidden>
+                            </label>
+                            <button class="btn btn-outline-secondary lang-reset-btn d-none">Reset</button>
+                        </div>
+                    </div>
                     <x-core::form.input-error field="lang_img" />
                 </div>
                 
@@ -130,8 +140,6 @@
 
        $('#lang_img').on('change', function(){
 
-            console.log('change');
-           // view image before upload
             var input = this;
             var url = $(this).val();
             var ext = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
@@ -142,13 +150,19 @@
                 }
                 reader.readAsDataURL(input.files[0]);
 
-                // $('.profile-picture-reset').removeClass('d-none');
+                $('.lang-reset-btn').removeClass('d-none');
             } else {
                 $('.lang-avatar').attr('src', '{{ $image }}');
                 alert('Please select a valid image file');
                 
             }
        })
+
+        $('.lang-reset-btn').on('click', function(){
+            $('#lang_img').val('');
+            $('.lang-avatar').attr('src', '{{ $image }}');
+            $(this).addClass('d-none');
+        })
     });
 </script>
 

@@ -1,7 +1,7 @@
 <?php
 
 return array (
-  'welcome' => 'স্বাগতম',
+  'welcome' => 'Welcome',
   'profile' => 'User Profile',
   'edit' => 'Edit My Profile',
 );

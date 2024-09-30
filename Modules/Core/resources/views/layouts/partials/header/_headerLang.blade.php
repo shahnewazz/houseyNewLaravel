@@ -6,7 +6,7 @@
         </svg>            
     </a>
     <ul class="dropdown-menu dropdown-menu-end">
-        @foreach ($languages as $language)
+        @foreach (\Modules\Core\Models\Language::where('status', 1)->get() as $language)
 
             <li>
                 <a class="dropdown-item lang-btn @if (session('lang') == $language->code) active @endif  " data-lang="{{$language->code}}" href="javascript:void(0);">

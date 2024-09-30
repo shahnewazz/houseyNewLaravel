@@ -32,10 +32,6 @@ class CoreServiceProvider extends ServiceProvider
         // add all the middleware
         $this->app->make('router')->aliasMiddleware('language', LanguageMiddleware::class);
 
-        View::composer('core::layouts.partials.header._headerLang', function ($view) {
-            $view->with('languages', Language::where('status', 1)->get());
-        });
-
     }
 
     /**

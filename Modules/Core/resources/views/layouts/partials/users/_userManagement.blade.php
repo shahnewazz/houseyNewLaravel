@@ -21,16 +21,21 @@
     </a>
 
     <ul class="app-sidebar-submenu">
+        @can('users-show')
         <li class="app-sidebar-menu-item">
             <a href="{{route('admin.users.index')}}" class="menu-link d-flex align-items-center {{(request()->routeIs('admin.users.index')) ? 'active' : ''}}">
                 <span class="menu-title flex-grow-1">{{__('sidebar.users_list')}}</span>
             </a>
         </li>
+        @endcan
+        
+        @can('users-create')
         <li class="app-sidebar-menu-item">
             <a href="{{route('admin.users.create')}}" class="menu-link d-flex align-items-center {{(request()->routeIs('admin.users.create')) ? 'active' : ''}}">
                 <span class="menu-title flex-grow-1">{{__('sidebar.users_create')}}</span>
             </a>
         </li>
+        @endcan
     </ul>
 </li>
 <li class="app-sidebar-menu-item">

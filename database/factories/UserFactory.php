@@ -26,6 +26,7 @@ class UserFactory extends Factory
             'last_name' => $this->faker->lastName,
             'username' =>  sanitize_username($this->faker->unique()->userName),
             'email' => $this->faker->unique()->safeEmail,
+            'user_type' => $this->faker->randomElement(['normal', 'admin']),
             'status' => $this->faker->randomElement(['active', 'inactive']),
             'email_verified_at' => now(),
             'password' => bcrypt('password'), // password hashing

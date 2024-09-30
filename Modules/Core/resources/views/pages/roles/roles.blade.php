@@ -45,13 +45,9 @@
 </div>
 @endsection
 
-@push('styles')
-<link href="{{ asset('backend/assets/vendor/libs/sweetalert2/sweetalert2.css') }}" rel="stylesheet">
-@endpush
 
 @push('scripts')
-<script src="{{ asset('backend/assets/vendor/libs/sweetalert2/sweetalert2.js') }}"></script>
-    
+  
 <script>
     "use strict";
 

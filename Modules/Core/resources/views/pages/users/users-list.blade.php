@@ -10,6 +10,16 @@
                 </div>
                 <div class="col-xl-7">
                     <div class="d-flex gap-6">
+
+                        <div class="user-filter-by-role">
+                            <select class="form-select user-filter-role" name="role">
+                                <option value="" selected>Select Role</option>
+                                @foreach(\Spatie\Permission\Models\Role::whereNotIn('name', ['super_admin'])->get() as $role)
+                                    <option value="{{$role->name}}">{{$role->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <div class="form-control-icon flex-grow-1 flex-shrink-1 flex-basis-0">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M7.22221 13.4444C10.6586 13.4444 13.4444 10.6586 13.4444 7.22221C13.4444 3.78578 10.6586 1 7.22221 1C3.78578 1 1 3.78578 1 7.22221C1 10.6586 3.78578 13.4444 7.22221 13.4444Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -17,9 +27,11 @@
                             </svg>
                             <input type="text" class="" id="user_search" placeholder="Enter Keywords...">
                         </div>
+                        @can('users-create')
                         <a href="{{ route('admin.users.create') }}" class="btn btn-primary  flex-basis-1">
                             {{__('users.add_user')}}
                         </a>
+                        @endcan
                     </div>
                 </div>
             </div>
@@ -63,14 +75,33 @@
 <script>
      "use strict";
 
-    // User Search
-    $('#user_search').on('keyup', function() {
-        var search = $(this).val();
+    $('.user-filter-role').on('change', function() {
+        var role = $(this).val();
+        var search = $('#user_search').val();
+
         $.ajax({
             url: "{{ route('admin.users.index') }}",
             type: 'GET',
             data: {
+                role: role,
                 search: search
+            },
+            success: function(response) {
+                $('#users_list_table').html(response);
+            }
+        });
+    });
+
+    // User Search
+    $('#user_search').on('keyup', function() {
+        var search = $(this).val();
+        var role = $('.user-filter-role').val();
+        $.ajax({
+            url: "{{ route('admin.users.index') }}",
+            type: 'GET',
+            data: {
+                search: search,
+                role: role
             },
             success: function(response) {
                 $('#users_list_table').html(response);
@@ -119,11 +150,37 @@
                 $('.app-backdrop').removeClass('show');
                 $('#userEdit').modal('show');
             },
-            error: function(response) {
-                console.log(response);
+            error: function(xhr, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong!',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }
+                });
             }
         });
     });
+
+    $(document).on('click', '.user-delete-btn', function(e){
+        e.preventDefault();
+
+        var username = $(this).data('username');
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $(this).closest('form').submit();
+            }
+        });
+    })
 
 </script>
 @endpush

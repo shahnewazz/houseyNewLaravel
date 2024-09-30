@@ -49,8 +49,20 @@
                     </div>
 
                     <div class="lang-avatar mb-3">
-                        <label for="lang_img" class="form-label"><span class="d-none d-sm-block">Upload Photo</span></label>
-                        <input class="form-control" type="file" id="lang_img" name="lang_img">
+                        <div class="">
+                            <label for="lang_img" class="btn btn-primary me-3 mb-3" tabindex="0">
+                                <span class="d-none d-sm-block">Upload Flag</span>
+                                <i class="bx bx-upload d-block d-sm-none"></i>
+                                <input type="file" id="lang_img" name="lang_img" id="lang_img" hidden>
+                            </label>
+                            
+                            <button class="btn btn-outline-secondary lang-flag-img-reset mb-3 d-none">
+                                <i class="bx bx-reset d-block d-sm-none"></i>
+                                <span class="d-none d-sm-block">Reset</span>
+                            </button>
+                        </div>
+                        <img class="lang-flag-img visually-hidden" src="" alt="" width="80px">
+                        <div class="form-text">Allowed JPG or PNG. Max size of 512KB</div>
                         <x-core::form.input-error field="lang_img" />
                     </div>
                     
@@ -65,12 +77,9 @@
 </div>
 @endsection
 
-@push('styles')
-<link href="{{asset('backend/assets/vendor/libs/select2/select2.css')}}" rel="stylesheet" />
-@endpush
 
 @push('scripts')
-<script src="{{asset('backend/assets/vendor/libs/select2/select2.js')}}"></script>
+
 <script>
     $(document).ready(function() {
         $('.lang-select').wrap('<div class="position-relative"></div>').select2({
@@ -78,9 +87,30 @@
             dropdownParent: $('.lang-select').parent()
         });
 
-       $('.lang_img').on('change', function(){
-           
+       $('#lang_img').on('change', function(){
+            var input = this;
+            var url = $(this).val();
+            var ext = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
+            if (input.files && input.files[0] && (ext == "png" || ext == "jpeg" || ext == "jpg")) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('.lang-flag-img').attr('src', e.target.result).removeClass('visually-hidden');;
+                }
+                reader.readAsDataURL(input.files[0]);
+
+                $('.lang-flag-img-reset').removeClass('d-none');
+            } else {
+                alert('Please select a valid image file');
+                
+            }
        })
+
+         $('.lang-flag-img-reset').on('click', function(e) {
+            e.preventDefault();
+            $('#lang_img').val('');
+            $('.lang-flag-img').addClass('visually-hidden');
+            $(this).addClass('d-none');
+         })
     });
 </script>
     

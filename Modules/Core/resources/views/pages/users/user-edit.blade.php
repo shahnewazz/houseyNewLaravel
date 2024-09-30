@@ -1,13 +1,16 @@
 @extends('core::layouts.master')
 
 @section('content')
+
+    @isset($user)
     <div class="card">
         <div class="card-body">
 
-            <form id="profile_form" action="{{ route('admin.users.store') }}" method="POST" enctype="multipart/form-data">
+            <form id="profile_form" action="{{ route('admin.users.update', ['username' => $user->username]) }}" method="POST" enctype="multipart/form-data">
                 @csrf
+                @method('PUT')
                 @php
-                    $user_profile_picture = "IMG";
+                    $user_profile_picture = $user->profile_picture ? asset('storage/'.$user->profile_picture) : $user->initials
                 @endphp
                 <div class="card-body">
                     <div class="d-flex align-items-start align-items-sm-center gap-6 pb-4 border-bottom">
@@ -39,73 +42,81 @@
                 <div class="card-body pt-4">
                     <div class="row g-6">
                         <div class="col-md-6">
-                            <x-core::form.input-label :value="__('First Name')" />
-                            <x-core::form.input type="text" id="first_name" name="first_name" value="{{ old('first_name') }}" />
+                            <x-core::form.input-label :value="'First Name'" />
+                            <x-core::form.input type="text" id="first_name" name="first_name" value="{{ old('first_name', $user->first_name) }}" />
                             <x-core::form.input-error field="first_name" />
                         </div>
                         <div class="col-md-6">
-                            <x-core::form.input-label for="last_name" :value="__('Last Name')" />
-                            <x-core::form.input type="text" id="last_name" name="last_name" value="{{ old('last_name') }}" />
+                            <x-core::form.input-label for="last_name" :value="'Last Name'" />
+                            <x-core::form.input type="text" id="last_name" name="last_name" value="{{ old('last_name', $user->last_name) }}" />
                             <x-core::form.input-error field="last_name" />
                         </div>
                         <div class="col-md-6">
-                            <x-core::form.input-label for="email" :value="__('E-mail')" />
-                            <x-core::form.input type="email" id="email" name="email" value="{{ old('email') }}" />
+                            <x-core::form.input-label for="email" :value="'E-mail'" />
+                            <x-core::form.input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" />
                             <x-core::form.input-error field="email" />
                         </div>
                         <div class="col-md-6">
-                            <x-core::form.input-label for="username" :value="__('Username')" />
-                            <x-core::form.input type="text" id="username" name="username" value="{{ old('username') }}" />
+                            <x-core::form.input-label for="username" :value="'Username'" />
+                            <x-core::form.input type="text" id="username" name="username" value="{{ old('username', $user->username) }}" />
                             <x-core::form.input-error field="username" />
                         </div>
                         @php
-                            $roles = \Spatie\Permission\Models\Role::all();
+                            $roles = \Spatie\Permission\Models\Role::whereNotIn('name', ['super_admin'])->get();
                         @endphp
                         <div class="col-md-6">
-                            <x-core::form.input-label for="role" :value="__('Role')" />
-                            <select class="form-select" name="role" aria-label="Role">
+                            <x-core::form.input-label for="role" :value="'Role'" />
+                            <select class="form-select user-role-select" name="role" aria-label="Role" multiple>
                                 @foreach ($roles as $role)
-                                <option value="{{$role->id}}">{{ucwords(Str::replaceFirst('_', ' ', $role->name))}}</option>
+                                <option value="{{$role->name}}" @if ($user->hasRole($role->name)) selected @endif>{{ucwords(Str::replaceFirst('_', ' ', $role->name))}}</option>
                                 @endforeach
                             </select>
                             <x-core::form.input-error field="role" />
                         </div>
                         <div class="col-md-6">
-                            <x-core::form.input-label for="status" :value="__('Status')" />
-                            <select class="form-select" name="status" aria-label="Status">
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
+                            <x-core::form.input-label for="user_type" :value="'User Type'" />
+                            <select class="form-select" name="user_type" aria-label="user_type">
+                                <option value="normal" @if ($user->status == 'normal') selected @endif>Normal</option>
+                                <option value="admin" @if ($user->status == 'admin') selected @endif>Admin</option>
                             </select>
                             <x-core::form.input-error field="status" />
                         </div>
                         <div class="col-md-6">
-                            <x-core::form.input-label for="phone" :value="__('Phone Number')" />
-                            <x-core::form.input type="text" id="phone" name="phone" value="{{ old('phone') }}" />
+                            <x-core::form.input-label for="status" :value="'Status'" />
+                            <select class="form-select" name="status" aria-label="Status">
+                                <option value="active" @if ($user->status == 'active') selected @endif>Active</option>
+                                <option value="inactive" @if ($user->status == 'inactive') selected @endif>Inactive</option>
+                            </select>
+                            <x-core::form.input-error field="status" />
+                        </div>
+                        <div class="col-md-6">
+                            <x-core::form.input-label for="phone" :value="'Phone Number'" />
+                            <x-core::form.input type="text" id="phone" name="phone" value="{{ old('phone', $user->phone) }}" />
                             <x-core::form.input-error field="phone" />
                         </div>
                         <div class="col-md-6">
-                            <x-core::form.input-label for="address" :value="__('Address')" />
-                            <x-core::form.input type="text" id="address" name="address" value="{{ old('address') }}" />
+                            <x-core::form.input-label for="address" :value="'Address'" />
+                            <x-core::form.input type="text" id="address" name="address" value="{{ old('address', $user->address) }}" />
                             <x-core::form.input-error field="address" />
                         </div>
                         <div class="col-md-6">
-                            <x-core::form.input-label for="city" :value="__('City')" />
-                            <x-core::form.input type="text" id="city" name="city" value="{{ old('city') }}" />
+                            <x-core::form.input-label for="city" :value="'City'" />
+                            <x-core::form.input type="text" id="city" name="city" value="{{ old('city', $user->city) }}" />
                             <x-core::form.input-error field="city" />
                         </div>
                         <div class="col-md-6">
-                            <x-core::form.input-label for="state" :value="__('State')" />
-                            <x-core::form.input type="text" id="state" name="state" value="{{ old('state') }}" />
+                            <x-core::form.input-label for="state" :value="'State'" />
+                            <x-core::form.input type="text" id="state" name="state" value="{{ old('state', $user->state) }}" />
                             <x-core::form.input-error field="state" />
                         </div>
                         <div class="col-md-6">
-                            <x-core::form.input-label for="zipCode" :value="__('Zip Code')" />
-                            <x-core::form.input type="text" id="zipCode" name="zipCode" value="{{ old('zipCode') }}" />
+                            <x-core::form.input-label for="zipCode" :value="'Zip Code'" />
+                            <x-core::form.input type="text" id="zipCode" name="zipCode" value="{{ old('zip_code', $user->zip_code) }}" />
                             <x-core::form.input-error field="zipCode" />
                         </div>
                         <div class="col-md-6">
-                            <x-core::form.input-label for="country" :value="__('Country')" />
-                            <x-core::form.input type="text" id="country" name="country" value="{{ old('country') }}" />
+                            <x-core::form.input-label for="country" :value="'Country'" />
+                            <x-core::form.input type="text" id="country" name="country" value="{{ old('country', $user->country) }}" />
                             <x-core::form.input-error field="country" />
                         </div>
                     </div>
@@ -117,25 +128,43 @@
                     </div>     
                     <div class="row mb-6">
                         <div class="col-md-6">
-                            <x-core::form.input-label for="password" :value="__('Password')" />
+                            <x-core::form.input-label for="password" :value="'Password'" />
                             <x-core::form.input type="text" id="password" name="password" />
                             <x-core::form.input-error field="password" />
                         </div>
                     </div>
                     <div class="row mb-6">
                         <div class="col-md-6">
-                            <x-core::form.input-label for="password_confirmation" :value="__('Confirm Password')" />
+                            <x-core::form.input-label for="password_confirmation" :value="'Confirm Password'" />
                             <input class="form-control" type="password" name="password_confirmation" id="password_confirmation">
                             <x-core::form.input-error field="password_confirmation" />
                         </div>
                     </div>
         
                     <div class="mt-6">
-                        <button type="submit" class="btn btn-primary me-3">Create User</button>
+                        <button type="submit" class="btn btn-primary me-3">Save Changes</button>
                     </div>
                 </div>
             </form>
 
         </div>
     </div>
+    @endisset
 @endsection
+
+
+@push('scripts')
+
+<script>
+    'use strict';
+
+    $(document).ready(function() {
+
+        $('.user-role-select').wrap('<div class="position-relative"></div>').select2({
+            placeholder: 'Select value',
+            dropdownParent: $('.user-role-select').parent()
+        });
+
+    });
+</script>  
+@endpush

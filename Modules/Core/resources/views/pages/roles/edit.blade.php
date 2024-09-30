@@ -3,9 +3,6 @@
 @extends('core::layouts.master')
 
 @section('content')
-
-
-
 <div class="card shadow rounded-md">
     <div class="card-body">
         <div class="row g-6">
@@ -46,13 +43,10 @@
                                             });
                                         @endphp
 
-                                  
-
                                         @foreach ($groupedPermissions as $group => $permissions)
                                         <tr>
                                             <td class="text-nowrap fw-medium text-heading">{{ ucfirst($group) }} Permissions</td>
                                             <td>
-
                                                 <div class="d-flex justify-content-end">
                                                     @foreach($permissions as $permission)
                                                     <div class="form-check mb-0 me-4 me-lg-12">
@@ -62,16 +56,11 @@
                                                         </label>
                                                     </div>
                                                     @endforeach
-
-                                                
                                                 </div>
                                             </td>
                                         </tr>
                                         @endforeach
-                                      
 
-                                       
-                                        
                                     </tbody>
                                 </table>
                             </div>

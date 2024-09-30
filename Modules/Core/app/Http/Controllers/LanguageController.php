@@ -4,6 +4,7 @@ namespace Modules\Core\Http\Controllers;
 
 
 use Illuminate\Http\Request;
+use Modules\Core\Http\Requests\LanguageUpdateRequest;
 use Modules\Core\Models\Language;
 use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
@@ -75,37 +76,50 @@ class LanguageController extends Controller
 
     }
 
-    public function update(LanguageRequest $request, $id)
+    public function update(LanguageUpdateRequest $request, $id)
     {
 
+
         $language = Language::findOrFail($id);
+        $oldCode = $language->code;
 
-        // if($oldCode != $request->code){
-        //     $source = resource_path('lang/'.$oldCode);
-        //     $destination = resource_path('lang/'.$request->code);
+        if($oldCode != $request->code){
+            // rename directory with the new code
+            $oldPath = resource_path('lang/'.$oldCode);
+            $newPath = resource_path('lang/' . $request->code);
+            
+            // check if the directory exists
+            if(File::exists($oldPath)){
+                if(!rename($oldPath, $newPath)){
+                    return redirect()->back()->with('error','Cannot rename the language directory');
+                };
+            }   
 
-        //     if(!File::exists($destination)){
-        //         File::makeDirectory($destination);
-        //     }
+            
+        }
 
-        //     $files = File::allFiles($source);
-        //     foreach($files as $file){
-        //         File::copy($file, $destination.'/'.basename($file));
-        //     }
-
-        //     File::deleteDirectory($source);
-
-        //     // update the defalt language in env file
-        //     $envFile = app()->environmentFilePath();
-        //     $env = file_get_contents($envFile);
-        //     $env = preg_replace('/APP_LOCALE=(.*)/', 'APP_LOCALE='.$request->code, $env);
-        //     file_put_contents($envFile, $env);
-
-        // }
-
-
+        $language->code = $request->code;
         $language->name = $request->name;
         $language->direction = $request->direction;
+
+        if($request->hasFile('lang_img')){
+            $request->validate([
+                'lang_img' => 'image|mimes:png,jpg,jpeg|max:512'
+            ]);
+
+            $image = $request->file('lang_img');
+            $imageName = $request->code.'.'.$image->getClientOriginalExtension();
+            
+            $imagePath = $image->storeAs('languages', $imageName, 'public');
+
+            // delete the old image
+            if(isset($language->image) && File::exists(storage_path('app/public/'.$language->image))){
+                File::delete(storage_path('app/public/'.$language->image));
+            }
+
+            $language->image = $imagePath;
+        }
+       
         $language->save();
 
         return redirect()->route('admin.languages.index')->with('success', 'Language updated successfully');
