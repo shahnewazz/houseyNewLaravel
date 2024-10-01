@@ -4,6 +4,7 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Controllers\Middleware;
@@ -75,6 +76,36 @@ class UserController extends Controller implements HasMiddleware
       
         $user = User::create($request->validated());
 
+        if($request->hasFile('profile_picture')){
+            
+            $request->validate([
+                'profile_picture' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            ]);        
+
+            try {
+
+                $uploadedFile = $request->file('profile_picture');
+                $fileName = $user->id . '_profile_' . $uploadedFile->getClientOriginalName();
+                $path = $uploadedFile->storeAs('profile', $fileName, 'public');
+                
+                if(isset($user->profile_picture) && Storage::disk('public')->exists($user->profile_picture)){
+                    Storage::disk('public')->delete($user->profile_picture);
+                }
+
+
+                $user->profile_picture = $path;
+                $user->save();
+
+            } catch (\Throwable $e) {
+
+                if (isset($user->profile_picture) && Storage::disk('public')->exists($path)) {
+                    Storage::disk('public')->delete($path);
+                }
+                return back()->with('error', 'Profile Photo Add Failed');
+            }
+
+        }
+
         $user->assignRole($request->role);
 
         return redirect()->route('admin.users.index')->with('success', 'User created successfully');
@@ -107,7 +138,81 @@ class UserController extends Controller implements HasMiddleware
      */
     public function update(Request $request, $username)
     {
-        dd($request->all());
+
+        $user = User::where('username', $username)->first();
+
+        if (!$user) {
+            return back()->with('error', 'User not found');
+        }
+
+        $request->validate([
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+            'username' => ['required', 'string', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+            'phone' => ['required', 'numeric', '', Rule::unique(User::class)->ignore($user->id)],
+            'profile_picture' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+            'user_type' => ['required', 'string', 'in:normal,admin'],
+            'status' => ['required', 'string','in:active,inactive'],
+            'role' => ['nullable', 'array', 'exists:roles,name'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'city' => ['nullable', 'string', 'max:255'],
+            'state' => ['nullable', 'string', 'max:255'],
+            'zip_code' => ['nullable', 'string', 'max:255'],
+            'country' => ['nullable', 'string', 'max:255'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user->first_name = $request->first_name;
+        $user->last_name = $request->last_name;
+        $user->email = $request->email;
+        $user->username = $request->username;
+        $user->user_type = $request->user_type;
+        $user->status = $request->status;
+        $user->phone = $request->phone;
+        $user->address = $request->address;
+        $user->city = $request->city;
+        $user->state = $request->state;
+        $user->country = $request->country;
+        $user->zip_code = $request->zip_code;
+       
+        if(!empty($request->password)){
+            $user->password = bcrypt($request->password);
+        }
+
+
+        if(!empty($request->role)){
+            $user->syncRoles($request->role);
+        }
+
+        $user->save();
+        
+
+        if($request->hasFile('profile_picture')){
+            
+            $request->validate([
+                'profile_picture' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            ]);        
+
+            try {
+
+                $uploadedFile = $request->file('profile_picture');
+                $fileName = $user->id . '_profile_' . $uploadedFile->getClientOriginalName();
+                $path = $uploadedFile->storeAs('profile', $fileName, 'public');
+                
+                if(isset($user->profile_picture) && Storage::disk('public')->exists($user->profile_picture)){
+                    Storage::disk('public')->delete($user->profile_picture);
+                }
+                $user->profile_picture = $path;
+                $user->save();
+
+            } catch (\Throwable $e) {
+                return back()->with('error', $e->getMessage());
+            }
+        }
+
+        return redirect()->route('admin.users.index')->with('success', 'User updated successfully');
+
     }
 
     public function destroy($username)

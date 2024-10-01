@@ -15,10 +15,17 @@
                 <div class="card-body">
                     <div class="d-flex align-items-start align-items-sm-center gap-6 pb-4 border-bottom">
         
+                        @isset($user->profile_picture)
+                            <div class="avatar avatar-lg rounded">
+                                <img width="120" class="profile-photo position-absolute start-0 top-0 z-1" src="{{$user_profile_picture}}" alt="{{$user->full_name}}">
+                            </div>
+                        @else
                         <div class="avatar avatar-lg rounded">
                             <img width="120" class="profile-photo position-absolute start-0 top-0 z-1 visually-hidden" src="" alt="">
                             <div class="avatar-text fs-4 bg-label-success">{{$user_profile_picture}}</div>
                         </div>
+                        @endisset
+                        
         
                         <div class="button-wrapper">
                             <label for="profile_picture" class="btn btn-primary me-3 mb-3" tabindex="0">
@@ -163,6 +170,35 @@
         $('.user-role-select').wrap('<div class="position-relative"></div>').select2({
             placeholder: 'Select value',
             dropdownParent: $('.user-role-select').parent()
+        });
+
+         // Profile Picture Upload
+         $('.profile-picture-upload').on('change', function() {
+            var input = this;
+            var url = $(this).val();
+            var ext = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
+            if (input.files && input.files[0] && (ext == "png" || ext == "jpeg" || ext == "jpg")) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('.profile-photo').attr('src', e.target.result).removeClass('visually-hidden');
+                    $('.profile-photo').siblings('.avatar-text').addClass('visually-hidden');
+                }
+                reader.readAsDataURL(input.files[0]);
+
+                $('.profile-picture-reset').removeClass('d-none');
+            } else {
+                $('.profile-photo').attr('src', '{{ $user_profile_picture }}');
+                $('.profile-photo').siblings('.avatar-text').addClass('visually-hidden');
+                alert('Please select a valid image file');
+                
+            }
+        });
+
+        // Profile Picture Reset
+        $('.profile-picture-reset').on('click' ,function() {
+            $('.profile-photo').attr('src', '{{ $user_profile_picture }}').addClass('visually-hidden');
+            $('.profile-photo').siblings('.avatar-text').removeClass('visually-hidden');
+            $('.profile-picture-upload').val('');
         });
 
     });

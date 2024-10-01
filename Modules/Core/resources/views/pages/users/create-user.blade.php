@@ -160,10 +160,6 @@
         });
 
 
-        $('#profile_form').on('submit', function(){
-            $('[name=username]').removeAttr('disabled');
-        })
-
         // Profile Picture Upload
         $('.profile-picture-upload').on('change', function() {
             var input = this;
