@@ -24,11 +24,19 @@
                         </span>
                         <span class="menu-title flex-grow-1">{{__('sidebar.dashboard')}}</span>
                     </a>
-
                 </li>
 
                 @include('core::layouts.partials.users._userManagement')
 
+                @include('core::layouts.partials.pageBuilder._pageBuilder')
+
+                <li class="app-sidebar-menu-heading">
+                    <span>
+                        <span class="app-sidebar-menu-heading-line"></span>
+                        {{__('sidebar.site_management')}}
+                    </span>
+                </li>
+                
                 @include('core::layouts.partials._languages')
 
                 @include('core::layouts.partials.users._userProfile')

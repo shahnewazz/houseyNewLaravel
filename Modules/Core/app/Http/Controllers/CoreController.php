@@ -2,17 +2,26 @@
 
 namespace Modules\Core\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Core\Models\Page;
+use App\Http\Controllers\Controller;
 
 class CoreController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($slug = null)
     {
-        return view('core::index');
+        $slug = $slug ? $slug : 'home';
+
+        $page = Page::where('slug', $slug)->get(['title', 'widgets'])->first();
+        
+        if (!$page) {
+            abort(404);
+        }else{
+            return view('core::frontend.index', compact('page'));
+        }
     }
 
     /**

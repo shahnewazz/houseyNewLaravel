@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Core\Http\Controllers\CoreController;
+use Modules\Core\Http\Controllers\PageController;
 use Modules\Core\Http\Controllers\RoleController;
 use Modules\Core\Http\Controllers\UserController;
 use Modules\Core\Http\Controllers\LanguageController;
@@ -19,9 +20,7 @@ use Modules\Core\Http\Controllers\DashboardController;
 */
 
 
-Route::get('core', function () {
-    return view('core::index');
-}); 
+Route::get('/{slug?}', [CoreController::class, 'index'])->where('slug', '[a-zA-Z0-9-/]+'); 
 
 
 
@@ -30,6 +29,19 @@ Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'v
     // dashboard route
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // page builder routes
+    Route::group(['prefix' => 'pages', 'as' => 'pages.'], function(){
+        Route::get('/', [PageController::class, 'index'])->name('index');
+        Route::get('/create', [PageController::class, 'create'])->name('create');
+        Route::post('/store', [PageController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [PageController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [PageController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [PageController::class, 'destroy'])->name('destroy');
+
+        // Route::group(['prefix' => 'widgets', 'as' => 'widgets.'], function(){
+        //     Route::get('/{page_id}', [PageController::class, 'edit'])->name('edit');
+        // });
+    });
 
     // users routes
     Route::group(['prefix' => 'users', 'as' => 'users.'], function(){

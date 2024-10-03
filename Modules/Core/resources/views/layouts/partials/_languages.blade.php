@@ -1,10 +1,3 @@
-<li class="app-sidebar-menu-heading">
-    <span>
-        <span class="app-sidebar-menu-heading-line"></span>
-        {{__('sidebar.site_management')}}
-    </span>
-</li>
-
 <li class="app-sidebar-menu-item">
     <a href="{{route('admin.languages.index')}}" class="menu-link d-flex align-items-center" {{(request()->routeIs('admin.languages.index')) ? 'active' : ''}}>
         <span class="menu-icon flex-shrink-0">

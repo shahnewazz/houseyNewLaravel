@@ -12,4 +12,6 @@ return array (
   'roles_permission' => 'Roles & Permissions',
   'profile_heading' => 'My Profile',
   'profile' => 'Profile',
+  'page_builder' => 'Page Builder',
+  'page_all' => 'All Pages',
 );
