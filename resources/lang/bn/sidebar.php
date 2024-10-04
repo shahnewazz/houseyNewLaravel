@@ -14,5 +14,4 @@ return array (
   'profile' => 'Profile',
   'page_builder' => 'Page Builder',
   'page_all' => 'All Pages',
-  'menu_builder' => 'Menu Builder',
 );

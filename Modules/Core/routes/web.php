@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Core\Http\Controllers\CoreController;
+use Modules\Core\Http\Controllers\MenuController;
 use Modules\Core\Http\Controllers\PageController;
 use Modules\Core\Http\Controllers\RoleController;
 use Modules\Core\Http\Controllers\UserController;
@@ -19,10 +20,7 @@ use Modules\Core\Http\Controllers\DashboardController;
 |
 */
 
-
-Route::get('/{slug?}', [CoreController::class, 'index'])->where('slug', '[a-zA-Z0-9-/]+'); 
-
-
+require __DIR__.'/auth.php';
 
 Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'verified']], function () {
     
@@ -38,9 +36,19 @@ Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'v
         Route::put('/update/{id}', [PageController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [PageController::class, 'destroy'])->name('destroy');
 
-        // Route::group(['prefix' => 'widgets', 'as' => 'widgets.'], function(){
-        //     Route::get('/{page_id}', [PageController::class, 'edit'])->name('edit');
-        // });
+        Route::group(['prefix' => 'widgets', 'as' => 'widgets.'], function(){
+            Route::get('/{page_id}', [PageController::class, 'edit'])->name('edit');
+        });
+    });
+
+    // menu builder
+    Route::group(['prefix' => 'menus', 'as' => 'menus.'], function(){
+        Route::get('/', [MenuController::class, 'index'])->name('index');
+        Route::get('/create', [MenuController::class, 'create'])->name('create');
+        Route::post('/store', [MenuController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [MenuController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [MenuController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [MenuController::class, 'destroy'])->name('destroy');
     });
 
     // users routes
@@ -87,4 +95,5 @@ Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'v
 Route::post('/xss/input', [DashboardController::class,'xss'])->name('xss.post');
 Route::get('/xss', [DashboardController::class,'getXss'])->name('xss');
 
-require __DIR__.'/auth.php';
+
+Route::get('/{slug?}', [CoreController::class, 'index'])->where('slug', '[a-zA-Z0-9-/]+'); 

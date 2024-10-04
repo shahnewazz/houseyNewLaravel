@@ -2,26 +2,17 @@
 
 namespace Modules\Core\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Modules\Core\Models\Page;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 
-class CoreController extends Controller
+class TranslationController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index($slug = null)
+    public function index()
     {
-        $slug = $slug ? $slug : 'home';
-
-        $page = Page::where('slug', $slug)->get(['title', 'widgets'])->first();
-        
-        if (!$page) {
-            abort(404);
-        }else{
-            return view('core::frontend.index', compact('page'));
-        }
+        return view('core::index');
     }
 
     /**
@@ -71,18 +62,4 @@ class CoreController extends Controller
     {
         //
     }
-
-    /**
-     * Change the language of the application.
-     */
-    public function lang()
-    {
-        return view('core::lang');
-    }
-
-    public function addLang(Request $request)
-    {
-        dd($request->all());
-    }
-
 }
