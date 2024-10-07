@@ -15,13 +15,12 @@ class Page extends Model
         'widgets' => 'json'
     ];
 
-    // Check if the page is home
-    public static function checkHomePage($id = null)
+    // Check if home page already exists
+    public static function checkHomePage()
     {
-        return self::where('is_home', true)
-                    ->where('id', '!=', $id)
-                    ->exists();
+        return self::where('is_home', 1)->exists();
     }
+    
 
 
 }

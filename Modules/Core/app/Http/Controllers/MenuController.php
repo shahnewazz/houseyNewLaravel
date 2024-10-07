@@ -21,7 +21,7 @@ class MenuController extends Controller
      */
     public function create()
     {
-        return view('core::create');
+        return view('core::pages.menu.create');
     }
 
     /**
@@ -31,30 +31,27 @@ class MenuController extends Controller
     {
         $validated = $request->validate([
             'menu_title' => ['required', 'string', 'max:255'],
+            'menu_data' => ['required', 'json']
         ]);
 
-        $menu = Menu::create([
+
+        Menu::create([
             'title' => $validated['menu_title'],
+            'menu_items' => json_decode($validated['menu_data'], true)
         ]);
 
         return redirect()->route('admin.menus.index')->with('success', 'Menu created successfully');
     }
 
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        
-    }
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit($id)
     {
-        $single_menu = Menu::findOrFail($id);
-        return view('core::pages.menu.index', compact('single_menu'));
+        $menu = Menu::findOrFail($id);
+        
+        return view('core::pages.menu.edit', compact('menu'));
     }
 
     /**
@@ -62,17 +59,19 @@ class MenuController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'menu_title' => ['required', 'string', 'max:255'],
             'menu_data' => ['required', 'json']
         ]);
 
-        $menu = Menu::findOrFail($id)->first();
-        $menu->title = $request->menu_title;
-        $menu->menu_items = $request->menu_data;
-        $menu->save();
 
-        return redirect()->route('admin.menus.index')->with('Menu Updated Successfully');
+        $menu = Menu::findOrFail($id);
+
+        $menu->title = $validated['menu_title'];
+        $menu->menu_items = json_decode($validated['menu_data'], true);
+        $menu->save(); 
+
+        return redirect()->route('admin.menus.index')->with('success', 'Menu Updated successfully');
     }
 
     /**
@@ -80,6 +79,9 @@ class MenuController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $menu = Menu::findOrFail($id);
+        $menu->delete();
+
+        return redirect()->route('admin.menus.index')->with('success', 'Menu deleted successfully');
     }
 }

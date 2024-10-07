@@ -24,6 +24,7 @@ require __DIR__.'/auth.php';
 
 Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'verified']], function () {
     
+    
     // dashboard route
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -35,6 +36,7 @@ Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'v
         Route::get('/edit/{id}', [PageController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [PageController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [PageController::class, 'destroy'])->name('destroy');
+        Route::post('/set-home/{id}', [PageController::class, 'setHomePage'])->name('set_home');
 
         Route::group(['prefix' => 'widgets', 'as' => 'widgets.'], function(){
             Route::get('/{page_id}', [PageController::class, 'edit'])->name('edit');

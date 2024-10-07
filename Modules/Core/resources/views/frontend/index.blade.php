@@ -5,5 +5,5 @@
 @endsection
 
 @section('content')
-<a href="/about-me">about</a>
+<a href="{{$page->slug}}">{{$page->title}}</a>
 @endsection

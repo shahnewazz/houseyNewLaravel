@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('pages', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('slug')->unique();
+            $table->string('slug')->nullable()->unique();
             $table->json('widgets')->nullable();
             $table->enum('status', ['active', 'inactive', 'draft']);
             $table->boolean('is_home')->default(0);

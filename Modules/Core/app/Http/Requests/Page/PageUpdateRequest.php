@@ -4,7 +4,7 @@ namespace Modules\Core\Http\Requests\Page;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PageStoreRequest extends FormRequest
+class PageUpdateRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -13,7 +13,7 @@ class PageStoreRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'regex:/^[a-zA-Z0-9-]+$/', 'max:255', 'unique:pages'],
+            'slug' => ['nullable', 'string', 'regex:/^[a-zA-Z0-9-]+$/', 'max:255', "unique:pages,slug,". $this->id],
             'widgets' => ['nullable', 'json'],
             'status' => ['required', 'in:active,inactive,draft'],
         ];

@@ -1,7 +1,7 @@
 <?php
 
 return array (
-  'dashboard' => 'Dashboard',
+  'dashboard' => 'ড্যাশবোর্ড',
   'settings' => 'Settings',
   'site_management' => 'Site Management',
   'languages' => 'Languages',
@@ -14,4 +14,5 @@ return array (
   'profile' => 'Profile',
   'page_builder' => 'Page Builder',
   'page_all' => 'All Pages',
+  'menu_builder' => 'Menu Builder',
 );

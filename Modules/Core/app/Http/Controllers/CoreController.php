@@ -13,9 +13,15 @@ class CoreController extends Controller
      */
     public function index($slug = null)
     {
-        $slug = $slug ? $slug : 'home';
 
-        $page = Page::where('slug', $slug)->get(['title', 'widgets'])->first();
+        if($slug == null){
+            $page = Page::where("is_home", 1)->first();
+            return $page;
+        }
+        
+        $page =  Page::where('slug', $slug)
+                    ->where('status', 'active')
+                    ->first(['title', 'widgets']);
         
         if (!$page) {
             abort(404);

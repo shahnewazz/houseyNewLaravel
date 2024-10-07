@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Modules\Core\Models\Page;
 use App\Http\Controllers\Controller;
 use Modules\Core\Http\Requests\Page\PageStoreRequest;
+use Modules\Core\Http\Requests\Page\PageUpdateRequest;
 
 class PageController extends Controller
 {
@@ -31,21 +32,24 @@ class PageController extends Controller
      */
     public function store(PageStoreRequest $request)
     {
-        if (empty($request->slug)) {
-            $slug = 'home';
-            $request->merge(['slug' => $slug, 'is_home' => true]);
+
+        if (empty($request->slug) && Page::checkHomePage()) {
+            return back()->with('error', 'Home page already exists.');
+            
         }
 
-        if ($request->is_home && Page::checkHomePage()) {
-            return back()->withErrors(['is_home' => 'There can only be one home page.']);
+        if(empty($request->slug)){
+            $slug = '';
+            $request->merge(['slug' => $slug, 'is_home' => 1]);
         }
-        
+
+    
         $page = new Page();
         $page->title = $request->title;
         $page->slug = $request->slug;
         $page->widgets = $request->widgets;
         $page->status = $request->status;
-        $page->is_home = $request->is_home;
+        $page->is_home = $request->is_home ?? 0;
         $page->save();
 
         return redirect()->route('admin.pages.index')->with('success', 'Page created successfully.');
@@ -64,15 +68,38 @@ class PageController extends Controller
      */
     public function edit($id)
     {
-        return view('core::edit');
+        $page = Page::findOrFail($id);
+        return view('core::pages.page.edit', compact('page'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(PageUpdateRequest $request, $id)
     {
-        //
+        $page = Page::findOrFail($id);
+
+        if(empty($request->slug) && !$page->is_home){
+            return back()->with('error', 'Home page already exists.');
+        }
+        if(empty($request->slug) && $page->is_home){
+            return back()->with('error', 'Cant add slug to home page.');
+        }
+
+        if(empty($request->slug)){
+            $slug = '';
+            $request->merge(['slug' => $slug, 'is_home' => 1]);
+        }
+        
+        $page->title = $request->title;
+        $page->slug = $request->slug;
+        $page->widgets = $request->widgets;
+        $page->status = $request->status;
+        $page->is_home = (empty($request->slug) && $page->is_home) ? 1 : 0;
+        $page->save();
+
+        return redirect()->route('admin.pages.index')->with('success', 'Page updated successfully.');
+
     }
 
     /**
@@ -80,6 +107,33 @@ class PageController extends Controller
      */
     public function destroy($id)
     {
-        //
+        // check if page is home page
+        $page = Page::findOrFail($id);
+        if($page->is_home){
+            return redirect()->route('admin.pages.index')->with('error', 'Home page cannot be deleted.');
+        }
+        if(Page::findOrFail($id)->delete()){
+            return redirect()->route('admin.pages.index')->with('success', 'Page deleted successfully.');
+        }
+    }
+
+    /**
+     * Set page as home page
+     */
+
+    public function setHomePage($id)
+    {
+
+        Page::query()->update(['is_home' => 0]);
+
+        $page = Page::findOrFail($id);
+        $page->is_home = 1;
+        $page->save();
+    
+        $pages = Page::all();
+        $html = view('core::pages.page.partials._page-list', compact('pages'))->render();
+        
+        return response()->json(['html' => $html]);
+      
     }
 }
