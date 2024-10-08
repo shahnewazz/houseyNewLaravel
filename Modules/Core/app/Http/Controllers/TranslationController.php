@@ -2,64 +2,29 @@
 
 namespace Modules\Core\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Core\Models\Language;
+use App\Http\Controllers\Controller;
+use Modules\Core\Models\Translation;
 
 class TranslationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        return view('core::index');
-    }
+    // public function add(object $request, string $model, int|string $id): bool
+    // {
+    //     foreach ($request->lang as $index => $key) {
+    //         foreach (['name','description','title'] as $type){
+    //             if (isset($request[$type][$index]) && $key != 'en') {
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('core::create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('core::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('core::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        //
-    }
+    //                 $translation = new Translation();
+    //                 $translation->translatable_type = $model;
+    //                 $translation->translatable_id = $id;
+    //                 $translation->language_code = $key;
+    //                 $translation->field_name = $type;
+    //                 $translation->content = $request[$type][$index];
+    //                 $translation->save();
+    //             }
+    //         }
+    //     }
+    //     return true;
+    // }
 }

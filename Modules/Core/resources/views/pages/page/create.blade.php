@@ -2,6 +2,10 @@
 
 @section('content')
 <div class="card">
+    <div class="card-header d-flex mb-5 align-items-center">
+        <h2 class="card-title m-0">Edit</h2>
+        <a href="{{ route('admin.pages.index') }}" class="btn btn-primary ms-auto">Back</a>
+    </div>
     <div class="card-body">
         <form action="{{route('admin.pages.store')}}" method="POST">
             @csrf

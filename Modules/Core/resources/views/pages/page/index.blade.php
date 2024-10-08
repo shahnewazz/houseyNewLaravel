@@ -3,6 +3,7 @@
 @section('content')
 <div class="card mb-5">
     <div class="card-body">
+        
         <form action="{{route('admin.pages.store')}}" method="POST">
             @csrf
             @method('POST')

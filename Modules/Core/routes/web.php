@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Core\Http\Controllers\BlogController;
 use Modules\Core\Http\Controllers\CoreController;
 use Modules\Core\Http\Controllers\MenuController;
 use Modules\Core\Http\Controllers\PageController;
@@ -39,7 +40,7 @@ Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'v
         Route::post('/set-home/{id}', [PageController::class, 'setHomePage'])->name('set_home');
 
         Route::group(['prefix' => 'widgets', 'as' => 'widgets.'], function(){
-            Route::get('/{page_id}', [PageController::class, 'edit'])->name('edit');
+            Route::get('/{page_id}', [PageController::class, 'widgetEdit'])->name('edit');
         });
     });
 
@@ -90,6 +91,17 @@ Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'v
         Route::get('/translate/{lang}/{file}', [LanguageController::class, 'showTranslations'])->name('translations.show');
         Route::post('/translate/{lang}/{file}', [LanguageController::class, 'updateTranslation'])->name('translations.update');
         Route::post('/change/{lang}', [LanguageController::class, 'changeLanguage'])->name('change');
+    });
+
+
+    // blog routes
+    Route::group(['prefix' => 'blog', 'as' => 'blog.'], function(){
+        Route::get('/', [BlogController::class, 'index'])->name('index');
+        Route::get('/create', [BlogController::class, 'create'])->name('create');
+        Route::post('/store', [BlogController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [BlogController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [BlogController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [BlogController::class, 'destroy'])->name('destroy');
     });
 });
 

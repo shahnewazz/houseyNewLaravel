@@ -77,25 +77,33 @@ class PageController extends Controller
      */
     public function update(PageUpdateRequest $request, $id)
     {
+
         $page = Page::findOrFail($id);
 
-        if(empty($request->slug) && !$page->is_home){
-            return back()->with('error', 'Home page already exists.');
+        if(!$page->is_home && empty($request->slug)){
+            return back()->with('error', 'Home page slug already exists.');
         }
-        if(empty($request->slug) && $page->is_home){
-            return back()->with('error', 'Cant add slug to home page.');
+        
+        if($page->is_home){
+
+            if(!empty($request->slug)){
+                return back()->with('error', 'Home page slug cannot be updated.');
+            }
+
+            if($request->status == 'inactive'|| $request->status == 'darft'){
+                return back()->with('error', 'Home page status cannot be inactive or draft.');
+            }
         }
 
         if(empty($request->slug)){
-            $slug = '';
-            $request->merge(['slug' => $slug, 'is_home' => 1]);
+            $request->merge(['slug' => null, 'is_home' => 1]);
         }
         
-        $page->title = $request->title;
-        $page->slug = $request->slug;
-        $page->widgets = $request->widgets;
-        $page->status = $request->status;
-        $page->is_home = (empty($request->slug) && $page->is_home) ? 1 : 0;
+        $page->title    = $request->title;
+        $page->slug     = (empty($request->slug) && $page->is_home) ? null : $request->slug;
+        $page->widgets  = $request->widgets;
+        $page->status   = $request->status;
+        $page->is_home  = (empty($request->slug) && $page->is_home) ? 1 : 0;
         $page->save();
 
         return redirect()->route('admin.pages.index')->with('success', 'Page updated successfully.');
@@ -134,6 +142,15 @@ class PageController extends Controller
         $html = view('core::pages.page.partials._page-list', compact('pages'))->render();
         
         return response()->json(['html' => $html]);
-      
+    }
+
+
+    /**
+     * Edit page widgets
+     */
+
+    public function widgetEdit($page_id){
+        $page = Page::findOrFail($page_id);
+        return view('core::pages.page.widgets', compact('page'));
     }
 }

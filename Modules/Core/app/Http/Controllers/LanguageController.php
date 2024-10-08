@@ -4,12 +4,13 @@ namespace Modules\Core\Http\Controllers;
 
 
 use Illuminate\Http\Request;
-use Modules\Core\Http\Requests\LanguageUpdateRequest;
 use Modules\Core\Models\Language;
 use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Modules\Core\Http\Requests\LanguageRequest;
+use Modules\Core\Http\Requests\LanguageUpdateRequest;
 
 class LanguageController extends Controller
 {
@@ -35,100 +36,127 @@ class LanguageController extends Controller
 
     public function store(LanguageRequest $request)
     {
-
-        if($request->code == 'en'){
+        if ($request->code == 'en') {
             return redirect()->route('admin.languages.index')->with('error', 'English language already exists');
         }
-
+    
         $language = Language::create($request->validated());
-
-        // store the language image if exists
-        if($request->hasFile('lang_img')){
+    
+        // store the language image if it exists
+        if ($request->hasFile('lang_img')) {
             $request->validate([
                 'lang_img' => 'image|mimes:png,jpg,jpeg|max:512'
             ]);
-
+    
             $image = $request->file('lang_img');
-            $imageName = $request->code.'.'.$image->getClientOriginalExtension();
-            
+            $imageName = $request->code . '.' . $image->getClientOriginalExtension();
             $imagePath = $image->storeAs('languages', $imageName, 'public');
-
+    
+            if (!$imagePath) {
+                return redirect()->back()->with('error', 'Failed to store language image.');
+            }
+    
             $language->image = $imagePath;
             $language->save();
         }
-
-        
-
+    
+        // Copy translation files from the default language
         $default_lang = Language::where('isDefault', 1)->first();
-        $source = resource_path('lang/'.$default_lang->code);
-        $destination = resource_path('lang/'.$request->code);
-
-        if(!File::exists($destination)){
-            File::makeDirectory($destination);
+        $source = resource_path('lang/' . $default_lang->code);
+        $destination = resource_path('lang/' . $request->code);
+    
+        if (!File::exists($destination)) {
+            File::makeDirectory($destination, 0755, true);
         }
-
+    
         $files = File::allFiles($source);
-        foreach($files as $file){
-            File::copy($file, $destination.'/'.basename($file));
+        foreach ($files as $file) {
+            File::copy($file, $destination . '/' . basename($file));
         }
-
+    
         return redirect()->route('admin.languages.index')->with('success', 'Language created successfully');
-
     }
+    
+
 
     public function update(LanguageUpdateRequest $request, $id)
     {
 
-
         $language = Language::findOrFail($id);
         $oldCode = $language->code;
+        $newCode = $request->code;
+        $imagePath = $language->image;
 
-        if($oldCode != $request->code){
-            // rename directory with the new code
-            $oldPath = resource_path('lang/'.$oldCode);
-            $newPath = resource_path('lang/' . $request->code);
-            
-            // check if the directory exists
-            if(File::exists($oldPath)){
-                if(!rename($oldPath, $newPath)){
-                    return redirect()->back()->with('error','Cannot rename the language directory');
-                };
-            }   
+        // Check if the language code is being changed
+        if ($oldCode !== $newCode) {
+            try {
+                // Rename the language directory
+                $oldPath = resource_path('lang/' . $oldCode);
+                $newPath = resource_path('lang/' . $newCode);
 
-            
-        }
+                if (File::exists($oldPath)) {
+                    // Copy files to the new directory, then delete the old directory
+                    File::copyDirectory($oldPath, $newPath);
+                    File::deleteDirectory($oldPath);
+                }
 
-        $language->code = $request->code;
-        $language->name = $request->name;
-        $language->direction = $request->direction;
-
-        if($request->hasFile('lang_img')){
-            $request->validate([
-                'lang_img' => 'image|mimes:png,jpg,jpeg|max:512'
-            ]);
-
-            $image = $request->file('lang_img');
-            $imageName = $request->code.'.'.$image->getClientOriginalExtension();
-            
-            $imagePath = $image->storeAs('languages', $imageName, 'public');
-
-            // delete the old image
-            if(isset($language->image) && File::exists(storage_path('app/public/'.$language->image))){
-                File::delete(storage_path('app/public/'.$language->image));
+                // Handle image renaming if it exists
+                if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+                    $newImagePath = 'languages/' . $newCode . '.' . pathinfo($imagePath, PATHINFO_EXTENSION);
+                    Storage::disk('public')->move($imagePath, $newImagePath); // Rename image
+                    $imagePath = $newImagePath; // Update image path for saving
+                }
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', 'Failed to rename directory or image: ' . $e->getMessage());
             }
-
-            $language->image = $imagePath;
         }
-       
-        $language->save();
 
-        return redirect()->route('admin.languages.index')->with('success', 'Language updated successfully');
-    }
+        // Handle new image upload if provided
+        if ($request->hasFile('lang_img')) {
+            try {
+                $request->validate([
+                    'lang_img' => 'image|mimes:png,jpg,jpeg|max:512'
+                ]);
+
+                if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+                    Storage::disk('public')->delete($imagePath);
+                }
+
+                // Store the new image
+                $image = $request->file('lang_img');
+                $imageName = $newCode . '.' . $image->getClientOriginalExtension();
+                $imagePath = $image->storeAs('languages', $imageName, 'public');
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', 'Failed to upload the new image: ' . $e->getMessage());
+            }
+        }
+
+        // Update the language record in the database
+        try {
+
+            $language->code = ($oldCode !== $newCode) ? $newCode : $oldCode;
+            $language->name = $request->name;
+            $language->direction = $request->direction;
+            $language->image = $imagePath;
+            $language->save();
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update language: ' . $e->getMessage());
+        }
+
+    return redirect()->route('admin.languages.index')->with('success', 'Language updated successfully');
+}
+
+    
+
 
     public function destroy($id)
     {
         $language = Language::findOrFail($id);
-        
+
+        if($language->code == 'en'){
+            return redirect()->route('admin.languages.index')->with('error', 'English language can not be deleted');
+        }
 
         if($language->isDefault == 1){
             return redirect()->route('admin.languages.index')->with('error', 'Default language can not be deleted');
@@ -140,9 +168,13 @@ class LanguageController extends Controller
             File::deleteDirectory($path);
         }
 
-
+        // delete the language image if exists
+        if($language->image && Storage::disk('public')->exists($language->image)){
+            Storage::disk('public')->delete($language->image);
+        }
 
         $language->delete();
+
         return redirect()->route('admin.languages.index')->with('success', 'Language deleted successfully');
     }
 

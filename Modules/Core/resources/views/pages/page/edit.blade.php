@@ -2,8 +2,14 @@
 
 @section('content')
 <div class="card mb-5">
+    @isset($page)
+    <div class="card-header d-flex mb-5 align-items-center">
+        <span class="card-title m-0 fs-4">Edit <b>{{$page->title}}</b></span>
+        <a href="{{ route('admin.pages.index') }}" class="btn btn-primary ms-auto">Back</a>
+    </div>
     <div class="card-body">
-        @isset($page)
+
+       
         <form action="{{route('admin.pages.update', ['id' => $page->id])}}" method="POST">
             @csrf
             @method('PUT')
@@ -39,7 +45,7 @@
                 <button class="btn btn-primary" type="submit">Update</button>
             </div>
         </form>
-        @endisset
     </div>
+    @endisset
 </div>
 @endsection

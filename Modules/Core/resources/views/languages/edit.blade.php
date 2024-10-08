@@ -18,41 +18,6 @@
         <form action="{{ route('admin.languages.update', ['id' => $language->id]) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
-            {{-- <div class="row g-6">
-                <div class="col-md-6">
-                    <label for="name" class="form-label">Name</label>
-                    <input class="form-control" type="text" id="name" name="name" value="{{ old('name', $language->name) }}">
-                    @error('name')
-                        <div class="form-text text-danger">{{ $message }}</div>
-                    @enderror
-                </div>
-                <div class="col-md-6">
-                    <label for="code" class="form-label">Code</label>
-                    <input class="form-control" type="text" id="code" name="code" value="{{ old('code', $language->code) }}">
-                    @error('code')
-                        <div class="form-text text-danger">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="col-md-3">
-                    <div>
-                        <label for="code" class="form-label">Direction</label>
-                    </div>
-
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="direction" id="ltr" value="ltr" @if($language->direction == 'ltr') checked @endif>
-                        <label class="form-check-label" for="ltr">Left To Right</label>
-                    </div>                       
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="direction" id="rtl" value="rtl" @if($language->direction == 'rtl') checked @endif>
-                        <label class="form-check-label" for="rtl">Right To Left</label>
-                    </div>                       
-                    @error('direction')
-                        <div class="form-text text-danger">{{ $message }}</div>
-                    @enderror                
-                </div>
-            </div> --}}
-
             <div class="col-md-6">
                 <div class="mb-5">
                     <label for="name" class="form-label">Name</label>
@@ -87,16 +52,23 @@
                 <div class="lang-avatar mb-3">
                     <div class="row">
                         <div class="col-sm-2">
-                            @isset($language->image)
-
                             @php
-                                $image = asset('storage/'.$language->image);
+                                if(isset($language->image)){
+                                    $image = asset('storage/'.$language->image);
+                                }else{
+                                    $image = '';
+                                }
                             @endphp
-    
-                            <div class="avatar avatar-lg rounded mb-3">
-                                <img class="lang-avatar" src="{{ $image }}" alt="{{$language->name}}">
-                            </div>
-                        @endisset
+
+                            @isset($language->image)    
+                                <div class="rounded mb-3">
+                                    <img class="lang-avatar" src="{{ $image }}" alt="{{$language->name}}">
+                                </div>
+                            @else
+                                <div class="rounded mb-3">
+                                    <img class="lang-avatar" src="" alt="">
+                                </div>
+                            @endisset
                         </div>
                         <div class="col-sm-4">
                             <label for="lang_img" class="btn btn-primary me-3 mb-3" tabindex="0">
@@ -158,7 +130,9 @@
             }
        })
 
-        $('.lang-reset-btn').on('click', function(){
+        $('.lang-reset-btn').on('click', function(e){
+            e.preventDefault();
+            
             $('#lang_img').val('');
             $('.lang-avatar').attr('src', '{{ $image }}');
             $(this).addClass('d-none');
