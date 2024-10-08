@@ -105,9 +105,16 @@ Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'v
     });
 });
 
+Route::get('/change-language/{lang}', function ($lang) {
+    session(['lang' => $lang]); // Store the selected language in the session
+    return redirect()->back();    // Redirect back to the previous page
+})->name('change.language');
+
+
 
 Route::post('/xss/input', [DashboardController::class,'xss'])->name('xss.post');
 Route::get('/xss', [DashboardController::class,'getXss'])->name('xss');
 
+Route::get('/blog', [DashboardController::class,'blog'])->name('blog');
 
 Route::get('/{slug?}', [CoreController::class, 'index'])->where('slug', '[a-zA-Z0-9-/]+'); 

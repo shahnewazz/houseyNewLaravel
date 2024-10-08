@@ -16,7 +16,7 @@ return new class extends Migration
             $table->morphs('translatable');
             $table->string('language_code');
             $table->string('field_name');
-            $table->text('content');
+            $table->text('content')->nullable();
             $table->timestamps();
         });
     }

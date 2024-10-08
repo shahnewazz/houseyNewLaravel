@@ -65,7 +65,16 @@ class BlogController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $blog = Blog::find($id);
+        $blog->update([
+            'title' => $request->title[0],
+            'slug' => Str::slug($request->title[0]),
+        ]);
+
+        
+        updateTranslation($request, 'Modules\Core\Models\Blog', $id);
+        
+        return redirect()->route('admin.blog.index')->with('success', 'Blog updated successfully.');
     }
 
     /**

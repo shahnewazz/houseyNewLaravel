@@ -1,9 +1,15 @@
 @extends('core::frontend.layouts.master')
 
-@section('title')
-{{$page->title}}
-@endsection
-
 @section('content')
-<a href="{{$page->slug}}">{{$page->title}}</a>
+
+@foreach (\Modules\Core\Models\Language::all() as $lang)
+<a href="{{ route('change.language', $lang->code) }}">{{$lang->name}}</a>
+@endforeach
+
+@foreach ($translatedBlogs as $translatedBlog)
+    <h2>{{ $translatedBlog['translations']['title'] }}</h2>
+    <!-- You can also display other fields like description if needed -->
+@endforeach
+
+<!-- You can add more translatable fields similarly -->
 @endsection
