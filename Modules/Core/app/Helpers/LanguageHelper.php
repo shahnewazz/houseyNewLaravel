@@ -44,7 +44,7 @@ function addTranslation(object $request, string $model, int|string $id): bool
 function updateTranslation(object $request, string $model, int|string $id): bool
 {
     foreach ($request->lang as $index => $key) {
-        foreach (['name', 'description', 'title'] as $type) {
+        foreach (['name', 'description', 'title', 'text'] as $type) {
             
             if (isset($request[$type]) && is_array($request[$type]) && array_key_exists($index, $request[$type]) && $key != 'en') {
                 
@@ -65,3 +65,24 @@ function updateTranslation(object $request, string $model, int|string $id): bool
     return true;
 }
 
+function deleteTranslation(object $request, string $model, int|string $id): bool
+{
+    foreach ($request->lang as $index => $key) {
+        foreach (['name', 'description', 'title', 'text'] as $type) {
+            if (isset($request[$type]) && is_array($request[$type]) && array_key_exists($index, $request[$type]) && $key != 'en') {
+                Translation::where('translatable_id', $id)
+                    ->where('translatable_type', $model)
+                    ->where('language_code', $key)
+                    ->where('field_name', $type)
+                    ->delete();
+            }
+        }
+    }
+    return true;
+}
+
+function deleteTranslationByCode(int|string $code): bool
+{
+    Translation::where('language_code', $code)->delete();
+    return true;
+}

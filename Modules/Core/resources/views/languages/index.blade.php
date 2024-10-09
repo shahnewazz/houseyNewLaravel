@@ -38,6 +38,26 @@
 
     $(document).ready(function(){
 
+
+        $(document).on('click', '.lang-del-btn', function(e){
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                html: "All Translations will be deleted!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $(this).closest('form').submit();
+                }
+            });
+
+        })
+
+
         $(document).on('change', 'input[name="isDefault"]',  function(){
             var id = $(this).attr('id').split('_')[1];
             var status = $(this).prop('checked') ? 1 : 0;

@@ -2,12 +2,31 @@
 
 @section('content')
 <div class="row">
+    <div class="col-lg-12 mb-6">
+        <div class="card">
+            <div class="card-body">
+                <?php $code = request()->query('code', 'en'); ?>
+                <ul class="nav nav-underline mb-3">
+                    @foreach (\Modules\Core\Models\Language::all() as $lang)
+                    <li class="nav-item" role="presentation">
+                        <a href="{{route('admin.menus.create', ['code' => $lang->code])}}" class="nav-link {{ $code == $lang->code ? ' active' :'' }}" >{{$lang->name}}</a>
+                    </li>
+                    @endforeach
+                </ul>
+
+                <div class="alert alert-outline-warning" role="alert">
+                    You are adding a menu in <b>{{strtoupper($code)}}</b> language
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="col-lg-4">
         <div class="card">
             <div class="card-body">
                 <div class="card border-primary mb-3">
                     <div class="card-header bg-primary text-white">Create Menu</div>
                     <div class="card-body">
+
                         <form id="menuBuilderForm" class="form-horizontal">
                             <div class="mb-3">
                                 <label for="page-select">Select Page</label>
@@ -19,6 +38,7 @@
                                     <option value="4" data-title="contact" data-url="/contact">Contact</option>
                                 </select>
                             </div>
+                            
                             <div class="form-group mb-3">
                                 <label for="text" class="form-label">Text</label>
                                 <div class="input-group">
@@ -66,6 +86,7 @@
                     @csrf
                     @method('POST')
                     <input type="hidden" name="menu_data" value=""> 
+                    <input type="hidden" name="code" value="{{$code}}">
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <div class="">
                             <label for="menu_title" class="form-label">Menu Title</label>

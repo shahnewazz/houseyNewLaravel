@@ -19,7 +19,7 @@
                         <div class="col-xl-7">
                             <div class="d-flex gap-6 justify-content-end">
                                 
-                                <a href="{{route('admin.menus.create')}}" class="btn btn-primary  flex-basis-1">
+                                <a href="{{route('admin.menus.create', ['code' => 'en'])}}" class="btn btn-primary  flex-basis-1">
                                     Create Menu
                                 </a>
                             </div>
@@ -33,7 +33,13 @@
                         <thead>
                             <tr>
                                 <th>
+                                    SN
+                                </th>
+                                <th>
                                     Title
+                                </th>
+                                <th>
+                                    Language Code
                                 </th>
                                 <th>
                                     Action
@@ -43,9 +49,11 @@
                         <tbody>
                             @foreach ($all_menu as $menu)
                             <tr>
+                                <td>{{$loop->iteration}}</td>
                                 <td>{{$menu->title}}</td>
+                                <td>{{$menu->code}}</td>
                                 <td>
-                                    <a class="btn btn-sm btn-primary" href="{{route('admin.menus.edit', ['id' => $menu->id])}}">Edit</a>
+                                    <a class="btn btn-sm btn-primary" href="{{route('admin.menus.edit', ['id' => $menu->id, 'code' => $menu->code])}}">Edit</a>
                                     <form action="{{route('admin.menus.destroy', ['id' => $menu->id])}}" method="POST" class="d-inline-block">
                                         @csrf
                                         @method('DELETE')

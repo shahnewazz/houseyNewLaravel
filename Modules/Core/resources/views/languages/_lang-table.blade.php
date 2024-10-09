@@ -44,11 +44,11 @@
                 <a href="{{ route('admin.languages.edit', ['id' => $lang->id]) }}" class="btn btn-sm btn-label-primary">
                     Edit
                 </a>
-                @if($lang->isDefault == 0)
+                @if($lang->isDefault == 0 && $lang->code != 'en')
                 <form action="{{route('admin.languages.destroy', ['id' => $lang->id])}}" method="POST">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-sm btn-label-danger">Delete</button>
+                    <button type="submit" class="btn btn-sm btn-label-danger lang-del-btn">Delete</button>
                 </form>
                 @endif
             </div>

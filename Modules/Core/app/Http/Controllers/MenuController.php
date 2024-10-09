@@ -29,15 +29,18 @@ class MenuController extends Controller
      */
     public function store(Request $request)
     {
+
         $validated = $request->validate([
             'menu_title' => ['required', 'string', 'max:255'],
-            'menu_data' => ['required', 'json']
+            'menu_data' => ['required', 'json'],
+            'code' => ['nullable', 'string','max:255', 'exists:language,code'],
         ]);
 
 
         Menu::create([
             'title' => $validated['menu_title'],
-            'menu_items' => json_decode($validated['menu_data'], true)
+            'menu_items' => json_decode($validated['menu_data'], true),
+            'code' => $validated['code'] ?? 'en',
         ]);
 
         return redirect()->route('admin.menus.index')->with('success', 'Menu created successfully');
@@ -47,11 +50,18 @@ class MenuController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
-        $menu = Menu::findOrFail($id);
+        // get code parameter from the request
+        $code = $request->query('code')?? 'en';
+
+        $menu = Menu::where('id', $id)->where('code', $code)->first();
         
-        return view('core::pages.menu.edit', compact('menu'));
+        if ($menu) {
+            return view('core::pages.menu.edit', compact('menu'));
+        }else{
+            return redirect()->route('admin.menus.index')->with('error', 'Menu not found');
+        }
     }
 
     /**
@@ -61,7 +71,8 @@ class MenuController extends Controller
     {
         $validated = $request->validate([
             'menu_title' => ['required', 'string', 'max:255'],
-            'menu_data' => ['required', 'json']
+            'menu_data' => ['required', 'json'],
+            'code' => ['nullable', 'string','max:255', 'exists:language,code'],
         ]);
 
 
@@ -69,6 +80,7 @@ class MenuController extends Controller
 
         $menu->title = $validated['menu_title'];
         $menu->menu_items = json_decode($validated['menu_data'], true);
+        $menu->code = $validated['code'] ?? 'en';
         $menu->save(); 
 
         return redirect()->route('admin.menus.index')->with('success', 'Menu Updated successfully');

@@ -12,7 +12,7 @@ class Menu extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = ['title', 'menu_items'];
+    protected $fillable = ['title', 'menu_items', 'code'];
 
     /**
      * The attributes that should be cast.

@@ -131,4 +131,10 @@ class DashboardController extends Controller
     {
         //
     }
+
+
+    // get settings page
+    public function settings(){
+        return view('core::pages.settings.index');
+    }
 }

@@ -144,11 +144,10 @@ class LanguageController extends Controller
             return redirect()->back()->with('error', 'Failed to update language: ' . $e->getMessage());
         }
 
-    return redirect()->route('admin.languages.index')->with('success', 'Language updated successfully');
-}
+        return redirect()->route('admin.languages.index')->with('success', 'Language updated successfully');
+    }
 
     
-
 
     public function destroy($id)
     {
@@ -173,9 +172,12 @@ class LanguageController extends Controller
             Storage::disk('public')->delete($language->image);
         }
 
-        $language->delete();
-
-        return redirect()->route('admin.languages.index')->with('success', 'Language deleted successfully');
+        if(deleteTranslationByCode($language->code)){
+            $language->delete();
+            return redirect()->route('admin.languages.index')->with('success', 'Language deleted successfully');
+        }
+        
+        return redirect()->route('admin.languages.index')->with('error', 'Failed to Delete Language & Translations');
     }
 
     public function default(Request $request)

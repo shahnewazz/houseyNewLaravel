@@ -103,6 +103,14 @@ Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'v
         Route::put('/update/{id}', [BlogController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [BlogController::class, 'destroy'])->name('destroy');
     });
+
+    
+    // system settings routes
+    
+
+    Route::group(['prefix' => 'settings', 'as' => 'settings.'], function(){
+        Route::get('/', [DashboardController::class, 'settings'])->name('index');
+    });
 });
 
 Route::get('/change-language/{lang}', function ($lang) {
