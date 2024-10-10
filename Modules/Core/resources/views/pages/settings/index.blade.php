@@ -3,28 +3,7 @@
 @section('title', 'Settings')
 
 @section('content')
-<x-core::card>
-    <ul class="nav nav-pills">
-        <li class="nav-item">
-            <a class="nav-link {{(request()->routeIs('admin.settings.index')) ? 'active' : ''}}" href="#">General</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">Email</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">SMS</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">Roles & Permission</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">Payment Gateways</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">Currency</a>
-        </li>
-    </ul>
-</x-core::card>
+    @include('core::pages.settings._nav')
 
 <form action="" class="pb-10">
     <!-- General Settings -->
@@ -47,7 +26,7 @@
             <div class="col">
                 <div class="mb-3">
                     <x-core::form.input-label for="app_mode" :value="'App Mode'" />
-                    <select class="form-select conca-selec2" id="app_mode" name="app_mode">
+                    <select class="form-select conca-select2" id="app_mode" name="app_mode">
                         <option value="development">Development</option>
                         <option value="production">Production</option>
                     </select>
@@ -85,7 +64,7 @@
             <div class="col">
                 <div class="mb-3">
                     <x-core::form.input-label for="site_timezone" :value="'Timezone'" />
-                    <select name="site_timezone" class="form-select conca-selec2">
+                    <select name="site_timezone" class="form-select conca-select2">
                         @foreach (timezone_identifiers_list() as $timezone)
                             <option value="{{ $timezone }}" {{ config('app.timezone') == $timezone ? 'selected' : '' }}>
                                 {{ $timezone }}
@@ -95,10 +74,35 @@
                     <x-core::form.input-error field="site_timezone" />
                 </div>                  
             </div>
+
+            @php
+                $today = \Carbon\Carbon::now();
+                $formats = [
+                    'Y-m-d' => 'YYYY-MM-DD (' . $today->format('Y-m-d') . ')',
+                    'd/m/Y' => 'DD/MM/YYYY (' . $today->format('d/m/Y') . ')',
+                    'm-d-Y' => 'MM-DD-YYYY (' . $today->format('m-d-Y') . ')',
+                    'M d, Y' => 'Month Day, Year (' . $today->format('M d, Y') . ')',
+                    'D, M d Y' => 'Day, Month Day Year (' . $today->format('D, M d Y') . ')',
+                    'F j, Y' => 'Full Month Name, Day, Year (' . $today->format('F j, Y') . ')',
+                    'Y/m/d' => 'YYYY/MM/DD (' . $today->format('Y/m/d') . ')',
+                    'd M, Y' => 'Day Month, Year (' . $today->format('d M, Y') . ')',
+                    'l, F j, Y' => 'Weekday, Full Month Day, Year (' . $today->format('l, F j, Y') . ')',
+                    'jS F Y' => 'Day Ordinal Full Month Year (' . $today->format('jS F Y') . ')',
+                    'd.m.Y' => 'DD.MM.YYYY (' . $today->format('d.m.Y') . ')',
+                    'Ymd' => 'YYYYMMDD (' . $today->format('Ymd') . ')',
+                ];                
+            @endphp
+
             <div class="col">
                 <div class="mb-3">
                     <x-core::form.input-label for="site_date_format" :value="'Date Format'" />
-                    <x-core::form.input type="text" id="site_date_format" name="site_date_format" value="{{ old('site_date_format', 'M Y D') }}" />
+                    <select name="site_date_format" id="site_date_format" class="form-select conca-select2">
+                        @foreach ($formats as $format => $label)
+                            <option value="{{ $format }}" {{ config('app.date_format') == $format ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
                     <x-core::form.input-error field="site_date_format" />
                 </div>                  
             </div>
@@ -116,7 +120,7 @@
             <div class="col">
                 <div class="mb-3">
                     <x-core::form.input-label for="site_currency" :value="'Currency'" />
-                    <select name="site_currency" class="form-select conca-selec2">
+                    <select name="site_currency" class="form-select conca-select2">
                         <option value="USD">USD</option>
                         <option value="EUR">EUR</option>
                         <option value="GBP">GBP</option>
@@ -273,7 +277,7 @@
             </x-core::card>
         </div>
     
-        <!-- site favicon & Font Family -->
+        <!-- site favicon -->
         <div class="col">
             <!-- site favicon -->
             <x-core::card>
@@ -327,7 +331,7 @@
         </div>
 
         <x-core::form.input-label for="site_maintenance_page" :value="'Page Template'" />
-        <select name="site_maintenance_page" class="form-select conca-selec2">
+        <select name="site_maintenance_page" class="form-select conca-select2">
             <option value="1">Maintenance Page 1</option>
             <option value="2">Maintenance Page 2</option>
             <option value="3">Maintenance Page 3</option>
@@ -346,8 +350,8 @@
 
 @endsection
 
-@push('scripts')
 
+@push('scripts')
 <script>
     "use strict";
 
@@ -358,39 +362,6 @@
             if($(this).val() < 1){
                 $(this).val(1);
             }
-        });
-
-        $('.input-color').each(function(){
-            $(this).on('input', function(){
-                $(this).siblings('.input-color-placeholder').css('background-color', $(this).val());
-            });
-        });
-        
-        // Handle image preview
-        $('.image-input').on('change', function (e) {
-            var file = e.target.files[0];
-            var target = $(this).data('target');
-            var resetButton = $(this).data('reset');
-
-            if (file) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    $(target).attr('src', e.target.result);
-                }
-                reader.readAsDataURL(file);
-                $(resetButton).removeClass('d-none');
-            }
-        });
-
-        // Handle image reset
-        $('.image-reset').on('click', function () {
-            var target = $(this).data('target');  
-            var input = $(this).closest('.image-upload-container').find('.image-input'); 
-            var defaultSrc = $(target).data('default'); 
-
-            $(target).attr('src', defaultSrc); 
-            input.val('');
-            $(this).addClass('d-none');
         });
 
     });

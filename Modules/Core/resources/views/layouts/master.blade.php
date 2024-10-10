@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <title>@yield('title') - {{ config('app.name', 'Laravel') }}</title>
+    <title>@yield('title', 'Dashboard') - {{ config('app.name', 'Laravel') }}</title>
 
     <meta name="description" content="{{ $description ?? '' }}">
     <meta name="keywords" content="{{ $keywords ?? '' }}">
@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="{{asset('backend/assets/vendor/libs/toastr/toastr.css')}}">
     <link href="{{asset('backend/assets/vendor/libs/sweetalert2/sweetalert2.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('backend/assets/vendor/libs/select2/select2.css')}}" rel="stylesheet">
+    <link href="{{asset('css/custom.css')}}" rel="stylesheet">
 
     @stack('styles')
 </head>
@@ -85,12 +86,43 @@
             }
         });
 
-        $('.conca-selec2').each(function() {
+        $('.conca-select2').each(function() {
             $(this).wrap('<div class="position-relative"></div>').select2({
                 placeholder: 'Select value',
                 dropdownParent: $(this).parent()
             });
 
+        });
+
+        $(document).on('input', '.input-color', function() {
+            $(this).siblings('.input-color-placeholder').css('background-color', $(this).val());
+        });
+        
+        // Handle image preview
+        $(document).on('change', '.image-input', function (e) {
+            var file = e.target.files[0];
+            var target = $(this).data('target');
+            var resetButton = $(this).data('reset');
+
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $(target).attr('src', e.target.result);
+                }
+                reader.readAsDataURL(file);
+                $(resetButton).removeClass('d-none');
+            }
+        });
+
+        // Handle image reset
+        $(document).on('click', '.image-reset', function () {
+            var target = $(this).data('target');  
+            var input = $(this).closest('.image-upload-container').find('.image-input'); 
+            var defaultSrc = $(target).data('default'); 
+
+            $(target).attr('src', defaultSrc); 
+            input.val('');
+            $(this).addClass('d-none');
         });
 
         @if($errors->any())

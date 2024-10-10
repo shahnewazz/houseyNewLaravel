@@ -17,39 +17,30 @@ class RoleController extends Controller
         if($type == 'id'){
             if($id == 1){
                 return ['status' => true, 'message'=> 'You can\'t edit Super Admin role'];
-            }elseif($id == 2){
-                return ['status' => true, 'message'=> 'You can\'t edit Default User role'];
-            }elseif($id == 3){
-                return ['status' => true, 'message'=> 'You can\'t edit Default Admin role'];
             }else{
                 return ['status' => false];
             }
         }elseif($type == 'name'){
             if($id == 'super_admin'){
                 return ['status' => true, 'message'=> 'You can\'t edit Super Admin role'];
-            }elseif($id == 'default_user'){
-                return ['status' => true, 'message'=> 'You can\'t edit Default User role'];
-            }elseif($id == 'default_admin'){
-                return ['status' => true, 'message'=> 'You can\'t edit Default Admin role'];
             }else{
                 return ['status' => false];
             }
         }
-      
     }
 
 
     public function index()
     {
         // get all roles expect super admin, default user and default admin
-        $roles = Role::whereNotIn('name', ['super_admin', 'default_user', 'default_admin'])->get();
+        $roles = Role::whereNotIn('name', ['super_admin'])->get();
 
         // get users count for each role
         foreach ($roles as $role) {
             $role->users_count = $role->users()->count();
         }
         
-        return view('core::pages.roles.roles', compact('roles'));
+        return view('core::pages.settings.roles_permission', compact('roles'));
     }
 
 
@@ -74,8 +65,7 @@ class RoleController extends Controller
         }
 
         return redirect()->route('admin.roles.index')->with('success','Role created successfully');
-        
-        
+           
     }
 
     /**
@@ -90,7 +80,6 @@ class RoleController extends Controller
         }
 
         $role = Role::findOrFail($id);
-        
         
         $permissions = Permission::all();
         return view('core::pages.roles.edit', compact('role','permissions'));
@@ -115,7 +104,6 @@ class RoleController extends Controller
         }
         $role->save();
 
-        
 
         return redirect()->route('admin.roles.index')->with('success','Role updated successfully');
 
@@ -131,7 +119,6 @@ class RoleController extends Controller
             return redirect()->route('admin.roles.index')->with('error',$this->checkRoleByID($id)['message']);
         }
         
-
         $role = Role::findOrFail($id);
         $role->permissions()->detach();
 

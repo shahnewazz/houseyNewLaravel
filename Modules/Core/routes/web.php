@@ -3,12 +3,15 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Core\Http\Controllers\BlogController;
 use Modules\Core\Http\Controllers\CoreController;
+use Modules\Core\Http\Controllers\CurrencyController;
 use Modules\Core\Http\Controllers\MenuController;
 use Modules\Core\Http\Controllers\PageController;
 use Modules\Core\Http\Controllers\RoleController;
+use Modules\Core\Http\Controllers\SiteSettingController;
 use Modules\Core\Http\Controllers\UserController;
 use Modules\Core\Http\Controllers\LanguageController;
 use Modules\Core\Http\Controllers\DashboardController;
+use Modules\Core\Models\SiteSetting;
 
 /*
 |--------------------------------------------------------------------------
@@ -105,12 +108,31 @@ Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'v
     });
 
     
-    // system settings routes
-    
+    Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
 
-    Route::group(['prefix' => 'settings', 'as' => 'settings.'], function(){
-        Route::get('/', [DashboardController::class, 'settings'])->name('index');
+    // email settings
+    Route::group(['prefix' => 'email', 'as' => 'email.'], function(){
+        Route::get('/', [SiteSettingController::class, 'emailSettings'])->name('index');
+        Route::post('/store', [SiteSettingController::class, 'storeEmailSettings'])->name('store');
+        Route::post('/update', [SiteSettingController::class, 'updateEmailSettings'])->name('update');
+        Route::post('/test-mail', [SiteSettingController::class,'testMail'])->name('testMail');
     });
+
+    // payment settings
+    Route::group(['prefix'=> 'payment', 'as'=> 'payment.'], function(){
+        Route::get('/', [SiteSettingController::class, 'paymentSettings'])->name('index');
+        Route::post('/store', [SiteSettingController::class, 'storePaymentSettings'])->name('store');
+    });
+
+    // currency settings
+    Route::group(['prefix'=> 'currency','as'=> 'currency.'], function(){
+        Route::get('/', [CurrencyController::class,'index'])->name('index');
+        Route::post('/store', [CurrencyController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [CurrencyController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [CurrencyController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [CurrencyController::class, 'destroy'])->name('destroy');
+    });
+
 });
 
 Route::get('/change-language/{lang}', function ($lang) {
