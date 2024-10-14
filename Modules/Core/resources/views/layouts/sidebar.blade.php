@@ -5,8 +5,7 @@
         <!-- app sidebar header -->
         <div class="app-sidebar-header d-flex align-items-center justify-content-between">
             <a href="{{route('admin.dashboard')}}" class="app-sidebar-logo">
-                <img class="app-main-logo" data-width="105" src="{{asset('backend/assets/img/logo/logo.png')}}" alt="Conca">
-                <img class="app-logo-icon" data-width="32" src="{{asset('backend/assets/img/logo/logo-icon.png')}}" alt="Conca">
+                <img class="app-main-logo" data-width="105" src="{{asset('storage/'.$config['site_logo'])}}" alt="{{$config['site_description']}}">
             </a>
         </div>
 

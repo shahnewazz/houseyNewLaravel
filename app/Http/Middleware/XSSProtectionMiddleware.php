@@ -71,6 +71,9 @@ class XSSProtectionMiddleware
             $html = mb_convert_encoding($html, 'UTF-8', 'auto');
         }
     
+        // Replace & with a placeholder
+        $html = str_replace('&', '##AMP##', $html);
+        
         // Initialize DOMDocument with UTF-8 encoding and suppress errors for cleaner output
         $dom = new \DOMDocument('1.0', 'UTF-8');
         libxml_use_internal_errors(true);
@@ -107,8 +110,12 @@ class XSSProtectionMiddleware
             $output .= $dom->saveHTML($child);
         }
     
-        // Return sanitized content without entity conversion, ensuring proper UTF-8
+        // Restore the original & character
+        $output = str_replace('##AMP##', '&', $output);
+    
+        // Return sanitized content ensuring proper UTF-8
         return trim($output);
     }
+    
      
 }

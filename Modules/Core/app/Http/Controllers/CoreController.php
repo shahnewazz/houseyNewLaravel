@@ -14,20 +14,8 @@ class CoreController extends Controller
     public function index($slug = null)
     {
 
-        if($slug == null){
-            $page = Page::where("is_home", 1)->first();
-            return $page;
-        }
-        
-        $page =  Page::where('slug', $slug)
-                    ->where('status', 'active')
-                    ->first(['title', 'widgets']);
-        
-        if (!$page) {
-            abort(404);
-        }else{
-            return view('core::frontend.index', compact('page'));
-        }
+        return view('core::frontend.index');
+
     }
 
     /**

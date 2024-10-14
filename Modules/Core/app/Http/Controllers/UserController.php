@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Modules\Core\Http\Requests\User\UserStoreRequest;
+use Modules\Core\Models\SiteSetting;
 
 class UserController extends Controller implements HasMiddleware
 {
@@ -50,11 +51,9 @@ class UserController extends Controller implements HasMiddleware
         }
 
         // Paginate the results
-        $users = $query->paginate(10);
+        $users = $query->paginate(SiteSetting::getValue('pagination_limit'));
 
         if ($request->ajax()) {
-            // Debug users if needed
-            // dd($users);
             return view('core::pages.users.partials._users-table', compact('users'))->render();
         }
 
@@ -62,9 +61,6 @@ class UserController extends Controller implements HasMiddleware
 
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('core::pages.users.create-user');
@@ -133,9 +129,7 @@ class UserController extends Controller implements HasMiddleware
         return view('core::pages.users.user-edit', compact('user'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(Request $request, $username)
     {
 
@@ -222,10 +216,10 @@ class UserController extends Controller implements HasMiddleware
         }
 
         $user = User::where('username', $username)->first();
-        // remove user role 
+
         $user->syncPermissions('');
 
-        // deleter user avatar
+ 
         if($user->profile_picture){
             if (Storage::disk('public')->exists($user->profile_picture)) {
                 Storage::disk('public')->delete($user->profile_picture);

@@ -27,6 +27,7 @@
                 @endforeach
             </tbody>
         </table>
+        {!! $files->links('core::components.pagination') !!}
     </div>
 </div>
 

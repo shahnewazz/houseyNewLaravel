@@ -1,4 +1,5 @@
 <?php
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Facade;
 
 return [
@@ -314,4 +315,18 @@ return [
         "za" => "Zhuang, Chuang",
         "zu" => "Zulu"
     ],  
+    'date_formats' => [
+        'Y-m-d' => 'YYYY-MM-DD (' . Carbon::now()->format('Y-m-d') . ')',
+        'd/m/Y' => 'DD/MM/YYYY (' . Carbon::now()->format('d/m/Y') . ')',
+        'm-d-Y' => 'MM-DD-YYYY (' . Carbon::now()->format('m-d-Y') . ')',
+        'M d, Y' => 'Month Day, Year (' . Carbon::now()->format('M d, Y') . ')',
+        'D, M d Y' => 'Day, Month Day Year (' . Carbon::now()->format('D, M d Y') . ')',
+        'F j, Y' => 'Full Month Name, Day, Year (' . Carbon::now()->format('F j, Y') . ')',
+        'Y/m/d' => 'YYYY/MM/DD (' . Carbon::now()->format('Y/m/d') . ')',
+        'd M, Y' => 'Day Month, Year (' . Carbon::now()->format('d M, Y') . ')',
+        'l, F j, Y' => 'Weekday, Full Month Day, Year (' . Carbon::now()->format('l, F j, Y') . ')',
+        'jS F Y' => 'Day Ordinal Full Month Year (' . Carbon::now()->format('jS F Y') . ')',
+        'd.m.Y' => 'DD.MM.YYYY (' . Carbon::now()->format('d.m.Y') . ')',
+        'Ymd' => 'YYYYMMDD (' . Carbon::now()->format('Ymd') . ')',
+    ]
 ];

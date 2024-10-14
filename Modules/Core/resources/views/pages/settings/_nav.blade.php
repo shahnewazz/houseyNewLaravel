@@ -5,6 +5,10 @@
             'label' => 'General'
         ],
         [
+            'route' => 'admin.env.index',
+            'label' => 'Environment'
+        ],
+        [
             'route' => 'admin.email.index',
             'label' => 'Email'
         ],
@@ -19,6 +23,10 @@
         [
             'route' => 'admin.currency.index', 
             'label' => 'Currency'
+        ],
+        [
+            'route' => 'admin.maintenance.index', 
+            'label' => 'Maintenance'
         ],
     ];
 @endphp

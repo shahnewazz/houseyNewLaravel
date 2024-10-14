@@ -4,6 +4,7 @@ namespace Modules\Core\Providers;
 
 use Modules\Core\Models\Language;
 use Illuminate\Support\Facades\View;
+use Modules\Core\Models\SiteSetting;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
@@ -31,6 +32,11 @@ class CoreServiceProvider extends ServiceProvider
 
         // add all the middleware
         $this->app->make('router')->aliasMiddleware('language', LanguageMiddleware::class);
+
+        
+        // share site settings with all views
+        $config = SiteSetting::all()->pluck('value', 'key')->toArray();
+        View::share('config', $config);
 
     }
 

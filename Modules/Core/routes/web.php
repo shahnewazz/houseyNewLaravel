@@ -24,6 +24,7 @@ use Modules\Core\Models\SiteSetting;
 |
 */
 
+
 require __DIR__.'/auth.php';
 
 Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'verified']], function () {
@@ -86,8 +87,8 @@ Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'v
         Route::get('/edit/{id}', [LanguageController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [LanguageController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [LanguageController::class, 'destroy'])->name('destroy');
-        Route::post('/default', [LanguageController::class, 'default'])->name('default');
-        Route::post('/status', [LanguageController::class, 'status'])->name('status');
+        Route::post('/default/{id}', [LanguageController::class, 'default'])->name('default');
+        Route::post('/status/{id}', [LanguageController::class, 'status'])->name('status');
 
         // translations routes
         Route::get('/translate/{code}', [LanguageController::class, 'translate'])->name('translate');
@@ -110,12 +111,30 @@ Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'v
     
     Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
 
+    // general settings
+    Route::group(['prefix' => 'general', 'as' => 'general.'], function(){
+        Route::put('/general-update', [SiteSettingController::class, 'updateGeneralSettings'])->name('update');
+        Route::put('/business-update', [SiteSettingController::class, 'updateBusinessSettings'])->name('business.update');
+        Route::put('/interface-update', [SiteSettingController::class, 'updateInterfaceSettings'])->name('interface.update');
+    });
+
     // email settings
     Route::group(['prefix' => 'email', 'as' => 'email.'], function(){
         Route::get('/', [SiteSettingController::class, 'emailSettings'])->name('index');
-        Route::post('/store', [SiteSettingController::class, 'storeEmailSettings'])->name('store');
         Route::post('/update', [SiteSettingController::class, 'updateEmailSettings'])->name('update');
         Route::post('/test-mail', [SiteSettingController::class,'testMail'])->name('testMail');
+    });
+
+    // Environment settings
+    Route::group(['prefix'=> 'env', 'as'=> 'env.'], function(){
+        Route::get('/', [SiteSettingController::class, 'envSettings'])->name('index');
+        Route::post('/update', [SiteSettingController::class, 'updateEnvSettings'])->name('update');
+    });
+
+    // Maintenance settings
+    Route::group(['prefix'=> 'maintenance', 'as'=> 'maintenance.'], function(){
+        Route::get('/', [SiteSettingController::class, 'maintenanceSettings'])->name('index');
+        Route::post('/store', [SiteSettingController::class, 'maintenanceSettings'])->name('store');
     });
 
     // payment settings
@@ -135,16 +154,10 @@ Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'v
 
 });
 
-Route::get('/change-language/{lang}', function ($lang) {
-    session(['lang' => $lang]); // Store the selected language in the session
-    return redirect()->back();    // Redirect back to the previous page
-})->name('change.language');
-
-
-
 Route::post('/xss/input', [DashboardController::class,'xss'])->name('xss.post');
 Route::get('/xss', [DashboardController::class,'getXss'])->name('xss');
 
-Route::get('/blog', [DashboardController::class,'blog'])->name('blog');
+// frontend routes
+require __DIR__.'/frontend.php';
 
 Route::get('/{slug?}', [CoreController::class, 'index'])->where('slug', '[a-zA-Z0-9-/]+'); 

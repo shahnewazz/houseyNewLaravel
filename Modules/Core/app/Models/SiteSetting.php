@@ -19,7 +19,11 @@ class SiteSetting extends Model
     // get value by key
     public static function getValue($key)
     {
-        return self::where('key', $key)->first();
+        return self::where('key', $key)->first(['value'])->value;
+    }
+    public static function getAdditionalData($key)
+    {
+        return self::where('key', $key)->first(['additional_data'])->value;
     }
 
     // update value by key

@@ -3,7 +3,7 @@
 return array (
   'dashboard' => 'Dashboard',
   'settings' => 'Settings',
-  'site_management' => 'Site Management',
+  'system_settings' => 'System Settings',
   'languages' => 'Languages',
   'users_heading' => 'Users Management',
   'users' => 'Users',

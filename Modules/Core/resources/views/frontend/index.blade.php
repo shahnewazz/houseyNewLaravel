@@ -2,7 +2,7 @@
 
 @section('content')
 
-@foreach (\Modules\Core\Models\Language::all() as $lang)
+{{-- @foreach (\Modules\Core\Models\Language::all() as $lang)
 <a href="{{ route('change.language', $lang->code) }}">{{$lang->name}}</a>
 @endforeach
 
@@ -11,5 +11,5 @@
     <!-- You can also display other fields like description if needed -->
 @endforeach
 
-<!-- You can add more translatable fields similarly -->
+<!-- You can add more translatable fields similarly --> --}}
 @endsection

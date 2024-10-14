@@ -15,7 +15,7 @@
 
 
     <!-- favicon -->
-    <link rel="shortcut icon" href="" type="image/x-icon">
+    <link rel="shortcut icon" type="image/x-icon" href="{{asset('storage/'.$config['site_favicon'])}}">
 
     <!-- global style sheet for all pages -->
     <link rel="stylesheet" href="{{asset('backend/assets/vendor/css/core.css')}}">
@@ -27,7 +27,19 @@
     <link href="{{asset('backend/assets/vendor/libs/sweetalert2/sweetalert2.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('backend/assets/vendor/libs/select2/select2.css')}}" rel="stylesheet">
     <link href="{{asset('css/custom.css')}}" rel="stylesheet">
-
+    <style>
+        :root {
+            --tp-theme-primary: {{ $config['site_primary_color'] }};
+            --tp-theme-2: {{ $config['site_secondary_color'] }};
+            --tp-grey-1: {{ $config['site_body_color'] }};
+            --tp-common-black: {{ $config['site_heading_color'] }};
+            --tp-common-falured: {{ $config['site_preloader_overlay'] }};
+        }
+    
+        body {
+            color: var(--tp-grey-1);
+        }
+    </style>
     @stack('styles')
 </head>
 
@@ -93,6 +105,10 @@
             });
 
         });
+
+        $('.input-color').each(function(){
+            $(this).siblings('.input-color-placeholder').css('background-color', $(this).val());
+        })
 
         $(document).on('input', '.input-color', function() {
             $(this).siblings('.input-color-placeholder').css('background-color', $(this).val());

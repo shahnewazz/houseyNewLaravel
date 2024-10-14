@@ -4,6 +4,8 @@ namespace Modules\Core\Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Modules\Core\Database\Seeders\FileSeeder;
+use Modules\Core\Database\Seeders\SiteSettingSeeder;
 use Modules\Core\Database\Seeders\RolePermissionSeeder;
 
 class CoreDatabaseSeeder extends Seeder
@@ -26,9 +28,11 @@ class CoreDatabaseSeeder extends Seeder
 
         $this->call([
             LanguageSeeder::class,
-            RolePermissionSeeder::class
+            RolePermissionSeeder::class,
+            SiteSettingSeeder::class,
+            FileSeeder::class
         ]);
 
-        User::factory()->count(30)->create();
+        User::factory()->count(5)->create();
     }
 }

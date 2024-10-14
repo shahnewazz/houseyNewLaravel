@@ -33,7 +33,7 @@
                 @endforeach
             </tbody>
         </table>
-
+        {!! $translations->links('core::components.pagination') !!}
     </div>
 </div>
 @endsection

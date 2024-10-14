@@ -4,11 +4,14 @@ namespace Modules\Core\Http\Controllers;
 
 
 use Illuminate\Http\Request;
+use Modules\Core\Enums\SiteSettingEnum;
 use Modules\Core\Models\Language;
 use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
+use Modules\Core\Models\SiteSetting;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Modules\Core\Http\Requests\LanguageRequest;
 use Modules\Core\Http\Requests\LanguageUpdateRequest;
 
@@ -17,7 +20,7 @@ class LanguageController extends Controller
 
     public function index()
     {
-        $languages = Language::all();
+        $languages = Language::paginate(SiteSetting::getValue('pagination_limit'));
 
         return view('core::languages.index', compact('languages'));
     }
@@ -182,33 +185,28 @@ class LanguageController extends Controller
 
     public function default(Request $request)
     {
-        if($request->ajax()){
-            $languages = Language::all();
 
-            foreach($languages as $language){
-                $language->isDefault =  $language->id == $request->id ? 1 : 0;
-                if($language->isDefault == 1){
-                    $language->status = 1;
-                }
-                $language->save();
+        $languages = Language::all();
+
+        foreach($languages as $language){
+            $language->isDefault =  $language->id == $request->id ? 1 : 0;
+            if($language->isDefault == 1){
+                $language->status = 1;
             }
-
-            $code = $languages->where('id', $request->id)->first()->code;
-
-            // update env file
-            $envFile = app()->environmentFilePath();
-            $env = file_get_contents($envFile);
-            $env = preg_replace('/APP_LOCALE=(.*)/', 'APP_LOCALE='.$code, $env);
-            file_put_contents($envFile, $env);
-            
-
-            $html = view('core::languages._lang-table', compact('languages'))->render();
-            return response()->json(['html' => $html]);
-
+            $language->save();
         }
-       
 
-        
+        $code = $languages->where('id', $request->id)->first()->code;
+
+
+        if(updateEnv('APP_LOCALE', $code)){
+            App::setLocale($code);
+            return redirect()->route('admin.languages.index')->with('success', 'Default language updated successfully');
+        }else{
+            return redirect()->route('admin.languages.index')->with('error', 'Failed to update default language');
+        }
+
+
     }
 
     public function status(Request $request)
@@ -217,39 +215,34 @@ class LanguageController extends Controller
         $languages = Language::all();
         $language = $languages->where('id', $request->id)->first();
 
-        
-
         if($language->isDefault == 1){
-            $html = view('core::languages._lang-table', compact('languages'))->render();
-            return response()->json([
-                'error' => 'Default language can not be disabled',
-                'html' => $html
-            ], 400);
+            return redirect()->route('admin.languages.index')->with('error', 'Default language status can not be changed');
         }
 
-        $language->status = $request->status;
+        $language->status = $request->status ? 1 : 0;
         $language->save();
         
-        
-        $html = view('core::languages._lang-table', compact('languages'))->render();
-        return response()->json(['html' => $html]);
+        return redirect()->route('admin.languages.index')->with('success', 'Language status updated successfully');
     }
 
 
     public function showTranslations($lang, $file)
     {
-
         $filePath = resource_path("lang/{$lang}/{$file}.php");
 
-
+        // Load translations from the file
         if (File::exists($filePath)) {
             $translations = include $filePath;
         } else {
             $translations = [];
         }
 
+        $translations = core_paginate($translations, SiteSetting::getValue(SiteSettingEnum::PAGINATION_LIMIT));
+
         return view('core::languages.translation', compact('translations', 'lang', 'file'));
     }
+
+
 
     public function translate($code)
     {
@@ -261,6 +254,8 @@ class LanguageController extends Controller
         $files = array_map(function ($file) {
             return pathinfo($file, PATHINFO_FILENAME);
         }, $files);
+
+        $files = core_paginate($files, SiteSetting::getValue(SiteSettingEnum::PAGINATION_LIMIT));
 
 
         return view('core::languages.translate', compact('files', 'code', 'language'));

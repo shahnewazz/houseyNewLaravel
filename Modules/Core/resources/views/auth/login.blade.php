@@ -1,9 +1,9 @@
 
 @extends('core::layouts.guest')
 
+@section('guest-title', 'Login')
 
 @section('guest-content')
-
 <div class="container mt-5 pt-5">
     <div class="row justify-content-center">
         <div class="col-xl-6">

@@ -8,7 +8,7 @@
       <meta name="viewport" content="width=device-width, initial-scale=1">
        
       <!-- Place favicon.ico in the root directory -->
-      <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon/favicon.png">
+      <link rel="shortcut icon" type="image/x-icon" href="{{'storage/'.$config['site_favicon']}}">
 
       <!-- CSS here -->
       <link rel="stylesheet" href="{{asset('frontend/assets/css/bootstrap.css')}}">
@@ -20,29 +20,48 @@
       <link rel="stylesheet" href="{{asset('frontend/assets/css/flatpicker-min.css')}}">
       <link rel="stylesheet" href="{{asset('frontend/assets/css/spacing.css')}}">
       <link rel="stylesheet" href="{{asset('frontend/assets/css/main.css')}}">
+
+      <style>
+         :root {
+            --tp-theme-primary: {{ $config['site_primary_color'] }};
+            --tp-theme-2: {{ $config['site_secondary_color'] }};
+            --tp-grey-1: {{ $config['site_body_color'] }};
+            --tp-common-black: {{ $config['site_heading_color'] }};
+            --tp-common-falured: {{ $config['site_preloader_overlay'] }};
+         }
+         body {
+            color: var(--tp-grey-1);
+         }
+      </style>
    </head>
    <body>
+
+      @if ($config['site_preloader'] == 'on')
+         <div id="loading">
+            <div class="loading"></div>
+         </div>
+      @endif
 
     @yield('content')
       
     <!-- JS here -->
-    <script src="{{asset('frontend/assets/js/vendor/jquery.')}}"></script>
-    <script src="{{asset('frontend/assets/js/vendor/waypoints.')}}"></script>
-    <script src="{{asset('frontend/assets/js/bootstrap-bundle.')}}"></script>
-    <script src="{{asset('frontend/assets/js/swiper-bundle.')}}"></script>
-    <script src="{{asset('frontend/assets/js/imagesloaded-pkgd.')}}"></script>
-    <script src="{{asset('frontend/assets/js/isotope-pkgd.')}}"></script>
-    <script src="{{asset('frontend/assets/js/magnific-popup.')}}"></script>
-    <script src="{{asset('frontend/assets/js/nice-select.')}}"></script>
-    <script src="{{asset('frontend/assets/js/purecounter.')}}"></script>
-    <script src="{{asset('frontend/assets/js/wow.')}}"></script>
-    <script src="{{asset('frontend/assets/js/ajax-form.')}}"></script>
-    <script src="{{asset('frontend/assets/js/flatpicker.')}}"></script>
-    <script src="{{asset('frontend/assets/js/parallax.')}}"></script>
-    <script src="{{asset('frontend/assets/js/jarallax.')}}"></script>
-    <script src="{{asset('frontend/assets/js/parallax-scroll.')}}"></script>
-    <script src="{{asset('frontend/assets/js/jquery.mb.YTPlayer.min.')}}"></script>
-    <script src="{{asset('frontend/assets/js/slider-init.')}}"></script>
-    <script src="{{asset('frontend/assets/js/main.')}}"></script>
+    <script src="{{asset('frontend/assets/js/vendor/jquery.js')}}"></script>
+    <script src="{{asset('frontend/assets/js/vendor/waypoints.js')}}"></script>
+    <script src="{{asset('frontend/assets/js/bootstrap-bundle.js')}}"></script>
+    <script src="{{asset('frontend/assets/js/swiper-bundle.js')}}"></script>
+    <script src="{{asset('frontend/assets/js/imagesloaded-pkgd.js')}}"></script>
+    <script src="{{asset('frontend/assets/js/isotope-pkgd.js')}}"></script>
+    <script src="{{asset('frontend/assets/js/magnific-popup.js')}}"></script>
+    <script src="{{asset('frontend/assets/js/nice-select.js')}}"></script>
+    <script src="{{asset('frontend/assets/js/purecounter.js')}}"></script>
+    <script src="{{asset('frontend/assets/js/wow.js')}}"></script>
+    <script src="{{asset('frontend/assets/js/ajax-form.js')}}"></script>
+    <script src="{{asset('frontend/assets/js/flatpicker.js')}}"></script>
+    <script src="{{asset('frontend/assets/js/parallax.js')}}"></script>
+    <script src="{{asset('frontend/assets/js/jarallax.js')}}"></script>
+    <script src="{{asset('frontend/assets/js/parallax-scroll.js')}}"></script>
+    <script src="{{asset('frontend/assets/js/jquery.mb.YTPlayer.min.js')}}"></script>
+    <script src="{{asset('frontend/assets/js/slider-init.js')}}"></script>
+    <script src="{{asset('frontend/assets/js/main.js')}}"></script>
    </body>
 </html>

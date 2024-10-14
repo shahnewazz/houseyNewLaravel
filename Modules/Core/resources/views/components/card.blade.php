@@ -6,7 +6,9 @@
 @endif
 
 @if (isset($header_2))
-{{ $header_2 }}
+    <div class="card-header bg-white p-4 {{ $headerClass ?? '' }}">
+        {{ $header_2 }}
+    </div>
 @endif
 
   <div class="card-body">
