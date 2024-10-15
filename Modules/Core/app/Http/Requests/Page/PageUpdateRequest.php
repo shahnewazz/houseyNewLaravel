@@ -13,7 +13,7 @@ class PageUpdateRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'regex:/^[a-zA-Z0-9-]+$/', 'max:255', "unique:pages,slug,". $this->id],
+            'slug' => ['required', 'string', 'regex:/^[a-zA-Z0-9-]+$/', 'max:255', "unique:pages,slug,". $this->id],
             'widgets' => ['nullable', 'json'],
             'status' => ['required', 'in:active,inactive,draft'],
         ];

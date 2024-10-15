@@ -28,7 +28,7 @@
             <div class="col">
                 <div class="mb-3">
                     <x-core::form.input-label for="default_currency_position" :value="'Currency Position'" />
-                    <div class="form-control form-group d-flex gap-4">
+                    <div class="form-control form-group d-flex flex-wrap gap-4">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="default_currency_position" id="currency_left" value="left" @if ($settings['default_currency_position'] == 'left') checked @endif required>
                             <label class="form-check-label" for="currency_left">($) Left Side</label>

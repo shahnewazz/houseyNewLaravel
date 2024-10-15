@@ -33,35 +33,11 @@ class PageController extends Controller
     public function store(PageStoreRequest $request)
     {
 
-        if (empty($request->slug) && Page::checkHomePage()) {
-            return back()->with('error', 'Home page already exists.');
-            
-        }
-
-        if(empty($request->slug)){
-            $slug = '';
-            $request->merge(['slug' => $slug, 'is_home' => 1]);
-        }
-
-    
-        $page = new Page();
-        $page->title = $request->title;
-        $page->slug = $request->slug;
-        $page->widgets = $request->widgets;
-        $page->status = $request->status;
-        $page->is_home = $request->is_home ?? 0;
-        $page->save();
+        Page::create($request->validated());
 
         return redirect()->route('admin.pages.index')->with('success', 'Page created successfully.');
     }
 
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('core::show');
-    }
 
     /**
      * Show the form for editing the specified resource.
@@ -80,31 +56,7 @@ class PageController extends Controller
 
         $page = Page::findOrFail($id);
 
-        if(!$page->is_home && empty($request->slug)){
-            return back()->with('error', 'Home page slug already exists.');
-        }
-        
-        if($page->is_home){
-
-            if(!empty($request->slug)){
-                return back()->with('error', 'Home page slug cannot be updated.');
-            }
-
-            if($request->status == 'inactive'|| $request->status == 'darft'){
-                return back()->with('error', 'Home page status cannot be inactive or draft.');
-            }
-        }
-
-        if(empty($request->slug)){
-            $request->merge(['slug' => null, 'is_home' => 1]);
-        }
-        
-        $page->title    = $request->title;
-        $page->slug     = (empty($request->slug) && $page->is_home) ? null : $request->slug;
-        $page->widgets  = $request->widgets;
-        $page->status   = $request->status;
-        $page->is_home  = (empty($request->slug) && $page->is_home) ? 1 : 0;
-        $page->save();
+        $page->update($request->validated());
 
         return redirect()->route('admin.pages.index')->with('success', 'Page updated successfully.');
 
@@ -129,19 +81,25 @@ class PageController extends Controller
      * Set page as home page
      */
 
-    public function setHomePage($id)
+    public function setHomePage(Request $request)
     {
 
-        Page::query()->update(['is_home' => 0]);
+       $request->validate([
+            'home_page' => ['required', 'integer', 'exists:pages,id']
+        ], [
+            'home_page.exists' => 'Page not found.',
+            'home_page.required' => 'Page ID is required.',
+            'home_page.integer' => 'Page ID must be an integer.'
+        ]);
+
+        $id = $request->home_page;
+        Page::where('is_home', 1)->update(['is_home' => 0]);
 
         $page = Page::findOrFail($id);
         $page->is_home = 1;
         $page->save();
     
-        $pages = Page::all();
-        $html = view('core::pages.page.partials._page-list', compact('pages'))->render();
-        
-        return response()->json(['html' => $html]);
+        return redirect()->route('admin.pages.index')->with('success', 'Home page updated successfully.');
     }
 
 
@@ -152,5 +110,34 @@ class PageController extends Controller
     public function widgetEdit($page_id){
         $page = Page::findOrFail($page_id);
         return view('core::pages.page.widgets', compact('page'));
+    }
+
+    /**
+     * Load widget
+     */
+    public function loadWidget($widget){
+
+        $id = request('id');
+
+        $viewPath = "core::pages.widgets.{$widget}"; // Assuming your widgets are in the 'resources/views/widgets/' directory
+
+        // Check if the view exists before rendering
+        if (view()->exists($viewPath)) {
+            return response()->json(['html' => view($viewPath, compact('id'))->render(), 'widget' => $widget]);
+        }
+
+        // If view does not exist, return a 404 or custom error
+        return response()->json(['error' => 'Widget not found'], 404);
+    }
+
+    public function saveWidgets(Request $request, $id){
+        
+        dd($request->all());
+        
+        $page = Page::findOrFail($id);
+        $page->widgets = $request->widgets;
+        $page->save();
+
+        return redirect()->route('admin.pages.index')->with('success', 'Widgets updated successfully.');
     }
 }

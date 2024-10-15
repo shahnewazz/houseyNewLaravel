@@ -14,7 +14,22 @@ class CoreController extends Controller
     public function index($slug = null)
     {
 
-        return view('core::frontend.index');
+        if(is_null($slug)){
+            $page = Page::where('is_home', 1)->first();
+            return view('core::frontend.index', compact('page'));
+        }
+
+        $page = Page::where('slug', $slug)->first();
+
+        if(!$page){
+            abort(404);
+        }
+        
+        if($page->is_home){
+            return redirect('/');
+        }
+        
+        return view('core::frontend.index', compact('page'));
 
     }
 

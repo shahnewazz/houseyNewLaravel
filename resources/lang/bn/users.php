@@ -2,7 +2,7 @@
 
 return array (
   'sn' => 'SN',
-  'name' => 'Name hello',
+  'name' => 'Name',
   'email' => 'Email',
   'role' => 'Role',
   'joined' => 'Joined',
@@ -14,6 +14,6 @@ return array (
   'add_user' => 'Add User',
   'user_not_found' => 'User not found',
   'upload_user_photo' => 'Upload new photo',
-  'user_photo_size' => 'Allowed JPG or PNG. Max size of 2Mb',
-  'reset' => 'Reset test',
+  'user_photo_size' => "Allowed JPG or PNG. Max size of 2Mb",
+  'reset' => 'Reset',
 );

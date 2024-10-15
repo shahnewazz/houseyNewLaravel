@@ -242,8 +242,6 @@ class LanguageController extends Controller
         return view('core::languages.translation', compact('translations', 'lang', 'file'));
     }
 
-
-
     public function translate($code)
     {
 
@@ -261,7 +259,6 @@ class LanguageController extends Controller
         return view('core::languages.translate', compact('files', 'code', 'language'));
         
     }
-
 
     public function updateTranslation(Request $request)
     {
@@ -301,7 +298,6 @@ class LanguageController extends Controller
         return response()->json(['error' => 'Key not found'], 400);
     }
     
-
     public function changeLanguage($code)
     {
         if(setLanguage($code)){

@@ -10,6 +10,8 @@ class SiteSetting extends Model
 {
     use HasFactory;
 
+    protected $table = 'site_settings';
+
     protected $fillable = ['key', 'value', 'additional_data'];
 
     protected $casts = [

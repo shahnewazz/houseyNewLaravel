@@ -1,12 +1,38 @@
 @extends('core::layouts.master')
 
 @section('content')
-<div class="card mb-5">
-    <div class="card-body">
+
+<form action="{{route('admin.pages.set_home')}}" method="POST">
+    @csrf
+    @method('POST')
+    <x-core::card>
+        <x-slot name="header">
+            Set Home Page
+        </x-slot>
+
+        <label for="home_page" class="form-label">Select Home Page</label>
+        <select name="home_page" id="home_page" class="form-select conca-select2" required>
+            <option value="">Select Home Page</option>
+            @foreach ($pages as $page)
+                <option value="{{$page->id}}" @if($page->is_home == 1) selected @endif>{{$page->title}}</option>
+            @endforeach
+        </select>
+
+        <x-slot name="footer">
+            <button type="submit" class="btn btn-primary float-end">Save</button>
+        </x-slot>
+
+    </x-core::card>
+</form>
+
+<form action="{{route('admin.pages.store')}}" method="POST">
+    @csrf
+    @method('POST')
+    <x-core::card>
+        <x-slot name="header">
+            Add New Page
+        </x-slot>
         
-        <form action="{{route('admin.pages.store')}}" method="POST">
-            @csrf
-            @method('POST')
             <div class="row">
                 <div class="col-md-8">
                     <div class="mb-5">
@@ -20,7 +46,7 @@
                             <span class="input-group-text">{{url('/')}}/</span>
                             <input type="text" class="form-control" id="page_url" name="slug">
                         </div>
-                        <div class="form-text">Alpha Numeric and hyphens are allowed, (Leave Blank for create home page)</div>
+                        <div class="form-text">Alpha Numeric and hyphens are allowed.</div>
                         <x-core::form.input-error field="slug" />
                     </div> 
                 </div>
@@ -28,8 +54,7 @@
                     
                     <div class="mb-5">
                         <label for="page_status" class="form-label">Status</label>
-                        <select class="form-select" name="status" id="page_status" required>
-                            <option selected>Select Status</option>
+                        <select class="form-select conca-select2" name="status" id="page_status" required>
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
                             <option value="draft">Draft</option>
@@ -37,16 +62,20 @@
                         <x-core::form.input-error field="status" />
                     </div>
                 </div>
-            </div>
-            <div class="mb-3">
-                <button class="btn btn-primary" type="submit">Create</button>
-            </div>
-        </form>
+            </div>   
 
-    </div>
-</div>
-<div class="card">
-    <div class="card-body">
+        <x-slot name="footer">
+            <button type="submit" class="btn btn-primary float-end">Create</button>
+        </x-slot>
+
+    </x-core::card>
+</form>
+
+
+<x-core::card>
+    <x-slot name="header">
+        All Pages
+    </x-slot>
         @isset($pages)
         <div class="table-responsive">
             <table class="table">
@@ -64,8 +93,7 @@
             </table>          
         </div>
         @endisset
-    </div>
-</div>
+</x-core::card>
 
 @endsection
 

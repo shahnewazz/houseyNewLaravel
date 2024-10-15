@@ -13,7 +13,7 @@ class PageStoreRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'regex:/^[a-zA-Z0-9-]+$/', 'max:255', 'unique:pages'],
+            'slug' => ['required', 'string', 'regex:/^[a-zA-Z0-9-]+$/', 'max:255', 'unique:pages'],
             'widgets' => ['nullable', 'json'],
             'status' => ['required', 'in:active,inactive,draft'],
         ];
@@ -25,5 +25,15 @@ class PageStoreRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     */
+    public function messages(): array
+    {
+        return [
+            'slug.regex' => 'The slug may only contain letters, numbers, and dashes.',
+        ];
     }
 }

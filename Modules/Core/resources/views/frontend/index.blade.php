@@ -12,4 +12,10 @@
 @endforeach
 
 <!-- You can add more translatable fields similarly --> --}}
+
+@isset($page)
+    @php
+        var_dump($page);
+    @endphp
+@endisset
 @endsection
