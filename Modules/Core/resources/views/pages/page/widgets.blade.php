@@ -59,6 +59,9 @@
                 <div class="col">
                     <x-core::widget.card title="Banner" widget="banner" src="https://shofy.botble.com/themes/shofy/images/shortcodes/about.png"  />
                 </div>
+                <div class="col">
+                    <x-core::widget.card title="Facilities" widget="facilities" src="https://shofy.botble.com/themes/shofy/images/shortcodes/about.png"  />
+                </div>
             </div>
         </div>
         <div class="modal-footer">
@@ -70,39 +73,94 @@
 </div>
 @endsection
 
-@push('styles')
-    <style>
-        [draggable]{
-            cursor: move;
-        }
-        .widget-toggle.collapsed svg.minus {
-            display: none;
-        }
-        .widget-toggle.collapsed svg.plus {
-            display: block;
-        }
-        .widget-toggle svg.plus {
-            display: none;
-        }
-        .widget-toggle svg.minus {
-            display: block;
-        }
-    </style>
-@endpush
-
 @push('scripts')
 <script src="{{asset('backend/assets/vendor/libs/sortable/sortable.js')}}"></script> <!-- jQuery UI for sorting -->
+<script src="{{asset('backend/assets/vendor/libs/jquery-repeater/jquery-repeater.js')}}"></script>
 
 <script>
     'use strict';
+
+    let repeaterIndex = 2; // Keep track of the repeater index
+
+    $(document).on('click', '.repeater-form-add-btn', function(e) {
+        e.preventDefault();
+        let html = $(this).parent().find('.repeater-form-fields').first().clone();
+
+        let updatedHtml = html.html().replaceAll('[repeater-item-1]', '[repeater-item-' + repeaterIndex + ']');
+        html.html(updatedHtml);
+
+        let oldItemCount = parseInt($(this).parent().find('.widget-form').data('item_count')) + 1;
+
+        $(this).parent().find('.widget-form').data('item_count', oldItemCount);
+
+        html.find('.repeater-item-title').text('Item ' + oldItemCount);
+        
+        $(this).parent().find(".widget-form .repeater-form-fields-wrapper").append(html);
+        repeaterIndex++;
+
+        let repeaterWrapper = $(this).parent().find('.repeater-form-fields-wrapper');
+        
+
+        if (repeaterWrapper[0]._sortable) {
+            repeaterWrapper[0]._sortable.destroy();
+        }
+
+        Sortable.create(repeaterWrapper[0], {
+            animation: 150,
+            handle: '.repeater-form-move',
+        });
+
+        
+    });
+
+
+    $(document).on('click', '.repeater-form-toggle-btn', function(e) {
+        e.preventDefault();
+        $(this).closest('.repeater-form-fields').find('.repeater-form-wrapper').slideToggle();
+    });
+
+
+    $(document).on('click', '.repeater-form-remove-btn', function(e) {
+    e.preventDefault();
+    
+    // Count the number of `.repeater-form-fields` elements
+    let formFields = $(this).closest('.widget-form').find('.repeater-form-fields');
+
+
+    if (formFields.length > 1) {
+        // If there is more than one item, show the confirmation dialog
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $(this).closest('.repeater-form-fields').remove();
+            }
+        });
+    } else {
+        // If there is only one item, show a warning or prevent removal
+        Swal.fire({
+            icon: 'warning',
+            title: 'Cannot remove the last item!',
+            text: 'At least one item must remain.',
+            confirmButtonColor: '#3085d6'
+        });
+    }
+});
 
     const widgetWrapper = document.getElementById('accordionWidget');
 
     if (widgetWrapper) {
         Sortable.create(widgetWrapper, {
             animation: 150,
+            handle: '.handle',
             onEnd: function (evt) {
-                // Update the data-index attribute for each widget
+                
                 const widgets = widgetWrapper.querySelectorAll('.widget-item');
                 widgets.forEach((widget, index) => {
                     widget.setAttribute('data-index', index);
@@ -110,6 +168,8 @@
             }
         });
     }
+
+
 
     let widgetIndex = 0; // Track the index of added widgets
 
@@ -119,6 +179,10 @@
         let $button = $(this);
         let widgetName = $(this).data('widget');
         widgetIndex++;
+
+        let handleSVG =  `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 2.5L7 0.5M7 0.5L9 2.5M7 0.5V13.5M5 11.5L7 13.5M7 13.5L9 11.5M11.5 5L13.5 7M13.5 7L11.5 9M13.5 7H0.5M2.5 5L0.5 7M0.5 7L2.5 9" stroke="#000001" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>`;
 
         $.ajax({
             url: "{{ route('admin.pages.widgets.load', ':widget') }}".replace(':widget', widgetName),
@@ -135,7 +199,8 @@
                 let widgetHTML = `<div class="card mb-5 widget-item" data-index="${widgetIndex}">
                                     <div class="card-header">
                                         <div class="d-flex align-items-center">
-                                            <button class="btn btn-xs btn-icon btn-primary me-3 widget-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#widget-body-${widgetIndex}" aria-expanded="true" aria-controls="widget-body-${widgetIndex}">
+                                            <span class="handle">${handleSVG}</span>
+                                            <button class="btn btn-xs btn-icon btn-primary ms-3 me-3 widget-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#widget-body-${widgetIndex}" aria-expanded="true" aria-controls="widget-body-${widgetIndex}">
                                                 <svg class="plus" width="16" height="16" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M9 1V17M1 9H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                                                 </svg>

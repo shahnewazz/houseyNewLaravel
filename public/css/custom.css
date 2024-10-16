@@ -1,7 +1,29 @@
+.widget-toggle.collapsed svg.minus {
+    display: none;
+}
+.widget-toggle.collapsed svg.plus {
+    display: block;
+}
+.widget-toggle svg.plus {
+    display: none;
+}
+.widget-toggle svg.minus {
+    display: block;
+}
+
+.handle,
+.repeater-form-move {
+    cursor: move !important;
+}
+
 /*
     Payment Gateway
 */
 
 .payment-gateway-logo{
     min-height: 60px;
+}
+
+.repeater-form-wrapper{
+    display: none;
 }
