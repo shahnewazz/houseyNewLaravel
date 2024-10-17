@@ -3,6 +3,7 @@
 namespace Modules\Core\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Core\Models\PageTranslation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Page extends Model
@@ -15,4 +16,7 @@ class Page extends Model
         'widgets' => 'json'
     ];
 
+    public function translations(){
+        return $this->hasMany(PageTranslation::class);
+    }
 }

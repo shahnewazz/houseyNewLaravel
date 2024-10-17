@@ -26,8 +26,9 @@ if(!function_exists('setLanguage')) {
 if(!function_exists('addTranslation')) {
     function addTranslation(object $request, string $model, int|string $id): bool
     {
+        $translable_fields = ['name','description', 'title', 'text', 'btn_text'];
         foreach ($request->lang as $index => $key) {
-            foreach (['name','description','title'] as $type){
+            foreach ($translable_fields as $type){
                 if (isset($request[$type][$index]) && $key != 'en') {
                     
                     $translation = new Translation();
@@ -44,7 +45,7 @@ if(!function_exists('addTranslation')) {
     }
 }
 
-if(!function_exists('addTranslation')) {
+if(!function_exists('updateTranslation')) {
     function updateTranslation(object $request, string $model, int|string $id): bool
     {
         foreach ($request->lang as $index => $key) {
@@ -70,7 +71,7 @@ if(!function_exists('addTranslation')) {
     }
 }
 
-if(!function_exists('addTranslation')) {
+if(!function_exists('deleteTranslation')) {
     function deleteTranslation(object $request, string $model, int|string $id): bool
     {
         foreach ($request->lang as $index => $key) {
@@ -88,7 +89,7 @@ if(!function_exists('addTranslation')) {
     }
 }
 
-if(!function_exists('addTranslation')) {
+if(!function_exists('deleteTranslationByCode')) {
     function deleteTranslationByCode(int|string $code): bool
     {
         Translation::where('language_code', $code)->delete();

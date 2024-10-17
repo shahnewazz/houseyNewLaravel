@@ -5,6 +5,8 @@ namespace Modules\Core\Http\Controllers;
 use Illuminate\Http\Request;
 use Modules\Core\Models\Page;
 use App\Http\Controllers\Controller;
+use Modules\Core\Models\PageTranslation;
+use Modules\Core\Models\Translation;
 use Modules\Core\Http\Requests\Page\PageStoreRequest;
 use Modules\Core\Http\Requests\Page\PageUpdateRequest;
 
@@ -107,37 +109,63 @@ class PageController extends Controller
      * Edit page widgets
      */
 
-    public function widgetEdit($page_id){
-        $page = Page::findOrFail($page_id);
-        return view('core::pages.page.widgets', compact('page'));
+    public function widgetEdit(Request $request, $page_id){
+        $code = $request->query('code' , 'en');
+        $page = Page::with(['translations' => function ($query) use ($code) {
+            $query->where('code', $code);
+        }])->findOrFail($page_id);
+
+        $lang_code = $code;
+
+        return view('core::pages.page.widgets', compact('page', 'lang_code'));
     }
 
     /**
      * Load widget
      */
     public function loadWidget($widget){
-
+        
         $id = request('id');
-
-        $viewPath = "core::pages.widgets.{$widget}"; // Assuming your widgets are in the 'resources/views/widgets/' directory
-
-        // Check if the view exists before rendering
+        $code = request('code');
+        $viewPath = "core::pages.widgets.{$widget}";
+    
         if (view()->exists($viewPath)) {
-            return response()->json(['html' => view($viewPath, compact('id'))->render(), 'widget' => $widget]);
+            return response()->json(['html' => view($viewPath, compact('id', 'code'))->render(), 'widget' => $widget]);
         }
-
-        // If view does not exist, return a 404 or custom error
+    
         return response()->json(['error' => 'Widget not found'], 404);
     }
 
-    public function saveWidgets(Request $request, $id){
+    public function saveWidgets(Request $request, $id)
+    {
         
-        dd($request->all());
-        
-        $page = Page::findOrFail($id);
-        $page->widgets = $request->widgets;
-        $page->save();
+        $request->validate([
+            'lang' => ['required', 'string', 'exists:language,code'],
+            'widgets' => ['nullable', 'array']
+        ], [
+            'lang.exists' => 'Language not found.',
+            'lang.required' => 'Language is required.',
+            'lang.string' => 'Language must be a string.'
+        ]);
 
+        $page = Page::findOrFail($id);
+        
+
+        if($request->lang == 'en'){
+            $page->widgets = $request->widgets;
+            $page->save();
+        }
+        
+        if($request->lang != 'en'){
+            $page->translations()->updateOrCreate([
+                'code' => $request->lang,
+                'content' => $request->widgets
+            ]);
+        }
+        
+       
         return redirect()->route('admin.pages.index')->with('success', 'Widgets updated successfully.');
     }
+    
+
 }

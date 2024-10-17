@@ -8,7 +8,7 @@
           <h5 class="card-title m-0 fs-4">{{$title ?? ''}}</h5>
         </div>
         <div class="col-3">
-          <button type="button" class="btn btn-primary btn-sm float-end widget-add-btn" data-widget="{{$widget}}">
+          <button type="button" class="btn btn-primary btn-sm float-end widget-add-btn" data-widget="{{$widget}}" data-code="{{$code ?? 'en'}}">
             <span>Add</span>
           </button>
         </div>
