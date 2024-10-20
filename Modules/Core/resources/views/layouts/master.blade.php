@@ -91,6 +91,26 @@
     <script>
         'use strict';
 
+        // tab
+        $(document).on('click', '.repeater-lang-btn', function(e) {
+            e.preventDefault();
+            var $this = $(this);
+            var code = $this.data('code');
+
+            $this.addClass('active').siblings('.repeater-lang-btn').removeClass('active');
+            $this.closest('.repeater-lang-content').find('.repeater-lang-tab').removeClass('active');
+            $this.closest('.repeater-lang-content').find('.repeater-lang-tab[data-code="' + code + '"]').addClass('active');
+
+            
+        });
+        $(document).on('change', '#iconType', function() {
+            var $this = $(this);
+
+            $this.closest('.conca-icon-uploader').find('.icon-upload-field').hide();
+            $this.closest('.conca-icon-uploader').find('.icon-upload-field[data-type="' + $this.val() + '"]').show();
+            
+        });
+
         // ajax setup
         $.ajaxSetup({
             headers: {

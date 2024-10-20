@@ -111,9 +111,7 @@ class PageController extends Controller
 
     public function widgetEdit(Request $request, $page_id){
         $code = $request->query('code' , 'en');
-        $page = Page::with(['translations' => function ($query) use ($code) {
-            $query->where('code', $code);
-        }])->findOrFail($page_id);
+        $page = Page::findOrFail($page_id);
 
         $lang_code = $code;
 
@@ -138,30 +136,10 @@ class PageController extends Controller
 
     public function saveWidgets(Request $request, $id)
     {
-        
-        $request->validate([
-            'lang' => ['required', 'string', 'exists:language,code'],
-            'widgets' => ['nullable', 'array']
-        ], [
-            'lang.exists' => 'Language not found.',
-            'lang.required' => 'Language is required.',
-            'lang.string' => 'Language must be a string.'
-        ]);
 
         $page = Page::findOrFail($id);
-        
-
-        if($request->lang == 'en'){
-            $page->widgets = $request->widgets;
-            $page->save();
-        }
-        
-        if($request->lang != 'en'){
-            $page->translations()->updateOrCreate([
-                'code' => $request->lang,
-                'content' => $request->widgets
-            ]);
-        }
+        $page->widgets = $request->widgets;
+        $page->save();
         
        
         return redirect()->route('admin.pages.index')->with('success', 'Widgets updated successfully.');

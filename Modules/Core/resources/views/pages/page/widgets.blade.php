@@ -3,7 +3,7 @@
 @section('content')
 <?php $code = request()->query('code', 'en'); ?>
 
-<form action="{{route('admin.pages.widgets.save', ['id' => $page->id])}}" method="POST" enctype="multipart/form-data">
+<form class="form-page-widget" action="{{route('admin.pages.widgets.save', ['id' => $page->id])}}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('POST')
    
@@ -23,77 +23,23 @@
         </x-slot>
     
        
-        <ul class="nav nav-underline mb-3">
-            @foreach (\Modules\Core\Models\Language::all() as $lang)
-            <li class="nav-item" role="presentation">
-                <a href="{{route('admin.pages.widgets.edit', ['page_id' => $page->id, 'code' => $lang->code])}}" class="nav-link {{ $code == $lang->code ? ' active' :'' }}" >{{$lang->name}}</a>
-            </li>
-            @endforeach
-        </ul>
-        <input type="hidden" name="lang" value="{{$code}}">
-
-        <div class="alert alert-outline-warning" role="alert">
-            You are adding content in <b>{{strtoupper($code)}}</b> language
-        </div>
-
         @php
             $widgetCount = @isset($page->widgets) ? count($page->widgets) : 0;
-            $translations = $page->translations->first()->content ?? [];
         @endphp
 
 
+        <div class="alert alert-danger">
+            <strong>Warning!</strong> Please fill all required fields before saving.
+        </div>
     
         <div class="widget-container" id="widgetContainer" data-widgets="{{$widgetCount}}">
-            {{-- @if(count($translations) > 0)
-
-                @foreach ($page->translations as $key => $value )
-                    @foreach ($value->content as $key => $value)
-                        @php
-                            $id = str_replace('widget-', '', $key);
-
-                            $dataArr = [
-                                'id' => $id,
-                                'data' => $value['widget_data'],
-                                'code' => $code,
-                                'translations' => $translations
-                            ];
-
-                        @endphp
-                        @include('core::pages.widgets.'.$value['widget_type'], $dataArr)
-                    @endforeach
-                    
-                @endforeach
- 
-            @else
-                @isset($page->widgets)
-                    @foreach ($page->widgets as $key => $widget)
-                        @php
-                            $id = str_replace('widget-', '', $key);
-
-                            $dataArr = [
-                                'id' => $id,
-                                'data' => $widget['widget_data'],
-                                'code' => $code,
-                                'translations' => $translations
-                            ];
-
-                        @endphp
-                        @include('core::pages.widgets.'.$widget['widget_type'], $dataArr)
-                    @endforeach
-                    
-                @endisset
-            @endif --}}
-
             @isset($page->widgets)
                 @foreach ($page->widgets as $key => $widget)
                     @php
-                        $id = str_replace('widget-', '', $key);
-
                         $dataArr = [
-                            'id' => $id,
-                            'data' => $widget['widget_data'],
+                            'id' => $loop->iteration,
+                            'data' => !empty($widget['widget_data']) ? $widget['widget_data'] : [],
                             'code' => $code,
-                            'translations' => $translations
                         ];
 
                     @endphp

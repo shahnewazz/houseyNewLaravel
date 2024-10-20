@@ -15,8 +15,4 @@ class Page extends Model
     protected $casts = [
         'widgets' => 'json'
     ];
-
-    public function translations(){
-        return $this->hasMany(PageTranslation::class);
-    }
 }

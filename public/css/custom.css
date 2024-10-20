@@ -16,6 +16,43 @@
     cursor: move !important;
 }
 
+/* 
+    Repeater CSS
+*/
+
+.repeater-lang-tab {
+    display: none;
+}
+
+.repeater-lang-tab.active {
+    display: block;
+}
+
+.repeater-lang-btn.active{
+    background-color: var(--bs-primary);
+    color: #fff;
+}
+
+.repeater-lang-btn-wrapper{
+    padding: 13px 0 8px;
+}
+
+.repeater-lang-btn{
+    padding: 5px 10px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    border: 1px solid var(--bs-primary);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* 
+    Icon Uploader CSS
+*/
+.icon-upload-field{
+    display: none;
+}
+
 /*
     Payment Gateway
 */
