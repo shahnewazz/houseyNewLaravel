@@ -49,73 +49,77 @@ class XSSProtectionMiddleware
     
     public function handle(Request $request, Closure $next)
     {
-        // Ensure input values are sanitized
-        foreach ($request->input() as $key => $value) {
-            if (is_string($value)) {
-                // Sanitize the value using the custom sanitize method
-                $sanitizedValue = $this->sanitize($value);
-        
-                // Merge sanitized value back into the request without using strip_tags
-                $request->merge([$key => trim($sanitizedValue)]);
-            }
-        }
+        // Recursively sanitize all input data, including nested arrays
+        $sanitizedInput = $this->sanitizeArray($request->input());
+
+        // Merge sanitized data back into the request
+        $request->merge($sanitizedInput);
 
         return $next($request);
     }
 
+    protected function sanitizeArray($data)
+    {
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                // Recursively sanitize array values
+                $data[$key] = $this->sanitizeArray($value);
+            } elseif (is_string($value)) {
+                // Sanitize string values using the sanitize method
+                $data[$key] = $this->sanitize($value);
+            }
+        }
+
+        return $data;
+    }
 
     protected function sanitize($html)
     {
-        // Ensure the input is in UTF-8 format
+        // Same sanitization logic as before
         if (mb_detect_encoding($html, 'UTF-8', true) === false) {
             $html = mb_convert_encoding($html, 'UTF-8', 'auto');
         }
-    
-        // Replace & with a placeholder
+
         $html = str_replace('&', '##AMP##', $html);
-        
-        // Initialize DOMDocument with UTF-8 encoding and suppress errors for cleaner output
+
         $dom = new \DOMDocument('1.0', 'UTF-8');
         libxml_use_internal_errors(true);
-    
-        // Wrap content in a div to prevent auto-wrapping by DOMDocument
+
         $html = "<div>{$html}</div>";
         $dom->loadHTML('<?xml encoding="utf-8" ?>' . $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         libxml_clear_errors();
-    
-        // Sanitize by removing disallowed tags and attributes
+
         foreach ($dom->getElementsByTagName('*') as $element) {
             $tagName = $element->nodeName;
-    
-            // If the tag is not in allowedTags, remove the element
+
             if (!array_key_exists($tagName, $this->allowedTags)) {
                 $element->parentNode->removeChild($element);
                 continue;
             }
-    
-            // Remove dangerous attributes like onmouseover
+
             foreach (iterator_to_array($element->attributes) as $attribute) {
                 $attrName = $attribute->nodeName;
-    
-                // If the attribute is not allowed or is an event handler, remove it
+
                 if (!in_array($attrName, $this->allowedTags[$tagName]) && !preg_match('/^data-/', $attrName)) {
                     $element->removeAttribute($attrName);
+                } else {
+                    if (in_array($attrName, ['href', 'src'])) {
+                        $url = $element->getAttribute($attrName);
+                        if (preg_match('/^(javascript|vbscript|data):/i', $url)) {
+                            $element->removeAttribute($attrName);
+                        }
+                    }
                 }
             }
         }
-    
-        // Extract content inside the div wrapper (without the div itself)
+
         $output = '';
         foreach ($dom->getElementsByTagName('div')->item(0)->childNodes as $child) {
             $output .= $dom->saveHTML($child);
         }
-    
-        // Restore the original & character
+
         $output = str_replace('##AMP##', '&', $output);
-    
-        // Return sanitized content ensuring proper UTF-8
+
         return trim($output);
     }
-    
-     
 }

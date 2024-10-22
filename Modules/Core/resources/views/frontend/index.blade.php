@@ -2,20 +2,23 @@
 
 @section('content')
 
-{{-- @foreach (\Modules\Core\Models\Language::all() as $lang)
-<a href="{{ route('change.language', $lang->code) }}">{{$lang->name}}</a>
-@endforeach
-
-@foreach ($translatedBlogs as $translatedBlog)
-    <h2>{{ $translatedBlog['translations']['title'] }}</h2>
-    <!-- You can also display other fields like description if needed -->
-@endforeach
-
-<!-- You can add more translatable fields similarly --> --}}
-
 @isset($page)
-    @php
-        var_dump($page);
-    @endphp
+    
+
+    @isset($page->widgets)
+        @foreach ($page->widgets as $key => $widget)
+            @php
+            
+                $code = request()->query('code', 'en');
+                $dataArr = [
+                    'id' => $loop->iteration,
+                    'data' => !empty($widget['widget_data']) ? $widget['widget_data'] : [],
+                    'code' => $code,
+                ];
+
+            @endphp
+            @include('core::frontend.pages.widgets.'.$widget['widget_type'], $dataArr)
+        @endforeach
+    @endisset
 @endisset
 @endsection

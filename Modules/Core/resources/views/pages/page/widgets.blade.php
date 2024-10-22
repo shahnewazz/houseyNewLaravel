@@ -70,7 +70,7 @@
         <div class="modal-body">
             <div class="row row-cols-lg-4 row-cols-sm-3 row-cols-1 g-5">
                 <div class="col">
-                    <x-core::widget.card title="About" widget="about" code="{{$code}}" src="https://shofy.botble.com/themes/shofy/images/shortcodes/about.png"  />
+                    <x-core::widget.card title="Header 1" widget="header-1" code="{{$code}}" src="https://shofy.botble.com/themes/shofy/images/shortcodes/about.png"  />
                 </div>
                 <div class="col">
                     <x-core::widget.card title="Banner" widget="banner" code="{{$code}}" src="https://shofy.botble.com/themes/shofy/images/shortcodes/about.png"  />
@@ -97,52 +97,80 @@
     'use strict';
 
 
-        document.addEventListener('click', function(e) {
-        if (e.target.matches('.repeater-form-add-btn')) {
-            e.preventDefault();
+    document.addEventListener('click', function(e) {
+    if (e.target.matches('.repeater-form-add-btn')) {
+        e.preventDefault();
 
-            // Find the parent element and clone the first .repeater-form-fields
-            var parentElement = e.target.parentNode;
-            var repeaterFields = parentElement.querySelector('.repeater-form-fields');
-            var html = repeaterFields.cloneNode(true); // Clone the node
-
-            // Find the widget form with data-item_count
-            var widgetForm = parentElement.querySelector('[data-item_count]');
-
-            // Get the current repeater index
-            var repeaterIndex = parseInt(widgetForm.getAttribute('data-item_count'), 10) || 0;
-            console.log(repeaterIndex);
-
-            // Update the cloned HTML
-            var updatedHtml = html.innerHTML.replaceAll('[repeater-item-1]', '[repeater-item-' + (repeaterIndex + 1) + ']');
-            html.innerHTML = updatedHtml; // Update the cloned element's HTML
-
-            // Update the repeater item title
-            var itemTitle = html.querySelector('.repeater-item-title');
-            if (itemTitle) {
-                itemTitle.textContent = 'Item ' + (repeaterIndex + 1); // Set the new title
-            }
-
-            // Append the cloned element to the repeater wrapper
-            var repeaterWrapper = parentElement.querySelector(".widget-form .repeater-form-fields-wrapper");
-            repeaterWrapper.appendChild(html); // Append the cloned element
-
-            // Update the data-item_count attribute
-            if (widgetForm) {
-                widgetForm.setAttribute('data-item_count', repeaterIndex + 1);
-            }
-
-            // Re-initialize the sortable if necessary
-            if (repeaterWrapper._sortable) {
-                repeaterWrapper._sortable.destroy();
-            }
-
-            Sortable.create(repeaterWrapper, {
-                animation: 150,
-                handle: '.repeater-form-move',
-            });
+        // Find the closest parent element with the class '.widget-form'
+        var parentElement = e.target.closest('.card-body');
+        
+        if (!parentElement) {
+            console.error('Could not find the .widget-form element.');
+            return; // Exit if no .widget-form is found
         }
-    });
+
+        // Find and clone the first .repeater-form-fields inside the widget form
+        var repeaterFields = parentElement.querySelector('.repeater-form-fields');
+        if (!repeaterFields) {
+            console.error('Could not find the .repeater-form-fields element.');
+            return; // Exit if no .repeater-form-fields is found
+        }
+
+        var html = repeaterFields.cloneNode(true); // Clone the node
+
+        // Find the widget form with data-item_count
+        var widgetForm = parentElement.querySelector('[data-item_count]');
+        
+        if (!widgetForm) {
+            console.error('Could not find the element with data-item_count attribute.');
+            return; // Exit if no widgetForm with data-item_count is found
+        }
+
+        // Get the current repeater index
+        var repeaterIndex = parseInt(widgetForm.getAttribute('data-item_count'), 10) || 0;
+
+        // Update the cloned HTML
+        var updatedHtml = html.innerHTML.replaceAll('[repeater-item-1]', '[repeater-item-' + (repeaterIndex + 1) + ']');
+        html.innerHTML = updatedHtml; // Update the cloned element's HTML
+
+        // Update the repeater item title
+        var itemTitle = html.querySelector('.repeater-item-title');
+        if (itemTitle) {
+            itemTitle.textContent = 'Item ' + (repeaterIndex + 1); // Set the new title
+        }
+
+        // change the for and id attributes of the for="contact_icon" fields
+        var fields = html.querySelectorAll('[for="contact_icon"], [id="contact_icon"]');
+        fields.forEach(function(field) {
+            field.setAttribute('for', 'contact_icon_' + (repeaterIndex + 1));
+            field.setAttribute('id', 'contact_icon_' + (repeaterIndex + 1));
+        });
+
+
+        // Append the cloned element to the repeater wrapper
+        var repeaterWrapper = parentElement.querySelector(".repeater-form-fields-wrapper");
+        if (!repeaterWrapper) {
+            console.error('Could not find the .repeater-form-fields-wrapper element.');
+            return; // Exit if no .repeater-form-fields-wrapper is found
+        }
+
+        repeaterWrapper.appendChild(html); // Append the cloned element
+
+        // Update the data-item_count attribute
+        widgetForm.setAttribute('data-item_count', repeaterIndex + 1);
+
+        // Re-initialize the sortable if necessary
+        if (repeaterWrapper._sortable) {
+            repeaterWrapper._sortable.destroy();
+        }
+
+        Sortable.create(repeaterWrapper, {
+            animation: 150,
+            handle: '.repeater-form-move',
+        });
+    }
+});
+
 
 
 
@@ -231,6 +259,10 @@
             },
             success: function(response) {
                 $('.widget-container').append(response.html);
+
+                // refresh select2
+                $(document).trigger('contentLoaded');
+                
                 toastr.success('Widget added successfully!');
             },
             error: function(xhr) {

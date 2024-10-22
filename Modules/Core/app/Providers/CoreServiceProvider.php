@@ -36,7 +36,10 @@ class CoreServiceProvider extends ServiceProvider
         
         // share site settings with all views
         $config = SiteSetting::all()->pluck('value', 'key')->toArray();
+        $all_languages = Language::all();
         View::share('config', $config);
+        View::share('site_languages', $all_languages);
+        
 
     }
 

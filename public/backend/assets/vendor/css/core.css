@@ -2935,7 +2935,7 @@ progress {
   line-height: 1.5;
   color: var(--bs-body-color);
   appearance: none;
-  background-color: var(--bs-body-bg);
+  background-color: #F3F4F6;
   background-clip: padding-box;
   border: var(--bs-border-width) solid rgba(18, 20, 32, 0.13);
   border-radius: var(--bs-border-radius);
@@ -3086,7 +3086,7 @@ textarea.form-control-lg {
   line-height: 1.5;
   color: var(--bs-body-color);
   appearance: none;
-  background-color: var(--bs-body-bg);
+  background-color: #F3F4F6;
   background-image: var(--bs-form-select-bg-img), var(--bs-form-select-bg-icon, none);
   background-repeat: no-repeat;
   background-position: right 1.625rem center;
@@ -3426,7 +3426,7 @@ textarea.form-control-lg {
   z-index: -1;
   height: 1.5em;
   content: "";
-  background-color: var(--bs-body-bg);
+  background-color: #F3F4F6;
   border-radius: var(--bs-border-radius);
 }
 .form-floating > .form-control:-webkit-autofill ~ label, .form-floating > .form-control-icon:-webkit-autofill ~ label {
@@ -13785,7 +13785,7 @@ textarea.form-control-lg {
   line-height: 1.5;
   color: var(--bs-body-color);
   appearance: none;
-  background-color: var(--bs-body-bg);
+  background-color: #F3F4F6;
   background-image: var(--bs-form-select-bg-img), var(--bs-form-select-bg-icon, none);
   background-repeat: no-repeat;
   background-position: right 1.625rem center;
@@ -14345,7 +14345,7 @@ textarea.form-control-lg {
   z-index: -1;
   height: 1.5em;
   content: "";
-  background-color: var(--bs-body-bg);
+  background-color: #F3F4F6;
   border-radius: var(--bs-border-radius);
   display: none;
 }

@@ -264,9 +264,9 @@
                     
                 </div>
 
+                <button class="btn btn-sm btn-primary repeater-form-add-btn" type="button">Add New</button>
                 
             </div>
-            <button class="btn btn-sm btn-primary repeater-form-add-btn" type="button">Add New</button>
         </div>
     </div>
 </div>

@@ -91,6 +91,20 @@
     <script>
         'use strict';
 
+        $(document).on('contentLoaded', function() {
+
+            $('.conca-select2').each(function() {
+                $(this).wrap('<div class="position-relative"></div>').select2({
+                    placeholder: 'Select Value',
+                    dropdownParent: $(this).parent()
+                });
+
+            });
+        });
+
+        $(document).trigger('contentLoaded');
+
+
         // tab
         $(document).on('click', '.repeater-lang-btn', function(e) {
             e.preventDefault();
@@ -103,13 +117,47 @@
 
             
         });
-        $(document).on('change', '#iconType', function() {
-            var $this = $(this);
 
-            $this.closest('.conca-icon-uploader').find('.icon-upload-field').hide();
-            $this.closest('.conca-icon-uploader').find('.icon-upload-field[data-type="' + $this.val() + '"]').show();
+      
+        function showIconField($uploader) {
+            var $iconUploadField = $uploader.closest('.conca-icon-uploader').find('.icon-upload-field');
+
             
+            $iconUploadField.each(function() {
+                $(this).hide(); 
+                $(this).find('input, textarea').attr('disabled', true);
+            });
+
+            var selectedValue = $uploader.val();
+            var $selectedField = $iconUploadField.filter('[data-type="' + selectedValue + '"]');
+
+            $selectedField.show(); 
+            $selectedField.find('input, textarea').removeAttr('disabled');
+        }
+
+        function initIconUploader() {
+            $(document).on('change', '.icon-uploader', function() {
+                var $this = $(this);
+                showIconField($this);
+            });
+
+            $('.icon-uploader').each(function() {
+                showIconField($(this));
+            });
+        }
+
+        // Call initIconUploader after page load
+        $(document).ready(function() {
+            initIconUploader();
         });
+
+        // Reinitialize the icon uploader after AJAX calls
+        $(document).on('ajaxComplete', function() {
+            initIconUploader();
+        });
+
+
+
 
         // ajax setup
         $.ajaxSetup({
@@ -118,13 +166,7 @@
             }
         });
 
-        $('.conca-select2').each(function() {
-            $(this).wrap('<div class="position-relative"></div>').select2({
-                placeholder: 'Select Value',
-                dropdownParent: $(this).parent()
-            });
-
-        });
+       
 
         $('.input-color').each(function(){
             $(this).siblings('.input-color-placeholder').css('background-color', $(this).val());
@@ -160,6 +202,10 @@
             input.val('');
             $(this).addClass('d-none');
         });
+
+
+
+
 
         @if($errors->any())
             toastr.options = {
