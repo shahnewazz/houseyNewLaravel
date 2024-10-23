@@ -12,12 +12,13 @@ class Menu extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = ['title', 'menu_items', 'code'];
+    protected $fillable = ['title', 'menu_items', 'translations'];
 
     /**
      * The attributes that should be cast.
      */
     protected $casts = [
         'menu_items' => 'json',
+        'translations' => 'json',
     ];
 }

@@ -3,7 +3,13 @@
 // print_r($data);
 // echo "</pre>";
 
-$menu = \Modules\Core\Models\Menu::where('code', $code)->findorFail($data['menu']);
+$menu = \Modules\Core\Models\Menu::findOrFail($data['menu']);
+
+if($code != 'en'){
+   $menu_data = $menu->translations[$code] ?? $menu->menu_items;
+}else{
+   $menu_data = $menu->menu_items;
+}
 
 @endphp
 
@@ -11,21 +17,30 @@ $menu = \Modules\Core\Models\Menu::where('code', $code)->findorFail($data['menu'
          
     <!-- header-area-start -->
     <div class="tp-header-area">
-       <div class="tp-header-top tp-header-border-bottom d-none d-lg-block">
+       <div class="tp-header-top tp-header-border-bottom d-none d-lg-block p-relative">
           <div class="container">
              <div class="row">
                 <div class="col-md-6">
                    <div class="tp-header-info">
                       <ul>
                         @foreach ($data['repeater'] as $key => $item)
-                        <li>
-                            <a href="{{$item['url'] ?? ''}}">
-                               <span>
-                                {!! $item['icon']['icon_type'] == 'image' ? '<img src="'.asset('storage/'.$item['icon']['icon_content']['image']).'" alt="icon">' : $item['icon']['icon_content']['svg'] !!}
-                               </span>
-                               {{$item['lang'][$code]['text'] ?? ''}}
-                            </a>
-                         </li>
+                           @if(!empty($item['lang'][$code]['text']))
+                           <li>
+                              @if (!empty($item['url']))
+                                 <a href="{{$item['url'] ?? ''}}">
+                                    <span>
+                                    {!! ($item['icon']['icon_type'] == 'image' && !empty($item['icon']['icon_content']['image'])) ? '<img src="'.asset('storage/'.$item['icon']['icon_content']['image']).'" alt="icon">' : ($item['icon']['icon_content']['svg'] ?? '') !!}
+                                    </span>
+                                    {{$item['lang'][$code]['text'] ?? ''}}
+                                 </a>
+                              @else
+                                 <span>
+                                    {!! ($item['icon']['icon_type'] == 'image' && !empty($item['icon']['icon_content']['image'])) ? '<img src="'.asset('storage/'.$item['icon']['icon_content']['image']).'" alt="icon">' : ($item['icon']['icon_content']['svg'] ?? '') !!}
+                                 </span>
+                                 {{$item['lang'][$code]['text'] ?? ''}}
+                              @endif
+                           </li>
+                           @endif
                         @endforeach
                       </ul>
                    </div>
@@ -35,22 +50,32 @@ $menu = \Modules\Core\Models\Menu::where('code', $code)->findorFail($data['menu'
 
                         @if (!empty($data['search_switch']) && $data['language_switch'] == '1')
                         <div class="tp-header-usd tp-header-border-right tp-header-usd-spacing mr-20">
-                            <span class="tp-header-selected-usd">EN</span>
-                            <ul class="tp-header-usd-list">
-                                <li>Spanish</li>
-                                <li>English</li>
-                                <li>Canada</li>
-                            </ul>
+                            <span class="tp-header-selected-usd">{{strtoupper(app()->getLocale())}}</span>
+
+                              <ul class="tp-header-usd-list">
+                                 @foreach (\Modules\Core\Models\Language::where('status', 1)->get() as $language)
+                                 <li>
+                                       <a class="lang-btn @if (session('lang') == $language->code) active @endif" data-lang="{{ $language->code }}"  href="javascript:void(0);"   >
+                                          <div class="d-flex align-items-center gap-1">
+                                             @isset($language->image)
+                                             <img class="rounded-pill object-cover" width="16px" height="16px" src="{{ asset('storage/' . $language->image) }}" alt="{{ $language->name }}">
+                                             @endisset
+                                             {{ $language->name }}
+                                          </div>
+                                       </a>
+                                 </li>
+                                 @endforeach
+                              </ul>
                         </div>
                         @endif
 
-                        @if (!empty($data['account']))
+                        @if (!empty($data['account']) && isset($data['account']['lang'][$code]['text']))
                         <div class="tp-header-acount tp-header-usd tp-header-border-right">
                             <a href="{{$data['account']['url'] ?? '#'}}">
                                 <span>
-                                    {!! $data['account']['icon']['icon_type'] == 'image' ? '<img width="17px" height="17px" src="'.asset('storage/'.$data['account']['icon']['icon_content']['image']).'" alt="icon">' : $data['account']['icon']['icon_content']['svg'] !!}
+                                    {!! $data['account']['icon']['icon_type'] == 'image' && !empty($data['account']['icon']['icon_content']['image']) ? '<img width="17px" height="17px" src="'.asset('storage/'.$data['account']['icon']['icon_content']['image']).'" alt="icon">' : ($data['account']['icon']['icon_content']['svg'] ?? '') !!}
                                 </span>
-                                {{$data['account']['text'] ?? ''}}
+                                {{$data['account']['lang'][$code]['text'] ?? ''}}
                             </a>
                         </div>
                         @endif
@@ -65,17 +90,19 @@ $menu = \Modules\Core\Models\Menu::where('code', $code)->findorFail($data['menu'
              <div class="tp-header-main-wrap p-relative">
                 <div class="row align-items-center">
                    <div class="col-xl-2 col-lg-2 col-6">
-                      <div class="tp-header-logo">
-                         <a href="{{url('/')}}">
-                            <img data-width="138" src="{{asset('storage/'.$data['logo']) ?? ''}}" alt="logo">
-                        </a>
-                      </div>   
-                   </div>
+                     @if (!empty($data['logo']) )
+                     <div class="tp-header-logo">
+                        <a href="{{url('/')}}">
+                           <img data-width="138" src="{{asset('storage/'.$data['logo']) ?? ''}}" alt="logo">
+                       </a>
+                     </div>   
+                     @endif
+                  </div>
                    <div class="col-xl-6 col-lg-8 d-none d-lg-block">
                       <div class="tp-main-menu">
                          <nav class="tp-mobile-menu-active">
                             <ul>
-                               @foreach ($menu->menu_items as $key => $item)
+                               @foreach ($menu_data as $key => $item)
                                <li>
                                     <a href="{{$item['href']}}" target="{{$item['target']}}">{{$item['text']}}</a>
                                </li>
@@ -105,10 +132,10 @@ $menu = \Modules\Core\Models\Menu::where('code', $code)->findorFail($data['menu'
                         @endif
 
 
-                        @if(!empty($data['button']))
+                        @if(!empty($data['button']) && isset($data['button']['lang'][$code]['text']))
                         <div class="tp-header-btn-wrap d-none d-lg-block ml-30">
                             <a class="tp-header-btn" href="{{$data['button']['url']}}" target="{{$data['button']['target'] == 1 ? '_blank' : '_self' }}">
-                                {{ $data['button']['text'] ?? '' }}
+                                {{ $data['button']['lang'][$code]['text'] ?? '' }}
                             </a>
                         </div>
                         @endif

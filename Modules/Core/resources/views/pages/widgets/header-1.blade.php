@@ -40,10 +40,10 @@
         // account icon
         $account_icon = '';
 
-        if(isset($data['account']) && $data['account']['icon']['icon_type'] == 'image'){
+        if(array_key_exists('account', $data) && $data['account']['icon']['icon_type'] == 'image'){
             $account_icon = $data['account']['icon']['icon_content']['image'];
         }
-        elseif (isset($data['account']) && $data['account']['icon']['icon_type'] == 'svg') {
+        elseif (array_key_exists('account', $data) && $data['account']['icon']['icon_type'] == 'svg') {
             $account_icon = $data['account']['icon']['icon_content']['svg'];
         }
         $account_icon_image = !empty($account_icon) ? asset('storage/'.$account_icon) : '';
@@ -64,14 +64,14 @@
                             
                             <div class="mb-2 image-upload-container">
                                 <img src="{{$header_logo}}" class="img-thumbnail header-logo image-preview" alt="header-logo" data-default="{{$header_logo}}">
+                                <label for="header_logo" class="btn btn-sm btn-label-primary me-3">
+                                    <span>Upload</span>     
+                                    <input name="widgets[widget-{{$id}}][widget_data][logo_db]" type="hidden" value="{{$header_logo_db}}">               
+                                    <x-core::form.input value="{{$header_logo}}" type="file" id="header_logo" name="widgets[widget-{{$id}}][widget_data][logo]" class="image-input" data-target=".header-logo" data-reset=".header-logo-reset" hidden value="{{$header_logo}}" />
+                                </label>
+                                <button type="button" class="btn btn-sm btn-label-secondary header-logo-reset image-reset d-none" data-target=".header-logo">Reset</button>
                             </div>
                             
-                            <label for="header_logo" class="btn btn-sm btn-label-primary me-3">
-                                <span>Upload</span>     
-                                <input name="widgets[widget-{{$id}}][widget_data][logo_db]" type="hidden" value="{{$header_logo_db}}">               
-                                <x-core::form.input value="{{$header_logo}}" type="file" id="header_logo" name="widgets[widget-{{$id}}][widget_data][logo]" class="image-input" data-target=".header-logo" data-reset=".header-logo-reset" hidden value="{{$header_logo}}" />
-                            </label>
-                            <button type="button" class="btn btn-sm btn-label-secondary header-logo-reset image-reset d-none" data-target=".header-logo">Reset</button>
                             
                         </div>
 
@@ -98,16 +98,42 @@
                             </div>                     
                         </div>
 
+
+                        @php
+                            $account_url = '';
+                            if(in_array('account', array_keys($data))){
+                                
+                                if(in_array('url', array_keys($data['account']))){
+                                    $account_url = $data['account']['url'];
+                                }
+                            }
+                        @endphp
                         <!-- account -->
                         <div class="mb-5">
                             <h5>Account</h5>
-                            <div class="mb-3">
-                                <x-core::form.input-label class="d-block" :value="'Text'" />
-                                <x-core::form.input type="text" id="button" name="widgets[widget-{{$id}}][widget_data][account][text]" value="{{ $data['account']['text'] ?? '' }} " />
+
+
+                            <div class="repeater-lang-content">
+                                <div class="repeater-lang-btn-wrapper">
+                                    @foreach ($site_languages as $lang)
+                                    <button type="button" class="repeater-lang-btn @if ($code == $lang->code) active @endif" data-code="{{$lang->code}}">{{$lang->code}}</button>
+                                    @endforeach
+                                </div>
+    
+                                @foreach ($site_languages as $lang)
+                                <div class="repeater-lang-tab @if ($code == $lang->code) active @endif" data-code="{{$lang->code}}">
+                                    <div class="mb-3">
+                                        <x-core::form.input-label :value="'Text '.$lang->code.' '"/>
+                                        <x-core::form.input type="text" name="widgets[widget-{{$id}}][widget_data][account][lang][{{$lang->code}}][text]" value="{{$data['account']['lang'][$lang->code]['text'] ?? ''}}" />
+                                    </div>
+                                </div>
+                                @endforeach
                             </div>
+
+
                             <div class="mb-3">
                                 <x-core::form.input-label class="d-block" :value="'URL'" />
-                                <x-core::form.input type="text" id="button" name="widgets[widget-{{$id}}][widget_data][account][url]" value="{{ $data['account']['url'] ?? '' }}" />
+                                <x-core::form.input type="text" id="button" name="widgets[widget-{{$id}}][widget_data][account][url]" value="{{ $account_url }}" />
                             </div>
                             <div class="mb-3">
                                 <div class="form-check form-check-inline">
@@ -151,7 +177,7 @@
                                     <!-- SVG Code Field -->
                                     <div data-type="svg" class="icon-upload-field">
                                         <label class="form-label" for="svgCode">SVG Code:</label>
-                                        <textarea class="form-control"  id="svgCode" name="widgets[widget-{{$id}}][widget_data][account][icon][icon_content][svg]" rows="4" placeholder="Paste your SVG code here...">{{$data['account']['icon']['icon_type'] == 'svg' ? $data['account']['icon']['icon_content']['svg'] : ''}}</textarea>
+                                        <textarea class="form-control"  id="svgCode" name="widgets[widget-{{$id}}][widget_data][account][icon][icon_content][svg]" rows="4" placeholder="Paste your SVG code here...">@if(array_key_exists('account',$data)){{$data['account']['icon']['icon_type'] == 'svg' ? $data['account']['icon']['icon_content']['svg'] : ''}}@endif</textarea>
                                     </div>
                                 </div>
                             </div>               
@@ -165,10 +191,24 @@
                         <div class="mb-5">
                             <h5>Button</h5>
         
-                            <div class="mb-3">
-                                <x-core::form.input-label class="d-block" :value="'Text'" />
-                                <x-core::form.input type="text" id="button" name="widgets[widget-{{$id}}][widget_data][button][text]" value="{{$data['button']['text'] ?? ''}}" />
+                            <div class="repeater-lang-content">
+                                <div class="repeater-lang-btn-wrapper">
+                                    @foreach ($site_languages as $lang)
+                                    <button type="button" class="repeater-lang-btn @if ($code == $lang->code) active @endif" data-code="{{$lang->code}}">{{$lang->code}}</button>
+                                    @endforeach
+                                </div>
+    
+                                @foreach ($site_languages as $lang)
+                                <div class="repeater-lang-tab @if ($code == $lang->code) active @endif" data-code="{{$lang->code}}">
+                                    <div class="mb-3">
+                                        <x-core::form.input-label :value="'Text '.$lang->code.' '"/>
+                                        <x-core::form.input type="text" id="text" name="widgets[widget-{{$id}}][widget_data][button][lang][{{$lang->code}}][text]" value="{{$data['button']['lang'][$lang->code]['text'] ?? ''}}" />
+                                    </div>
+                                </div>
+                                @endforeach
                             </div>
+                            
+
         
                             <div class="mb-3">
                                 <x-core::form.input-label class="d-block" :value="'URL'" />
@@ -193,7 +233,7 @@
                                 @forelse ($data['repeater'] as $key => $item)
                                 @php
                                     $loop_count = $loop->iteration;
-                                    var_dump($item);
+                                    
                                 @endphp
                                 <div class="repeater-form-fields pb-4">
                                     <div class="card-header d-flex align-items-center gap-3">
@@ -246,7 +286,7 @@
                                                 <div class="conca-icon-uploader">
                                                     <div class="mb-3">
                                                         <label for="iconType" class="form-label">Select Icon Type:</label>
-                                                        <select class="form-select icon-uploader conca-select2" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop_count}}][icon][icon_type]">
+                                                        <select class="form-select icon-uploader" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop_count}}][icon][icon_type]">
                                                             <option value="image" @if (!empty($item['icon']['icon_type']) && $item['icon']['icon_type'] == 'image') selected @endif>Image</option>
                                                             <option value="svg" @if (!empty($item['icon']['icon_type']) && $item['icon']['icon_type'] == 'svg') selected @endif>SVG Code</option>
                                                         </select>

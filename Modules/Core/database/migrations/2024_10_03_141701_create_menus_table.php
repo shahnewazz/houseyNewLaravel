@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->json('menu_items')->nullable();
-            $table->string('code')->nullable();
+            $table->json('translations')->nullable();
             $table->timestamps();
         });
     }

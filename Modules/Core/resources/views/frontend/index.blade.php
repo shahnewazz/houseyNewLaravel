@@ -9,15 +9,20 @@
         @foreach ($page->widgets as $key => $widget)
             @php
             
-                $code = request()->query('code', 'en');
+                                              
                 $dataArr = [
                     'id' => $loop->iteration,
                     'data' => !empty($widget['widget_data']) ? $widget['widget_data'] : [],
-                    'code' => $code,
+                    'code' => app()->getLocale(),
                 ];
 
             @endphp
+           
+
+            @if(View::exists('core::frontend.pages.widgets.'.$widget['widget_type']))
             @include('core::frontend.pages.widgets.'.$widget['widget_type'], $dataArr)
+            @endif
+
         @endforeach
     @endisset
 @endisset

@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="zxx">
+<html class="no-js" lang="zxx" dir="{{ session('lang_dir', 'ltr') }}">
    <head>
       <meta charset="utf-8">
       <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -7,6 +7,8 @@
       <meta name="description" content="">
       <meta name="viewport" content="width=device-width, initial-scale=1">
        
+      <meta name="csrf-token" content="{{ csrf_token() }}">
+
       <!-- Place favicon.ico in the root directory -->
       <link rel="shortcut icon" type="image/x-icon" href="{{'storage/'.$config['site_favicon']}}">
 
@@ -20,6 +22,9 @@
       <link rel="stylesheet" href="{{asset('frontend/assets/css/flatpicker-min.css')}}">
       <link rel="stylesheet" href="{{asset('frontend/assets/css/spacing.css')}}">
       <link rel="stylesheet" href="{{asset('frontend/assets/css/main.css')}}">
+
+      <!-- toastr -->
+      <link rel="stylesheet" href="{{asset('backend/assets/vendor/libs/toastr/toastr.css')}}">
 
       <style>
          :root {
@@ -43,6 +48,8 @@
       @endif
 
     @yield('content')
+
+    
       
     <!-- JS here -->
     <script src="{{asset('frontend/assets/js/vendor/jquery.js')}}"></script>
@@ -63,5 +70,43 @@
     <script src="{{asset('frontend/assets/js/jquery.mb.YTPlayer.min.js')}}"></script>
     <script src="{{asset('frontend/assets/js/slider-init.js')}}"></script>
     <script src="{{asset('frontend/assets/js/main.js')}}"></script>
+
+
+    <!-- others -->
+    <script src="{{asset('backend/assets/vendor/libs/toastr/toastr.js')}}"></script>
+
+    <script>
+      'use strict';
+              // ajax setup
+              $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+      $(document).ready(function() {
+            $(document).on('click', '.lang-btn', function() {
+                var code = $(this).data('lang');
+                $.ajax({
+                    url: "{{ route('set-lang', ':code') }}".replace(':code', code),
+                    type: 'POST',
+                    data: {
+                        code: code,
+                    },
+                    success: function(response) {
+                       if(response.status){
+                        toastr.success(response.message);
+                           setTimeout(function() {
+                              location.reload();
+                           }, 1000);
+                       }
+                    },
+                     error: function(xhr, status, error) {
+                        toastr.error('Something went wrong');
+                     }
+                });
+            })
+        });
+    </script>
    </body>
 </html>

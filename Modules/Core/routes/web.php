@@ -156,6 +156,10 @@ Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ['auth', 'v
 
 });
 
+
+Route::post('/set-lang/{code}', [CoreController::class, 'setLang'])->name('set-lang');
+
+
 Route::post('/xss/input', [DashboardController::class,'xss'])->name('xss.post');
 Route::get('/xss', [DashboardController::class,'getXss'])->name('xss');
 

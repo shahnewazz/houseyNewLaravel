@@ -84,14 +84,18 @@ class CoreController extends Controller
     /**
      * Change the language of the application.
      */
-    public function lang()
+    public function setLang(Request $request, $code)
     {
-        return view('core::lang');
-    }
+        $request->validate([
+            'code' => 'required|string|exists:language,code'
+        ]);
 
-    public function addLang(Request $request)
-    {
-        dd($request->all());
+        if(setLanguage($code)){
+            return response()->json(['message' => 'Language changed successfully', 'status' => true], 200);
+        }
+
+        return response()->json(['message' => 'Language not found', 'status' => false], 422);
+
     }
 
 }

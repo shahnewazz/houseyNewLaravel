@@ -32,15 +32,12 @@ class MenuController extends Controller
 
         $validated = $request->validate([
             'menu_title' => ['required', 'string', 'max:255'],
-            'menu_data' => ['required', 'json'],
-            'code' => ['nullable', 'string','max:255', 'exists:language,code'],
+            'menu_data' => ['required', 'json'],  
         ]);
-
 
         Menu::create([
             'title' => $validated['menu_title'],
             'menu_items' => json_decode($validated['menu_data'], true),
-            'code' => $validated['code'] ?? 'en',
         ]);
 
         return redirect()->route('admin.menus.index')->with('success', 'Menu created successfully');
@@ -52,13 +49,14 @@ class MenuController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        // get code parameter from the request
-        $code = $request->query('code')?? 'en';
 
-        $menu = Menu::where('id', $id)->where('code', $code)->first();
+        $code = $request->query('code', 'en');
+
+        // get code parameter from the request
+        $menu = Menu::where('id', $id)->first();
         
         if ($menu) {
-            return view('core::pages.menu.edit', compact('menu'));
+            return view('core::pages.menu.edit', compact('menu', 'code'));
         }else{
             return redirect()->route('admin.menus.index')->with('error', 'Menu not found');
         }
@@ -69,18 +67,36 @@ class MenuController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        $code = $request->query('code');
+
+
         $validated = $request->validate([
             'menu_title' => ['required', 'string', 'max:255'],
             'menu_data' => ['required', 'json'],
-            'code' => ['nullable', 'string','max:255', 'exists:language,code'],
+            'code' => ['required', 'string', 'max:255', 'exists:language,code'],
+        ],
+        [
+            'code.exists' => 'The language code does not exist',
         ]);
 
 
         $menu = Menu::findOrFail($id);
 
         $menu->title = $validated['menu_title'];
-        $menu->menu_items = json_decode($validated['menu_data'], true);
-        $menu->code = $validated['code'] ?? 'en';
+        $menuData = json_decode($validated['menu_data'], true);
+
+        if($code != 'en'){
+            $translations = $menu->translations ?? [];
+
+            $translations[$code] = $menuData;
+    
+            $menu->translations = $translations;
+        }else{
+            $menu->menu_items = $menuData;
+        }
+
+
         $menu->save(); 
 
         return redirect()->route('admin.menus.index')->with('success', 'Menu Updated successfully');

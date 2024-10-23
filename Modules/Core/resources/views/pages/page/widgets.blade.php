@@ -3,7 +3,7 @@
 @section('content')
 <?php $code = request()->query('code', 'en'); ?>
 
-<form class="form-page-widget" action="{{route('admin.pages.widgets.save', ['id' => $page->id])}}" method="POST" enctype="multipart/form-data">
+<form id="formPageWidget" class="form-page-widget" action="{{route('admin.pages.widgets.save', ['id' => $page->id])}}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('POST')
    
@@ -43,7 +43,11 @@
                         ];
 
                     @endphp
-                    @include('core::pages.widgets.'.$widget['widget_type'], $dataArr)
+                    @if(View::exists('core::pages.widgets.'.$widget['widget_type']))
+                        @include('core::pages.widgets.'.$widget['widget_type'], $dataArr)
+                    @endif
+
+                    
                 @endforeach
                 
             @endisset
@@ -98,78 +102,71 @@
 
 
     document.addEventListener('click', function(e) {
-    if (e.target.matches('.repeater-form-add-btn')) {
-        e.preventDefault();
+        if (e.target.matches('.repeater-form-add-btn')) {
+            e.preventDefault();
 
-        // Find the closest parent element with the class '.widget-form'
-        var parentElement = e.target.closest('.card-body');
-        
-        if (!parentElement) {
-            console.error('Could not find the .widget-form element.');
-            return; // Exit if no .widget-form is found
+            // Find the closest parent element with the class '.widget-form'
+            var parentElement = e.target.closest('.card-body');
+            
+            if (!parentElement) {
+                console.error('Could not find the .widget-form element.');
+                return; // Exit if no .widget-form is found
+            }
+
+            // Find and clone the first .repeater-form-fields inside the widget form
+            var repeaterFields = parentElement.querySelector('.repeater-form-fields');
+            if (!repeaterFields) {
+                console.error('Could not find the .repeater-form-fields element.');
+                return; // Exit if no .repeater-form-fields is found
+            }
+
+            var html = repeaterFields.cloneNode(true); // Clone the node
+
+            // Find the widget form with data-item_count
+            var widgetForm = parentElement.querySelector('[data-item_count]');
+            
+            if (!widgetForm) {
+                console.error('Could not find the element with data-item_count attribute.');
+                return; // Exit if no widgetForm with data-item_count is found
+            }
+
+            // Get the current repeater index
+            var repeaterIndex = parseInt(widgetForm.getAttribute('data-item_count'), 10) || 0;
+
+            // Update the cloned HTML
+            var updatedHtml = html.innerHTML.replaceAll('[repeater-item-1]', '[repeater-item-' + (repeaterIndex + 1) + ']');
+            html.innerHTML = updatedHtml; // Update the cloned element's HTML
+
+            // Update the repeater item title
+            var itemTitle = html.querySelector('.repeater-item-title');
+            if (itemTitle) {
+                itemTitle.textContent = 'Item ' + (repeaterIndex + 1); // Set the new title
+            }
+
+
+            // Append the cloned element to the repeater wrapper
+            var repeaterWrapper = parentElement.querySelector(".repeater-form-fields-wrapper");
+            if (!repeaterWrapper) {
+                console.error('Could not find the .repeater-form-fields-wrapper element.');
+                return; // Exit if no .repeater-form-fields-wrapper is found
+            }
+
+            repeaterWrapper.appendChild(html); // Append the cloned element
+
+            // Update the data-item_count attribute
+            widgetForm.setAttribute('data-item_count', repeaterIndex + 1);
+
+            // Re-initialize the sortable if necessary
+            if (repeaterWrapper._sortable) {
+                repeaterWrapper._sortable.destroy();
+            }
+
+            Sortable.create(repeaterWrapper, {
+                animation: 150,
+                handle: '.repeater-form-move',
+            });
         }
-
-        // Find and clone the first .repeater-form-fields inside the widget form
-        var repeaterFields = parentElement.querySelector('.repeater-form-fields');
-        if (!repeaterFields) {
-            console.error('Could not find the .repeater-form-fields element.');
-            return; // Exit if no .repeater-form-fields is found
-        }
-
-        var html = repeaterFields.cloneNode(true); // Clone the node
-
-        // Find the widget form with data-item_count
-        var widgetForm = parentElement.querySelector('[data-item_count]');
-        
-        if (!widgetForm) {
-            console.error('Could not find the element with data-item_count attribute.');
-            return; // Exit if no widgetForm with data-item_count is found
-        }
-
-        // Get the current repeater index
-        var repeaterIndex = parseInt(widgetForm.getAttribute('data-item_count'), 10) || 0;
-
-        // Update the cloned HTML
-        var updatedHtml = html.innerHTML.replaceAll('[repeater-item-1]', '[repeater-item-' + (repeaterIndex + 1) + ']');
-        html.innerHTML = updatedHtml; // Update the cloned element's HTML
-
-        // Update the repeater item title
-        var itemTitle = html.querySelector('.repeater-item-title');
-        if (itemTitle) {
-            itemTitle.textContent = 'Item ' + (repeaterIndex + 1); // Set the new title
-        }
-
-        // change the for and id attributes of the for="contact_icon" fields
-        var fields = html.querySelectorAll('[for="contact_icon"], [id="contact_icon"]');
-        fields.forEach(function(field) {
-            field.setAttribute('for', 'contact_icon_' + (repeaterIndex + 1));
-            field.setAttribute('id', 'contact_icon_' + (repeaterIndex + 1));
-        });
-
-
-        // Append the cloned element to the repeater wrapper
-        var repeaterWrapper = parentElement.querySelector(".repeater-form-fields-wrapper");
-        if (!repeaterWrapper) {
-            console.error('Could not find the .repeater-form-fields-wrapper element.');
-            return; // Exit if no .repeater-form-fields-wrapper is found
-        }
-
-        repeaterWrapper.appendChild(html); // Append the cloned element
-
-        // Update the data-item_count attribute
-        widgetForm.setAttribute('data-item_count', repeaterIndex + 1);
-
-        // Re-initialize the sortable if necessary
-        if (repeaterWrapper._sortable) {
-            repeaterWrapper._sortable.destroy();
-        }
-
-        Sortable.create(repeaterWrapper, {
-            animation: 150,
-            handle: '.repeater-form-move',
-        });
-    }
-});
+    });
 
 
 
@@ -226,6 +223,17 @@
                     widget.setAttribute('data-index', index);
                 });
             }
+        });
+    }
+
+    const repeaterWidgets = document.querySelectorAll('.repeater-form-fields-wrapper');
+
+    if(repeaterWidgets) {
+        repeaterWidgets.forEach(function(repeaterWidget) {
+            Sortable.create(repeaterWidget, {
+                animation: 150,
+                handle: '.repeater-form-move',
+            });
         });
     }
 
@@ -297,6 +305,33 @@
         });
     });
 
+
+    // handle ajax submition
+    $(document).on('submit', '#formPageWidget', function(e){
+        e.preventDefault();
+        var formData = new FormData(this);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function() {
+                $('.widget-save-btn').prop('disabled', true).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+            },
+            success: function(response) {
+                console.log(response);
+                toastr.success(response.message);
+            },
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON.message);
+            },
+            complete: function() {
+                $('.widget-save-btn').prop('disabled', false).find('.spinner-border').remove();
+            }
+        });
+    })
 
 </script>
 @endpush

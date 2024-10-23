@@ -29,7 +29,6 @@
         $item_count = @isset($data['repeater']) ? count($data['repeater']) : 1;
         $code = @isset($data) ? $code : 'en';
         $all_languages = \Modules\Core\Models\Language::all();
-
     @endphp
 
     <div class="collapse" id="widget-body-{{ $id }}">
@@ -68,203 +67,162 @@
 
                     </div>
                     <div class="col">
-                        @php
-                            $main_image = asset('storage/') ?? '';
-                        @endphp
 
-                        <div class="mb-5">
-                            <x-core::form.input-label class="d-block" :value="'Image'" />
-                            
-                            <div class="mb-2 image-upload-container">
-                                <img src="{{$main_image}}" class="img-thumbnail main-image image-preview" alt="main-image" data-default="{{$main_image}}">
-                            </div>
-                            
-                            <label for="main_image" class="btn btn-sm btn-label-primary me-3">
-                                <span>Upload Image</span>                    
-                                <x-core::form.input value="{{$main_image}}" type="file" id="main_image" name="widgets[widget-{{$id}}][widget_data][image]" class="image-input" data-target=".main-image" data-reset=".main-image-reset" hidden />
-                            </label>
-                            <button type="button" class="btn btn-sm btn-label-secondary main-image-reset image-reset d-none" data-target=".main-image">Reset</button>
-                            
-                            <x-core::form.input-error field="main_image" />
+                        <h5 class="mt-3">Items</h5>
+                        <div class="repeater-form-fields-wrapper">
+                            @isset($data['repeater'])
+
+                                @forelse ($data['repeater'] as $key => $item)
+                                @php
+                                    $loop_count = $loop->iteration;
+                                    
+                                @endphp
+                                <div class="repeater-form-fields pb-4">
+                                    <div class="card-header d-flex align-items-center gap-3">
+                                        <button class="btn btn-icon btn-xs btn-label-primary repeater-form-move" type="button">
+                                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M5 2.5L7 0.5M7 0.5L9 2.5M7 0.5V13.5M5 11.5L7 13.5M7 13.5L9 11.5M11.5 5L13.5 7M13.5 7L11.5 9M13.5 7H0.5M2.5 5L0.5 7M0.5 7L2.5 9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                        </button>
+                                        <button class="btn btn-icon btn-xs btn-label-primary repeater-form-toggle-btn" type="button">
+                                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M7 11.5V2.5M7 11.5L9.5 9M7 11.5L4.5 9M7 2.5L9.5 5M7 2.5L4.5 5M13.5 0.5H0.5M13.5 13.5H0.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                        </button>
+                                        <h5 class="card-title repeater-item-title">Item {{$loop_count}}</h5>
+                                        <button class="btn btn-icon btn-xs btn-label-danger repeater-form-remove-btn ms-auto" type="button">
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M15 0.999939L1 14.9999M1 0.999939L15 14.9999" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div class="repeater-form-wrapper">
+
+                                        <div class="row row-cols-lg-1">
+                                            <div class="col">
+                                                <div class="repeater-lang-content">
+                
+                                                    <div class="repeater-lang-btn-wrapper">
+                                                        @foreach ($site_languages as $lang)
+                                                        <button type="button" class="repeater-lang-btn @if ($code == $lang->code) active @endif" data-code="{{$lang->code}}">{{$lang->code}}</button>
+                                                        @endforeach
+                                                    </div>
+                
+                                                    @foreach ($site_languages as $lang)
+                                                    <div class="repeater-lang-tab @if ($code == $lang->code) active @endif" data-code="{{$lang->code}}">
+                                                        <div class="mb-3">
+                                                            <x-core::form.input-label :value="'Text '.$lang->code.' '"/>
+                                                            <x-core::form.input type="text" id="text" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop_count}}][lang][{{$lang->code}}][text]" value="{{$item['lang'][$lang->code]['text'] ?? ''}}" />
+                                                        </div>
+                                                    </div>
+                                                    @endforeach
+                                                    <div class="mb-3">
+                                                        <x-core::form.input-label :value="'URL'" />
+                                                        <x-core::form.input type="text" id="text" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop_count}}][url]" value="{{$item['url'] ?? ''}}" />
+                                                    </div>
+                                                </div>
+
+                                                @php
+                                                    $item_image = '';
+                                                    $item_image_db = '';
+                                                @endphp
+                                                <div class="mb-2 image-upload-container d-none">
+                                                    <img src="{{$item_image}}" class="img-thumbnail item-image image-preview" alt="item-image" data-default="{{$item_image}}">
+                                                    <label class="btn btn-sm btn-label-primary me-3">
+                                                        <span>Upload</span>     
+                                                        <input name="widgets[widget-{{$id}}][widget_data][logo_db]" type="hidden" value="{{$item_image_db}}">               
+                                                        <x-core::form.input value="{{$item_image}}" type="file" name="widgets[widget-{{$id}}][widget_data][logo]" class="image-input" data-target=".item-image" data-reset=".item-image-reset" hidden value="{{$item_image}}" />
+                                                    </label>
+                                                    <button type="button" class="btn btn-sm btn-label-secondary item-image-reset image-reset d-none" data-target=".item-image">Reset</button>
+                                                </div>
+
+                                                <div class="conca-image-upload-container">
+                                                    <img src="{{$item_image}}" class="img-thumbnail image-preview" alt="item-image" data-default="{{$item_image}}">
+
+                                                    <button class="btn btn-sm btn-label-primary conca-image-upload-btn" data-id="{{$loop_count}}">Upload</button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> 
+                                @empty
+                                    no Data
+                                @endforelse 
+                            @else
+                                <div class="repeater-form-fields pb-4">
+                                    <div class="card-header d-flex align-items-center gap-3">
+                                        <button class="btn btn-icon btn-xs btn-label-primary repeater-form-move" type="button">
+                                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M5 2.5L7 0.5M7 0.5L9 2.5M7 0.5V13.5M5 11.5L7 13.5M7 13.5L9 11.5M11.5 5L13.5 7M13.5 7L11.5 9M13.5 7H0.5M2.5 5L0.5 7M0.5 7L2.5 9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                        </button>
+                                        <button class="btn btn-icon btn-xs btn-label-primary repeater-form-toggle-btn" type="button">
+                                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M7 11.5V2.5M7 11.5L9.5 9M7 11.5L4.5 9M7 2.5L9.5 5M7 2.5L4.5 5M13.5 0.5H0.5M13.5 13.5H0.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                        </button>
+                                        <h5 class="card-title repeater-item-title">Item 1</h5>
+                                        <button class="btn btn-icon btn-xs btn-label-danger repeater-form-remove-btn ms-auto" type="button">
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M15 0.999939L1 14.9999M1 0.999939L15 14.9999" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div class="repeater-form-wrapper">
+
+                                        <div class="row row-cols-lg-1">
+                                            <div class="col">
+                                                <div class="repeater-lang-content">
+                
+                                                    <div class="repeater-lang-btn-wrapper">
+                                                        @foreach ($site_languages as $lang)
+                                                        <button type="button" class="repeater-lang-btn @if ($code == $lang->code) active @endif" data-code="{{$lang->code}}">{{$lang->code}}</button>
+                                                        @endforeach
+                                                    </div>
+                
+                                                    @foreach ($site_languages as $lang)
+                                                    <div class="repeater-lang-tab @if ($code == $lang->code) active @endif" data-code="{{$lang->code}}">
+                                                        <div class="mb-3">
+                                                            <x-core::form.input-label :value="'Text '.$lang->code.' '"/>
+                                                            <x-core::form.input type="text" id="text" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1][lang][{{$lang->code}}][text]" />
+                                                        </div>
+                                                    </div>
+                                                    @endforeach
+                                                    <div class="mb-3">
+                                                        <x-core::form.input-label :value="'URL'" />
+                                                        <x-core::form.input type="text" id="text" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1][url]" />
+                                                    </div>
+                                                </div>
+
+                                                @php
+                                                    $item_image = '';
+                                                    $item_image_db = '';
+                                                @endphp
+                                                <div class="mb-2 image-upload-container">
+                                                    <img src="{{$item_image}}" class="img-thumbnail item-image image-preview" alt="item-image" data-default="{{$item_image}}">
+                                                    <label class="btn btn-sm btn-label-primary me-3">
+                                                        <span>Upload</span>     
+                                                        <input name="widgets[widget-{{$id}}][widget_data][logo_db]" type="hidden" value="{{$item_image_db}}">               
+                                                        <x-core::form.input value="{{$item_image}}" type="file" name="widgets[widget-{{$id}}][widget_data][logo]" class="image-input" data-target=".item-image" data-reset=".item-image-reset" hidden value="{{$item_image}}" />
+                                                    </label>
+                                                    <button type="button" class="btn btn-sm btn-label-secondary item-image-reset image-reset d-none" data-target=".item-image">Reset</button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> 
+                            @endisset
                         </div>
+                        <button class="btn btn-sm btn-primary repeater-form-add-btn" type="button">Add New</button>
+                        
                     </div>
                 </div>
                 
 
-                <h5 class="mt-3">Services Items</h5>
-                <div class="repeater-form-fields-wrapper">
-                    
-                    @isset($data['repeater'])
-                        
-                        
-                        @foreach ($data['repeater'] as $key => $item)
-                        
-                        <div class="repeater-form-fields pb-4">
-                            <div class="card-header d-flex align-items-center gap-3">
-                                <button class="btn btn-icon btn-xs btn-label-primary repeater-form-move" type="button">
-                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M5 2.5L7 0.5M7 0.5L9 2.5M7 0.5V13.5M5 11.5L7 13.5M7 13.5L9 11.5M11.5 5L13.5 7M13.5 7L11.5 9M13.5 7H0.5M2.5 5L0.5 7M0.5 7L2.5 9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </button>
-                                <button class="btn btn-icon btn-xs btn-label-primary repeater-form-toggle-btn" type="button">
-                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M7 11.5V2.5M7 11.5L9.5 9M7 11.5L4.5 9M7 2.5L9.5 5M7 2.5L4.5 5M13.5 0.5H0.5M13.5 13.5H0.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </button>
-                                <h5 class="card-title repeater-item-title">Item {{$loop->iteration}}</h5>
-                                <button class="btn btn-icon btn-xs btn-label-danger repeater-form-remove-btn ms-auto" type="button">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M15 0.999939L1 14.9999M1 0.999939L15 14.9999" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="repeater-form-wrapper">
 
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="repeater-lang-content">
-        
-                                            <div class="repeater-lang-btn-wrapper">
-                                                @foreach ($all_languages as $lang)
-                                                <button type="button" class="repeater-lang-btn @if ($code == $lang->code) active @endif" data-code="{{$lang->code}}">{{$lang->code}}</button>
-                                                @endforeach
-                                            </div>
-        
-                                            @foreach ($all_languages as $lang)
-                                            <div class="repeater-lang-tab @if ($code == $lang->code) active @endif" data-code="{{$lang->code}}">
-                                                <div class="mb-3">
-                                                    <x-core::form.input-label :value="'Title'"/>
-                                                    <x-core::form.input type="text" id="title" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop->iteration}}][lang][{{$lang->code}}][title]" value="{{ $item['lang'][$lang->code]['title'] ?? '' }}" />
-                                                </div>
-                                                <div class="mb-3">
-                                                    <x-core::form.input-label :value="'Description'" />
-                                                    <textarea class="form-control" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop->iteration}}][lang][{{$lang->code}}][description]" rows="3" placeholder="Enter widget description">{{ $item['lang'][$lang->code]['description'] ?? '' }}</textarea>
-                                                </div>
-                                            </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="mb-3">
-                                            <label for="widget_image" class="form-label">Image</label>
-                                            <input type="file" class="form-control" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop->iteration}}][image]" value="{{ $item['lang'][$lang->code]['description'] ?? '' }}">
-                                        </div> 
-        
-                                        <div class="conca-icon-uploader">
-                                            <label for="iconType">Select Icon Type:</label>
-                                            <select class="form-select" id="iconType" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop->iteration}}][icon][icon_type]">
-                                                <option>-- Select Icon Type --</option>
-                                                <option value="image" @if (isset($item['icon']) && $item['icon']['icon_type'] == 'image') selected @endif>Image</option>
-                                                <option value="svg" @if (isset($item['icon']) && $item['icon']['icon_type'] == 'svg') selected @endif>SVG Class</option>
-                                            </select>
-                                            
-                                            @if (isset($item['icon']) && $item['icon']['icon_type'] == 'image')
-                                              <img src="" alt="">                                     
-                                            @endif
-        
-                                            <!-- Image Upload Field -->
-                                            <div data-type="image" class="icon-upload-field">
-                                                <label class="form-label" for="imageUpload">Upload Image:</label>
-                                                <input class="form-control" type="file" id="imageUpload" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop->iteration}}][icon][icon_content]" accept="image/*" />
-                                            </div>
-                                            
-                                            
-                                            <!-- SVG Code Field -->
-                                            <div data-type="svg" class="icon-upload-field">
-                                                <label class="form-label" for="svgCode">SVG Code:</label>
-                                                <textarea class="form-control" id="svgCode" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop->iteration}}][icon][icon_content]" rows="4" placeholder="Paste your SVG code here...">@if (isset($item['icon']) && $item['icon']['icon_type'] == 'svg') {{ $item['icon']['icon_content'] }} @endif</textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div> 
-                        @endforeach
-
-                    @else
-
-                        <div class="repeater-form-fields pb-4">
-                            <div class="card-header d-flex align-items-center gap-3">
-                                <button class="btn btn-icon btn-xs btn-label-primary repeater-form-move" type="button">
-                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M5 2.5L7 0.5M7 0.5L9 2.5M7 0.5V13.5M5 11.5L7 13.5M7 13.5L9 11.5M11.5 5L13.5 7M13.5 7L11.5 9M13.5 7H0.5M2.5 5L0.5 7M0.5 7L2.5 9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </button>
-                                <button class="btn btn-icon btn-xs btn-label-primary repeater-form-toggle-btn" type="button">
-                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M7 11.5V2.5M7 11.5L9.5 9M7 11.5L4.5 9M7 2.5L9.5 5M7 2.5L4.5 5M13.5 0.5H0.5M13.5 13.5H0.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </button>
-                                <h5 class="card-title repeater-item-title">Item 1</h5>
-                                <button class="btn btn-icon btn-xs btn-label-danger repeater-form-remove-btn ms-auto" type="button">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M15 0.999939L1 14.9999M1 0.999939L15 14.9999" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="repeater-form-wrapper">
-
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="repeater-lang-content">
-        
-                                            <div class="repeater-lang-btn-wrapper">
-                                                @foreach ($all_languages as $lang)
-                                                <button type="button" class="repeater-lang-btn @if ($code == $lang->code) active @endif" data-code="{{$lang->code}}">{{$lang->code}}</button>
-                                                @endforeach
-                                            </div>
-        
-                                            @foreach ($all_languages as $lang)
-                                            <div class="repeater-lang-tab @if ($code == $lang->code) active @endif" data-code="{{$lang->code}}">
-                                                <div class="mb-3">
-                                                    <x-core::form.input-label :value="'Title'"/>
-                                                    <x-core::form.input type="text" id="title" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1][lang][{{$lang->code}}][title]" value="{{ old('title') }}" />
-                                                </div>
-                                                <div class="mb-3">
-                                                    <x-core::form.input-label :value="'Description'" />
-                                                    <textarea class="form-control" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1][lang][{{$lang->code}}][description]" rows="3" placeholder="Enter widget description"></textarea>
-                                                </div>
-                                            </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="mb-3">
-                                            <label for="widget_image" class="form-label">Image</label>
-                                            <input type="file" class="form-control" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1][image]">
-                                        </div> 
-        
-                                        <div class="conca-icon-uploader">
-                                            <label for="iconType">Select Icon Type:</label>
-                                            <select class="form-select" id="iconType" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1][icon][icon_type]">
-                                                <option>-- Select Icon Type --</option>
-                                                <option value="image">Image</option>
-                                                <option value="svg">SVG Code</option>
-                                            </select>
-                                            
-                                            <!-- Image Upload Field -->
-                                            <div data-type="image" class="icon-upload-field">
-                                                <label class="form-label" for="imageUpload">Upload Image:</label>
-                                                <input class="form-control" type="file" id="imageUpload" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1][icon][icon_content]" accept="image/*" />
-                                            </div>
-                                            
-                                            
-                                            <!-- SVG Code Field -->
-                                            <div data-type="svg" class="icon-upload-field">
-                                                <label class="form-label" for="svgCode">SVG Code:</label>
-                                                <textarea class="form-control"  id="svgCode" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1][icon][icon_content]" rows="4" placeholder="Paste your SVG code here..."></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> 
-                    @endisset
-                    
-                </div>
-
-                <button class="btn btn-sm btn-primary repeater-form-add-btn" type="button">Add New</button>
+                
                 
             </div>
         </div>

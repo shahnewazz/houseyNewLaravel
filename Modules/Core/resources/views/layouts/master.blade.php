@@ -114,15 +114,12 @@
             $this.addClass('active').siblings('.repeater-lang-btn').removeClass('active');
             $this.closest('.repeater-lang-content').find('.repeater-lang-tab').removeClass('active');
             $this.closest('.repeater-lang-content').find('.repeater-lang-tab[data-code="' + code + '"]').addClass('active');
-
-            
         });
 
       
         function showIconField($uploader) {
             var $iconUploadField = $uploader.closest('.conca-icon-uploader').find('.icon-upload-field');
 
-            
             $iconUploadField.each(function() {
                 $(this).hide(); 
                 $(this).find('input, textarea').attr('disabled', true);
@@ -157,16 +154,13 @@
         });
 
 
-
-
         // ajax setup
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-
-       
+  
 
         $('.input-color').each(function(){
             $(this).siblings('.input-color-placeholder').css('background-color', $(this).val());
@@ -196,6 +190,7 @@
         $(document).on('click', '.image-reset', function () {
             var target = $(this).data('target');  
             var input = $(this).closest('.image-upload-container').find('.image-input'); 
+            console.log(input);
             var defaultSrc = $(target).data('default'); 
 
             $(target).attr('src', defaultSrc); 

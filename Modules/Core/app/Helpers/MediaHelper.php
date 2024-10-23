@@ -22,7 +22,6 @@ if(!function_exists('storeMedia')) {
 if(!function_exists('updateMedia')) {
     function updateMedia($newFile, ?string $oldFilePath, string $path = '', string $disk = 'public', $random = true) {
 
-
         try {
             if ($oldFilePath && Storage::disk($disk)->exists($oldFilePath)) {
                 Storage::disk($disk)->delete($oldFilePath);

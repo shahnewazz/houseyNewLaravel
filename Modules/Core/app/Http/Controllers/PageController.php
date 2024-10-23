@@ -137,15 +137,12 @@ class PageController extends Controller
     public function saveWidgets(Request $request, $id)
     {
 
-        // dd($request->all());
-        
         $rules = [
             'widgets.*.widget_type' => 'required|string',
             'widgets.*.widget_data' => 'required|array',
-            'widgets.*.widget_data.menu' => 'required|exists:menus,id',
+            'widgets.*.widget_data.menu' => 'nullable|exists:menus,id',
             'widgets.*.widget_data.logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ];
-
 
 
         if($request->hasFile("widgets.*.widget_data.account.icon.icon_content.image")){
@@ -178,6 +175,7 @@ class PageController extends Controller
 
         if(isset($data) && is_array($data)){
             foreach ($data as $key => $value) {
+                // header -1 validation
                 if($value['widget_type'] == 'header-1'){
                     foreach($value['widget_data'] as $k => $item){
 
@@ -197,24 +195,51 @@ class PageController extends Controller
                             $data[$key]['widget_data']['search_switch'] = 0;
                         }
 
+                        
                         // ACOOUNT 
                         // ------------------------------------------------
-                        
-                        if($k == 'account'){
-                            if($value['widget_data']['account']['icon']['icon_type'] == 'image' && $request->hasFile("widgets.$key.widget_data.account.icon.icon_content.image")){
-                                $avatar_path = storeMedia($request->file("widgets.$key.widget_data.account.icon.icon_content.image"), 'page');
-                                $data[$key]['widget_data']['account']['icon']['icon_content']['image'] = $avatar_path;
-                            }else{
-                                $data[$key]['widget_data']['account']['icon']['icon_content']['image'] = $value['widget_data']['account']['icon']['icon_type'] == 'image' ? $data[$key]['widget_data']['account']['icon']['icon_content']['image_db'] : null;
+                        if(array_key_exists('account', $value['widget_data'])){
+                            if($k == 'account' ){
+                                if(array_key_exists('icon', $data[$key]['widget_data']['account'])){
+    
+                                    if(array_key_exists('icon_type', $data[$key]['widget_data']['account']['icon']) && array_key_exists('icon_content', $data[$key]['widget_data']['account']['icon'])){
+                                        
+                                        if($value['widget_data']['account']['icon']['icon_type'] == 'image' && $request->hasFile("widgets.$key.widget_data.account.icon.icon_content.image")){
+                                            $avatar_path = updateMedia($request->file("widgets.$key.widget_data.account.icon.icon_content.image"), $value['widget_data']['account']['icon']['icon_content']['image_db'], 'page');
+                                            $data[$key]['widget_data']['account']['icon']['icon_content']['image'] = $avatar_path;
+                                        }else{
+                                            if(array_key_exists('image_db', $data[$key]['widget_data']['account']['icon']['icon_content'])){
+                                                $data[$key]['widget_data']['account']['icon']['icon_content']['image'] = $value['widget_data']['account']['icon']['icon_type'] == 'image' ? $data[$key]['widget_data']['account']['icon']['icon_content']['image_db'] : null;
+                                            }
+                                        }
+                                    }else{
+                                        return response()->json(['message' => 'Some Fields are missing in Accounts', 'status' => false], 422);
+                                    }
+        
+    
+    
+                                    // target
+                                    if(array_key_exists('target', $data[$key]['widget_data']['account'])){
+                                        $data[$key]['widget_data']['account']['target'] = 1;
+                                    }else{
+                                        $data[$key]['widget_data']['account']['target'] = 0;
+                                    }
+    
+                                    // follow
+                                    if(array_key_exists('follow', $data[$key]['widget_data']['account'])){
+                                        $data[$key]['widget_data']['account']['follow'] = 1;
+                                    }else{
+                                        $data[$key]['widget_data']['account']['follow'] = 0;
+                                    }
+                                }
+    
+                                if(!array_key_exists('text', $data[$key]['widget_data']['account']['lang']['en']) || !array_key_exists('url', $data[$key]['widget_data']['account'])){
+                                    return response()->json(['message' => 'Some Fields are missing in Accounts', 'status' => false], 422);
+                                }
+    
                             }
-
-                            if(array_key_exists('target', $data[$key]['widget_data']['account'])){
-                                $data[$key]['widget_data']['account']['target'] = 1;
-                                $data[$key]['widget_data']['account']['follow'] = 1;
-                            }else{
-                                $data[$key]['widget_data']['account']['target'] = 0;
-                                $data[$key]['widget_data']['account']['follow'] = 0;
-                            }
+                        }else{
+                            return response()->json(['message' => 'Some Fields are missing in Account', 'status' => false], 422);
                         }
 
                         // BUTTON
@@ -232,43 +257,74 @@ class PageController extends Controller
 
                         // LOGO
                         // ------------------------------------------------
-                        if($k == 'logo' && $request->hasFile("widgets.$key.widget_data.logo")){
-                            $logo_path = storeMedia($request->file("widgets.$key.widget_data.logo"), 'page');
-                            $data[$key]['widget_data']['logo'] = $logo_path;
-                            dd($logo_path);
+                        if(array_key_exists('logo_db', $data[$key]['widget_data'])){
+                            if($k == 'logo' && $request->hasFile("widgets.$key.widget_data.logo")){
+                                $logo_path = updateMedia($request->file("widgets.$key.widget_data.logo"), $value['widget_data']['logo_db'], 'page');
+                                $data[$key]['widget_data']['logo'] = $logo_path;
+                               
+                            }else{
+                                $data[$key]['widget_data']['logo'] = $data[$key]['widget_data']['logo_db'];
+                                
+                            }
                         }else{
-                            $data[$key]['widget_data']['logo'] = $data[$key]['widget_data']['logo_db'];
-                            dd($data[$key]['widget_data']['logo']);
+                            return response()->json(['message' => 'Some Fields are missing in Logo', 'status' => false], 422);
                         }
+
 
                         // REPEATER
                         // ------------------------------------------------
-                        if($k == 'repeater'){
-                            foreach($item as $rep => $rep_item){
-                                
-                                if($rep_item['icon']['icon_type'] == 'image' && $request->hasFile("widgets.$key.widget_data.repeater.$rep.icon.icon_content.image")){
-                                    $icon_image_path = storeMedia($request->file("widgets.$key.widget_data.repeater.$rep.icon.icon_content.image"), 'page');
-                                    $data[$key]['widget_data']['repeater'][$rep]['icon']['icon_content']['image'] = $icon_image_path;
-                                }
-                                else{
-                                    $data[$key]['widget_data']['repeater'][$rep]['icon']['icon_content']['image'] = $rep_item['icon']['icon_type'] == 'image' ? $data[$key]['widget_data']['repeater'][$rep]['icon']['icon_content']['image_db'] : null;
+                        if(array_key_exists('repeater', $data[$key]['widget_data'])){
+                            if($k == 'repeater'){
+                                foreach($item as $rep => $rep_item){
+                                    
+                                    if(!array_key_exists('url', $rep_item) || !array_key_exists('lang', $rep_item) || !array_key_exists('en', $rep_item['lang']) || !array_key_exists('text', $rep_item['lang']['en'])){
+                                        return response()->json(['message' => 'Some Fields are missing in Repeater Items', 'status' => false], 422);
+                                    }
+
+
+                                    if(array_key_exists('icon', $rep_item) && array_key_exists('icon_type', $rep_item['icon'])){
+                                        if(array_key_exists('icon_content', $rep_item['icon'])){
+                                            if($rep_item['icon']['icon_type'] == 'image' && $request->hasFile("widgets.$key.widget_data.repeater.$rep.icon.icon_content.image")){
+                                                $icon_image_path = updateMedia($request->file("widgets.$key.widget_data.repeater.$rep.icon.icon_content.image"), $rep_item['icon']['icon_content']['image_db'], 'page');
+                                                $data[$key]['widget_data']['repeater'][$rep]['icon']['icon_content']['image'] = $icon_image_path;
+                                            }
+                                            else{
+                                                $data[$key]['widget_data']['repeater'][$rep]['icon']['icon_content']['image'] = $rep_item['icon']['icon_type'] == 'image' ? $data[$key]['widget_data']['repeater'][$rep]['icon']['icon_content']['image_db'] : null;
+                                            }
+                                        }else{
+                                            $data[$key]['widget_data']['repeater'][$rep]['icon']['icon_content'] = ['image' => null, 'image_db' => null, 'svg' => null];
+                                        }
+                                    }else{
+                                        return response()->json(['message' => 'Some Fields are missing in Repeater Items', 'status' => false], 422);
+                                    } 
                                 }
                             }
+                        }else{
+                            return response()->json(['message' => 'Some Fields are missing in Repeater', 'status' => false], 422);
+                           
                         }
                     }
                 }
+                
+                // facilities validation
+
+                // if($value['widget_type'] == 'facilities'){
+                //     foreach($value['widget_data'] & $k => $item){
+
+                //     }
+                // }
             }
 
         }
 
-        dd($data);
 
         $page = Page::findOrFail($id);
         $page->widgets = $data ?? [];
         $page->save();
         
        
-        return redirect()->route('admin.pages.index')->with('success', 'Widgets updated successfully.');
+        return response()->json(['message' => 'Widgets saved successfully.'], 200);
+
     }
     
 
