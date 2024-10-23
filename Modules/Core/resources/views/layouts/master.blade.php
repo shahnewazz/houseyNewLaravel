@@ -199,6 +199,52 @@
         });
 
 
+        // Handle image preview
+        window.addEventListener('click', (event) => {
+            
+            if (!event.target.matches('.conca-image-upload-btn')) return;
+            event.preventDefault();
+            var id = event.target.dataset.id;
+
+            event.target.closest('.conca-image-upload-container').querySelector('.image-input').click();
+
+            // Handle image preview
+            $(document).on('change', '.image-input', function (e) {
+                
+                var file = e.target.files[0];
+                var target = $(this).closest('.conca-image-upload-container').find('.image-preview');
+                var defaultSrc = target.data('default');
+
+                
+                // read file and show reset button
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        target.attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(file);
+                    $(this).closest('.conca-image-upload-container').find('.conca-image-reset-btn').removeClass('d-none');
+                }else{
+                    target.attr('src', defaultSrc);
+                }
+            });
+
+            // Handle image reset by .conca-image-reset-btn
+            $(document).on('click', '.conca-image-reset-btn', function (e) {
+                e.preventDefault();
+                var target = $(this).closest('.conca-image-upload-container').find('.image-preview');
+                var input = $(this).closest('.conca-image-upload-container').find('.image-input');
+                var defaultSrc = target.data('default');
+
+                target.attr('src', defaultSrc);
+                input.val('');
+                $(this).addClass('d-none');
+            });
+           
+           
+
+            
+        });
 
 
 

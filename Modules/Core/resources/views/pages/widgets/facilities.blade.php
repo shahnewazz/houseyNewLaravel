@@ -136,10 +136,13 @@
                                                     <button type="button" class="btn btn-sm btn-label-secondary item-image-reset image-reset d-none" data-target=".item-image">Reset</button>
                                                 </div>
 
+
                                                 <div class="conca-image-upload-container">
                                                     <img src="{{$item_image}}" class="img-thumbnail image-preview" alt="item-image" data-default="{{$item_image}}">
 
-                                                    <button class="btn btn-sm btn-label-primary conca-image-upload-btn" data-id="{{$loop_count}}">Upload</button>
+                                                    <input type="file" hidden class="image-input" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop_count}}][image]">
+                                                    <button class="btn btn-sm btn-label-primary conca-image-upload-btn" data-id="[repeater-item-{{$loop_count}}]">Uploadxs</button>
+                                                    <button class="btn btn-sm btn-label-secondary conca-image-reset-btn d-none" data-id="[repeater-item-{{$loop_count}}]">Reset</button>
                                                 </div>
 
                                             </div>
@@ -207,6 +210,12 @@
                                                         <x-core::form.input value="{{$item_image}}" type="file" name="widgets[widget-{{$id}}][widget_data][logo]" class="image-input" data-target=".item-image" data-reset=".item-image-reset" hidden value="{{$item_image}}" />
                                                     </label>
                                                     <button type="button" class="btn btn-sm btn-label-secondary item-image-reset image-reset d-none" data-target=".item-image">Reset</button>
+                                                </div>
+
+                                                <div class="conca-image-upload-container">
+                                                    <img src="{{$item_image}}" class="img-thumbnail image-preview" alt="item-image" data-default="{{$item_image}}">
+
+                                                    <button class="btn btn-sm btn-label-primary conca-image-upload-btn" data-id="{{$id}}">Uploadxs</button>
                                                 </div>
 
                                             </div>
