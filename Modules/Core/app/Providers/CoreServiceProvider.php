@@ -6,6 +6,7 @@ use Modules\Core\Models\Language;
 use Illuminate\Support\Facades\View;
 use Modules\Core\Models\SiteSetting;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
 use Modules\Core\Http\Middleware\LanguageMiddleware;
@@ -35,12 +36,12 @@ class CoreServiceProvider extends ServiceProvider
 
         
         // share site settings with all views
-        $config = SiteSetting::all()->pluck('value', 'key')->toArray();
-        $all_languages = Language::all();
-        View::share('config', $config);
-        View::share('site_languages', $all_languages);
-        
-
+        if (Schema::hasTable('site_settings') && Schema::hasTable('language')) {
+            $config = SiteSetting::all()->pluck('value', 'key')->toArray();
+            $all_languages = Language::all();
+            View::share('config', $config);
+            View::share('site_languages', $all_languages);
+        }
     }
 
     /**

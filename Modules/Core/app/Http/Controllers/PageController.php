@@ -137,40 +137,120 @@ class PageController extends Controller
     public function saveWidgets(Request $request, $id)
     {
 
-        $rules = [
-            'widgets.*.widget_type' => 'required|string',
-            'widgets.*.widget_data' => 'required|array',
-            'widgets.*.widget_data.menu' => 'nullable|exists:menus,id',
-            'widgets.*.widget_data.logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ];
+
+        $widgets = $request->widgets ?? [];
+
+        $widgetTypes = array_map(function ($widget) {
+            return $widget['widget_type'] ?? null; // Safely get widget_type
+        }, $widgets);
 
 
-        if($request->hasFile("widgets.*.widget_data.account.icon.icon_content.image")){
-            $rules['widgets.*.widget_data.account.icon.icon_content.image'] = "nullable|image|mimes:jpeg,png,jpg|max:2048";
+        foreach($widgetTypes as $item){
+            if($item == 'header-1'){
+                $rules = [
+                    'widgets.*.widget_data.menu' => 'nullable|exists:menus,id',
+                    'widgets.*.widget_data.logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                    'widgets.*.widget_data.account' => 'required|array',
+                    'widgets.*.widget_data.account.icon' => 'required|array',
+                    'widgets.*.widget_data.account.icon.icon_type' => 'required|string',
+                    'widgets.*.widget_data.account.icon.icon_content' => 'required|array',
+                    'widgets.*.widget_data.account.icon.icon_content.image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                    'widgets.*.widget_data.account.icon.icon_content.image_db' => 'nullable|string',
+                    'widgets.*.widget_data.account.icon.icon_content.svg' => 'nullable|string',
+
+                    'widgets.*.widget_data.account.lang' => 'required|array',
+                    'widgets.*.widget_data.account.lang.*.text' => 'nullable|string',
+                    'widgets.*.widget_data.account.url' => 'nullable|string',
+                    'widgets.*.widget_data.account.target' => 'nullable|string',
+                    'widgets.*.widget_data.account.follow' => 'nullable|string',
+
+                    'widgets.*.widget_data.button' => 'required|array',
+                    'widgets.*.widget_data.button.lang' => 'required|array',
+                    'widgets.*.widget_data.button.lang.*.text' => 'nullable|string',
+                    'widgets.*.widget_data.button.url' => 'nullable|string',
+                    'widgets.*.widget_data.button.target' => 'nullable|string',
+                    'widgets.*.widget_data.button.follow' => 'nullable|string',
+
+
+                    'widgets.*.widget_data.repeater' => 'required|array',
+                    'widgets.*.widget_data.repeater.*.url' => 'nullable|string',
+                    'widgets.*.widget_data.repeater.*.lang' => 'required|array',
+                    'widgets.*.widget_data.repeater.*.lang.*.text' => 'nullable|array',
+                    'widgets.*.widget_data.repeater.*.icon' => 'required|array',
+                    'widgets.*.widget_data.repeater.*.icon.icon_type' => 'required|string',
+                    'widgets.*.widget_data.repeater.*.icon.icon_content' => 'required|array',
+                    'widgets.*.widget_data.repeater.*.icon.icon_content.image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                    'widgets.*.widget_data.repeater.*.icon.icon_content.image_db' => 'nullable|string',
+                    'widgets.*.widget_data.repeater.*.icon.icon_content.svg' => 'nullable|string',
+
+
+                ];
+
+                if($request->hasFile("widgets.*.widget_data.account.icon.icon_content.image")){
+                    $rules['widgets.*.widget_data.account.icon.icon_content.image'] = "nullable|image|mimes:jpeg,png,jpg|max:2048";
+                }   
+
+                if($request->hasFile("widgets.*.widget_data.repeater.*.icon.icon_content.image")){
+                    $rules['widgets.*.widget_data.repeater.*.icon.icon_content.image'] = "nullable|image|mimes:jpeg,png,jpg|max:2048";
+                }
+
+                $messages = [
+                    'widgets.*.widget_data.menu.exists' => 'Menu not found.',
+                    'widgets.*.widget_data.logo.image' => 'The logo must be an image.',
+                    'widgets.*.widget_data.logo.mimes' => 'The logo must be a file of type: jpeg, png, jpg.',
+                    'widgets.*.widget_data.logo.max' => 'The logo may not be greater than 2048 kilobytes.',
+                    'widgets.*.widget_data.account.required' => 'The account field is required.',
+                    'widgets.*.widget_data.account.icon.required' => 'The icon field is required.',
+                    'widgets.*.widget_data.account.icon.icon_type.required' => 'The icon type field is required.',
+                    'widgets.*.widget_data.account.icon.icon_content.required' => 'The icon content field is required.',
+                    'widgets.*.widget_data.account.icon.icon_content.image.image' => 'The icon content image must be an image.',
+                    'widgets.*.widget_data.account.icon.icon_content.image.mimes' => 'The icon content image must be a file of type: jpeg, png, jpg.',
+                    'widgets.*.widget_data.account.icon.icon_content.image.max' => 'The icon content image may not be greater than 2048 kilobytes.',
+                    'widgets.*.widget_data.account.icon.icon_content.image_db.string' => 'The icon content image db must be a string.',
+                    'widgets.*.widget_data.account.icon.icon_content.svg.string' => 'The icon content svg must be a string.',
+                    'widgets.*.widget_data.account.lang.required' => 'The account lang field is required.',
+                    'widgets.*.widget_data.account.lang.*.text.string' => 'The account text must be a string.',
+                    'widgets.*.widget_data.account.url.string' => 'The account url must be a string.',
+                    'widgets.*.widget_data.account.target.string' => 'The account target must be a string.',
+                    'widgets.*.widget_data.account.follow.string' => 'The account follow must be a string.',
+                    'widgets.*.widget_data.button.required' => 'The button field is required.',
+                    'widgets.*.widget_data.button.lang.required' => 'The button lang field is required.',
+                    'widgets.*.widget_data.button.lang.*.text.string' => 'The button text must be a string.',
+                    'widgets.*.widget_data.button.url.string' => 'The button url must be a string.',
+                    'widgets.*.widget_data.button.target.string' => 'The button target must be a string.',
+                    'widgets.*.widget_data.button.follow.string' => 'The button follow must be a string.',
+                    'widgets.*.widget_data.repeater.required' => 'The repeater field is required.',
+                    'widgets.*.widget_data.repeater.*.url.string' => 'The repeater url must be a string.',
+                    'widgets.*.widget_data.repeater.*.lang.required' => 'The repeater lang field is required.',
+                    'widgets.*.widget_data.repeater.*.lang.*.text.string' => 'The repeater text must be a string.',
+                    'widgets.*.widget_data.repeater.*.icon.required' => 'The repeater icon field is required.',
+                    'widgets.*.widget_data.repeater.*.icon.icon_type.required' => 'The repeater icon type field is required.',
+                    'widgets.*.widget_data.repeater.*.icon.icon_content.required' => 'The repeater icon content field is required.',
+                    'widgets.*.widget_data.repeater.*.icon.icon_content.image.image' => 'The repeater icon content image must be an image.',
+                    'widgets.*.widget_data.repeater.*.icon.icon_content.image.mimes' => 'The repeater icon content image must be a file of type: jpeg, png, jpg.',
+                    'widgets.*.widget_data.repeater.*.icon.icon_content.image.max' => 'The repeater icon content image may not be greater than 2048 kilobytes.',
+                    'widgets.*.widget_data.repeater.*.icon.icon_content.image_db.string' => 'The repeater icon content image db must be a string.',
+                    'widgets.*.widget_data.repeater.*.icon.icon_content.svg.string' => 'The repeater icon content svg must be a string.',
+
+                ];
+
+                $request->validate($rules, $messages);
+            }
         }
 
-        $messages = [
-            'widgets.*.widget_type.required' => 'The widget type is required.',
-            'widgets.*.widget_type.string' => 'The widget type must be a valid string.',
-            'widgets.*.widget_data.required' => 'The widget data is required.',
+        $rules = [];
 
-            // logo validation
-            'widgets.*.widget_data.logo.image' => 'The logo must be a valid image file.',
-            'widgets.*.widget_data.logo.max' => 'The logo must not be greater than 2MB.',
-            'widgets.*.widget_data.logo.required' => 'The logo is required.',
+        $rules['widgets.*.widget_type'] = 'nullable|string';
+        $rules['widgets.*.widget_data'] = 'nullable|array';
 
-            // menu validation
-            'widgets.*.widget_data.menu.required' => 'The menu is required.',
-            'widgets.*.widget_data.menu.exists' => 'The menu not found.',
 
-            // account icon validation
-            'widgets.*.widget_data.account.icon.icon_content.image' => 'The account icon image must be a valid image file.',
-            'widgets.*.widget_data.account.icon.icon_content.image.max' => 'The account icon image must not be greater than 2MB.',
 
-        ];
+        $messages = [];
+        $messages['widgets.*.widget_type.string'] = 'The widget type must be a string.';
+        $messages['widgets.*.widget_data.array'] = 'The widget data must be an array.';
 
         $request->validate($rules, $messages);
-        
+
         $data = $request->widgets;
 
         if(isset($data) && is_array($data)){

@@ -3,12 +3,12 @@
 // print_r($data);
 // echo "</pre>";
 
-$menu = \Modules\Core\Models\Menu::findOrFail($data['menu']);
+$menu = isset($data['menu']) ? \Modules\Core\Models\Menu::findOrFail($data['menu']) : null;
 
 if($code != 'en'){
    $menu_data = $menu->translations[$code] ?? $menu->menu_items;
 }else{
-   $menu_data = $menu->menu_items;
+   $menu_data = is_null($menu) ? [] : $menu->menu_items;
 }
 
 @endphp
@@ -100,8 +100,10 @@ if($code != 'en'){
                   </div>
                    <div class="col-xl-6 col-lg-8 d-none d-lg-block">
                       <div class="tp-main-menu">
+                           @if(isset($menu_data) && count($menu_data) > 0)
                          <nav class="tp-mobile-menu-active">
                             <ul>
+
                                @foreach ($menu_data as $key => $item)
                                <li>
                                     <a href="{{$item['href']}}" target="{{$item['target']}}">{{$item['text']}}</a>
@@ -110,6 +112,7 @@ if($code != 'en'){
                                @endforeach
                             </ul>
                          </nav>
+                           @endif
                       </div>
                    </div>
                    <div class="col-xl-4 col-lg-2 col-6">
