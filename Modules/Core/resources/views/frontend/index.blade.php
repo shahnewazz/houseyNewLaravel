@@ -5,11 +5,10 @@
 @isset($page)
     
 
-    @isset($page->widgets)
-        @foreach ($page->widgets as $key => $widget)
+    @if(isset($page->widgets) && !empty($page->widgets))
+        @foreach (unserialize($page->widgets) as $key => $widget)
             @php
-            
-                                              
+                           
                 $dataArr = [
                     'id' => $loop->iteration,
                     'data' => !empty($widget['widget_data']) ? $widget['widget_data'] : [],
@@ -17,13 +16,12 @@
                 ];
 
             @endphp
-           
 
             @if(View::exists('core::frontend.pages.widgets.'.$widget['widget_type']))
-            @include('core::frontend.pages.widgets.'.$widget['widget_type'], $dataArr)
+                @include('core::frontend.pages.widgets.'.$widget['widget_type'], $dataArr)
             @endif
 
         @endforeach
-    @endisset
+    @endif
 @endisset
 @endsection

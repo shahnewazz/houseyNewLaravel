@@ -24,7 +24,7 @@
     
        
         @php
-            $widgetCount = @isset($page->widgets) ? count($page->widgets) : 0;
+            $widgetCount = is_array($page->widgets) && isset($page->widgets) ? count($page->widgets) : 0;
         @endphp
 
 
@@ -33,7 +33,7 @@
         </div>
     
         <div class="widget-container" id="widgetContainer" data-widgets="{{$widgetCount}}">
-            @isset($page->widgets)
+            @if(isset($page->widgets) && is_array($page->widgets))
                 @foreach ($page->widgets as $key => $widget)
                     @php
                         $dataArr = [
@@ -50,7 +50,7 @@
                     
                 @endforeach
                 
-            @endisset
+            @endif
            
         </div>
         
@@ -77,7 +77,7 @@
                     <x-core::widget.card title="Header 1" widget="header-1" code="{{$code}}" src="https://shofy.botble.com/themes/shofy/images/shortcodes/about.png"  />
                 </div>
                 <div class="col">
-                    <x-core::widget.card title="Banner" widget="banner" code="{{$code}}" src="https://shofy.botble.com/themes/shofy/images/shortcodes/about.png"  />
+                    <x-core::widget.card title="Slider 1" widget="slider-1" code="{{$code}}" src="https://shofy.botble.com/themes/shofy/images/shortcodes/about.png"  />
                 </div>
                 <div class="col">
                     <x-core::widget.card title="Facilities" widget="facilities" code="{{$code}}" src="https://shofy.botble.com/themes/shofy/images/shortcodes/about.png"  />
@@ -101,73 +101,144 @@
     'use strict';
 
 
+    // document.addEventListener('click', function(e) {
+    //     if (e.target.matches('.repeater-form-add-btn')) {
+    //         e.preventDefault();
+
+    //         // Find the closest parent element with the class '.widget-form'
+    //         var parentElement = e.target.closest('.card-body');
+            
+    //         if (!parentElement) {
+    //             console.error('Could not find the .widget-form element.');
+    //             return; // Exit if no .widget-form is found
+    //         }
+
+    //         // Find and clone the first .repeater-form-fields inside the widget form
+    //         var repeaterFields = parentElement.querySelector('.repeater-form-fields');
+    //         if (!repeaterFields) {
+    //             console.error('Could not find the .repeater-form-fields element.');
+    //             return; // Exit if no .repeater-form-fields is found
+    //         }
+
+    //         var html = repeaterFields.cloneNode(true); // Clone the node
+
+    //         // Find the widget form with data-item_count
+    //         var widgetForm = parentElement.querySelector('[data-item_count]');
+            
+    //         if (!widgetForm) {
+    //             console.error('Could not find the element with data-item_count attribute.');
+    //             return; // Exit if no widgetForm with data-item_count is found
+    //         }
+
+    //         // Get the current repeater index
+    //         var repeaterIndex = parseInt(widgetForm.getAttribute('data-item_count'), 10) || 0;
+
+    //         // Update the cloned HTML
+    //         var updatedHtml = html.innerHTML.replaceAll('[repeater-item-1]', '[repeater-item-' + (repeaterIndex + 1) + ']');
+    //         html.innerHTML = updatedHtml; // Update the cloned element's HTML
+
+    //         // Update the repeater item title
+    //         var itemTitle = html.querySelector('.repeater-item-title');
+    //         if (itemTitle) {
+    //             itemTitle.textContent = 'Item ' + (repeaterIndex + 1); // Set the new title
+    //         }
+
+
+    //         // Append the cloned element to the repeater wrapper
+    //         var repeaterWrapper = parentElement.querySelector(".repeater-form-fields-wrapper");
+    //         if (!repeaterWrapper) {
+    //             console.error('Could not find the .repeater-form-fields-wrapper element.');
+    //             return; // Exit if no .repeater-form-fields-wrapper is found
+    //         }
+
+    //         repeaterWrapper.appendChild(html); // Append the cloned element
+
+    //         // Update the data-item_count attribute
+    //         widgetForm.setAttribute('data-item_count', repeaterIndex + 1);
+
+    //         // Re-initialize the sortable if necessary
+    //         if (repeaterWrapper._sortable) {
+    //             repeaterWrapper._sortable.destroy();
+    //         }
+
+    //         Sortable.create(repeaterWrapper, {
+    //             animation: 150,
+    //             handle: '.repeater-form-move',
+    //         });
+    //     }
+    // });
+
     document.addEventListener('click', function(e) {
-        if (e.target.matches('.repeater-form-add-btn')) {
-            e.preventDefault();
+    if (e.target.matches('.repeater-form-add-btn')) {
+        e.preventDefault();
 
-            // Find the closest parent element with the class '.widget-form'
-            var parentElement = e.target.closest('.card-body');
-            
-            if (!parentElement) {
-                console.error('Could not find the .widget-form element.');
-                return; // Exit if no .widget-form is found
-            }
+        // Find the closest parent element with the class '.widget-form'
+        var parentElement = e.target.closest('.card-body');
 
-            // Find and clone the first .repeater-form-fields inside the widget form
-            var repeaterFields = parentElement.querySelector('.repeater-form-fields');
-            if (!repeaterFields) {
-                console.error('Could not find the .repeater-form-fields element.');
-                return; // Exit if no .repeater-form-fields is found
-            }
-
-            var html = repeaterFields.cloneNode(true); // Clone the node
-
-            // Find the widget form with data-item_count
-            var widgetForm = parentElement.querySelector('[data-item_count]');
-            
-            if (!widgetForm) {
-                console.error('Could not find the element with data-item_count attribute.');
-                return; // Exit if no widgetForm with data-item_count is found
-            }
-
-            // Get the current repeater index
-            var repeaterIndex = parseInt(widgetForm.getAttribute('data-item_count'), 10) || 0;
-
-            // Update the cloned HTML
-            var updatedHtml = html.innerHTML.replaceAll('[repeater-item-1]', '[repeater-item-' + (repeaterIndex + 1) + ']');
-            html.innerHTML = updatedHtml; // Update the cloned element's HTML
-
-            // Update the repeater item title
-            var itemTitle = html.querySelector('.repeater-item-title');
-            if (itemTitle) {
-                itemTitle.textContent = 'Item ' + (repeaterIndex + 1); // Set the new title
-            }
-
-
-            // Append the cloned element to the repeater wrapper
-            var repeaterWrapper = parentElement.querySelector(".repeater-form-fields-wrapper");
-            if (!repeaterWrapper) {
-                console.error('Could not find the .repeater-form-fields-wrapper element.');
-                return; // Exit if no .repeater-form-fields-wrapper is found
-            }
-
-            repeaterWrapper.appendChild(html); // Append the cloned element
-
-            // Update the data-item_count attribute
-            widgetForm.setAttribute('data-item_count', repeaterIndex + 1);
-
-            // Re-initialize the sortable if necessary
-            if (repeaterWrapper._sortable) {
-                repeaterWrapper._sortable.destroy();
-            }
-
-            Sortable.create(repeaterWrapper, {
-                animation: 150,
-                handle: '.repeater-form-move',
-            });
+        if (!parentElement) {
+            console.error('Could not find the .widget-form element.');
+            return; // Exit if no .widget-form is found
         }
-    });
 
+        // Find and clone the first .repeater-form-fields inside the widget form
+        var repeaterFields = parentElement.querySelector('.repeater-form-fields');
+        if (!repeaterFields) {
+            console.error('Could not find the .repeater-form-fields element.');
+            return; // Exit if no .repeater-form-fields is found
+        }
+
+        var html = repeaterFields.cloneNode(true); // Clone the node
+
+        // Find the widget form with data-item_count
+        var widgetForm = parentElement.querySelector('[data-item_count]');
+        
+        if (!widgetForm) {
+            console.error('Could not find the element with data-item_count attribute.');
+            return; // Exit if no widgetForm with data-item_count is found
+        }
+
+        // Get the current repeater index
+        var repeaterIndex = parseInt(widgetForm.getAttribute('data-item_count'), 10) || 0;
+
+        // Update the cloned HTML
+        var updatedHtml = html.innerHTML.replaceAll('[repeater-item-1]', '[repeater-item-' + (repeaterIndex + 1) + ']');
+        html.innerHTML = updatedHtml; // Update the cloned element's HTML
+
+        // Clear the value of the input fields in the cloned element
+        var clonedInputFields = html.querySelectorAll('input'); // Select all input fields in the cloned element
+        clonedInputFields.forEach(function(input) {
+            input.value = ''; // Set each input value to an empty string
+        });
+
+        // Update the repeater item title
+        var itemTitle = html.querySelector('.repeater-item-title');
+        if (itemTitle) {
+            itemTitle.textContent = 'Item ' + (repeaterIndex + 1); // Set the new title
+        }
+
+        // Append the cloned element to the repeater wrapper
+        var repeaterWrapper = parentElement.querySelector(".repeater-form-fields-wrapper");
+        if (!repeaterWrapper) {
+            console.error('Could not find the .repeater-form-fields-wrapper element.');
+            return; // Exit if no .repeater-form-fields-wrapper is found
+        }
+
+        repeaterWrapper.appendChild(html); // Append the cloned element
+
+        // Update the data-item_count attribute
+        widgetForm.setAttribute('data-item_count', repeaterIndex + 1);
+
+        // Re-initialize the sortable if necessary
+        if (repeaterWrapper._sortable) {
+            repeaterWrapper._sortable.destroy();
+        }
+
+        Sortable.create(repeaterWrapper, {
+            animation: 150,
+            handle: '.repeater-form-move',
+        });
+    }
+});
 
 
 
@@ -321,8 +392,8 @@
                 $('.widget-save-btn').prop('disabled', true).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
             },
             success: function(response) {
-                console.log(response);
                 toastr.success(response.message);
+                window.location.href = "{{ route('admin.pages.index') }}";
             },
             error: function(xhr) {
                 toastr.error(xhr.responseJSON.message);

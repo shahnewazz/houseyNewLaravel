@@ -1,8 +1,4 @@
 @php
-// echo "<pre>";
-// print_r($data);
-// echo "</pre>";
-
 $menu = isset($data['menu']) ? \Modules\Core\Models\Menu::findOrFail($data['menu']) : null;
 
 if($code != 'en'){
@@ -137,7 +133,7 @@ if($code != 'en'){
 
                         @if(!empty($data['button']) && isset($data['button']['lang'][$code]['text']))
                         <div class="tp-header-btn-wrap d-none d-lg-block ml-30">
-                            <a class="tp-header-btn" href="{{$data['button']['url']}}" target="{{$data['button']['target'] == 1 ? '_blank' : '_self' }}">
+                            <a class="tp-header-btn" href="{{$data['button']['url'] ?? ''}}" target="{{$data['button']['target'] == 1 ? '_blank' : '_self' }}" rel="{{$data['button']['follow'] == 1 ? 'nofollow' : ''}}">
                                 {{ $data['button']['lang'][$code]['text'] ?? '' }}
                             </a>
                         </div>

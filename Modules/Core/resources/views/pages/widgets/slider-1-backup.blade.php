@@ -14,7 +14,7 @@
                     <path d="M1 1H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
             </button>
-            <span class="card-title m-0 fs-4">Facilities Widget</span>
+            <span class="card-title m-0 fs-4">Slider 1 Widget</span>
             <div class="d-flex align-items-center justify-content-end ms-auto gap-3 widget-controls">
                 <button type="button" class="btn btn-xs btn-label-danger btn-icon widget-remove">
                     <svg width="16" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -34,40 +34,11 @@
     <div class="collapse" id="widget-body-{{ $id }}">
         <div class="card-body">
             <div class="widget-form" id="widget-{{ $id }}" data-index="{{ $id }}" data-item_count="{{$item_count}}">
-                <input type="hidden" name="widgets[widget-{{$id}}][widget_type]" value="facilities">
+                <input type="hidden" name="widgets[widget-{{$id}}][widget_type]" value="slider-1">
 
                 <div class="row">
+                    
                     <div class="col">
-
-                        <div class="repeater-lang-content">
-        
-                            <div class="repeater-lang-btn-wrapper">
-                                @foreach ($all_languages as $lang)
-                                <button type="button" class="repeater-lang-btn @if ($code == $lang->code) active @endif" data-code="{{$lang->code}}">{{$lang->code}}</button>
-                                @endforeach
-                            </div>
-
-                            @foreach ($all_languages as $lang)
-                            <div class="repeater-lang-tab @if ($code == $lang->code) active @endif" data-code="{{$lang->code}}">
-                                <div class="mb-3">
-                                    <x-core::form.input-label :value="'Title'"/>
-                                    <x-core::form.input type="text" id="title" name="widgets[widget-{{$id}}][widget_data][lang][{{$lang->code}}][section_title]" value="{{ $data['lang'][$lang->code]['section_title'] ?? '' }}" />
-                                </div>
-                                <div class="mb-3">
-                                    <x-core::form.input-label :value="'Subtitle'"/>
-                                    <x-core::form.input type="text" id="subtitle" name="widgets[widget-{{$id}}][widget_data][lang][{{$lang->code}}][section_subtitle]" value="{{ $data['lang'][$lang->code]['section_subtitle'] ?? '' }}" />
-                                </div>
-                                <div class="mb-3">
-                                    <x-core::form.input-label :value="'Description'" />
-                                    <textarea class="form-control" name="widgets[widget-{{$id}}][widget_data][lang][{{$lang->code}}][section_description]" rows="3" placeholder="Enter widget description">{{ $data['lang'][$lang->code]['section_description'] ?? '' }}</textarea>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-
-                    </div>
-                    <div class="col">
-
                         <h5 class="mt-3">Items</h5>
                         <div class="repeater-form-fields-wrapper">
                             @isset($data['repeater'])
@@ -111,18 +82,32 @@
                                                     @foreach ($site_languages as $lang)
                                                     <div class="repeater-lang-tab @if ($code == $lang->code) active @endif" data-code="{{$lang->code}}">
                                                         <div class="mb-3">
-                                                            <x-core::form.input-label :value="'Text '.$lang->code.' '"/>
+                                                            <x-core::form.input-label :value="'Subtitle '.$lang->code.' '"/>
+                                                            <x-core::form.input type="text" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop_count}}][lang][{{$lang->code}}][subtitle]" value="{{$item['lang'][$lang->code]['subtitle'] ?? ''}}" />
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <x-core::form.input-label :value="'Title '.$lang->code.' '"/>
                                                             <x-core::form.input type="text" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop_count}}][lang][{{$lang->code}}][title]" value="{{$item['lang'][$lang->code]['title'] ?? ''}}" />
                                                         </div>
                                                         <div class="mb-3">
-                                                            <x-core::form.input-label :value="'Description'" />
-                                                            <textarea class="form-control" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop_count}}][lang][{{$lang->code}}][description]" rows="3" placeholder="Enter widget description">{{ $data['lang'][$lang->code]['description'] ?? '' }}</textarea>
+                                                            <x-core::form.input-label :value="'Button Text '.$lang->code.' '"/>
+                                                            <x-core::form.input type="text" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop_count}}][button][lang][{{$lang->code}}][text]" value="{{$item['button']['lang'][$lang->code]['text'] ?? ''}}" />
                                                         </div>
                                                     </div>
                                                     @endforeach
+                                                    
                                                     <div class="mb-3">
                                                         <x-core::form.input-label :value="'URL'" />
-                                                        <x-core::form.input type="text" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop_count}}][url]" value="{{$item['url'] ?? ''}}" />
+                                                        <x-core::form.input type="text" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1]['button'][url]" />
+                                                    </div>
+
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="btn_target-[repeater-item-{{$loop_count}}]" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop_count}}][button][target]" @if (!empty($item['button']['target']) && $item['button']['target'] == 1) checked @endif >
+                                                        <label class="form-check-label" for="btn_target-[repeater-item-{{$loop_count}}]">Open In New Window</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="btn_nofollow-[repeater-item-{{$loop_count}}]" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop_count}}][button][follow]" @if (!empty($item['button']['follow']) && $item['button']['follow'] == 1) checked @endif>
+                                                        <label class="form-check-label" for="btn_nofollow-[repeater-item-{{$loop_count}}]">Add Nofollow</label>
                                                     </div>
                                                 </div>
 
@@ -188,14 +173,30 @@
                                                     @foreach ($site_languages as $lang)
                                                     <div class="repeater-lang-tab @if ($code == $lang->code) active @endif" data-code="{{$lang->code}}">
                                                         <div class="mb-3">
-                                                            <x-core::form.input-label :value="'Text '.$lang->code.' '"/>
+                                                            <x-core::form.input-label :value="'Subtitle '.$lang->code.' '"/>
+                                                            <x-core::form.input type="text" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1][lang][{{$lang->code}}][subtitle]" />
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <x-core::form.input-label :value="'Title '.$lang->code.' '"/>
                                                             <x-core::form.input type="text" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1][lang][{{$lang->code}}][title]" />
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <x-core::form.input-label :value="'Button Text '.$lang->code.' '"/>
+                                                            <x-core::form.input type="text" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1][button][lang][{{$lang->code}}][text]" />
                                                         </div>
                                                     </div>
                                                     @endforeach
                                                     <div class="mb-3">
                                                         <x-core::form.input-label :value="'URL'" />
-                                                        <x-core::form.input type="text" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1][url]" />
+                                                        <x-core::form.input type="text" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1]['button'][url]" />
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="btn_target-[repeater-item-1]" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1][button][target]" >
+                                                        <label class="form-check-label" for="btn_target-[repeater-item-1]">Open In New Window</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="btn_nofollow-[repeater-item-1]" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1][button][follow]">
+                                                        <label class="form-check-label" for="btn_nofollow-[repeater-item-1]">Add Nofollow</label>
                                                     </div>
                                                 </div>
 
@@ -228,10 +229,7 @@
                         
                     </div>
                 </div>
-                
-
-
-                
+            
                 
             </div>
         </div>

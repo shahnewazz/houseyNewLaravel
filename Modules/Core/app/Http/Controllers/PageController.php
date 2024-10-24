@@ -112,7 +112,7 @@ class PageController extends Controller
     public function widgetEdit(Request $request, $page_id){
         $code = $request->query('code' , 'en');
         $page = Page::findOrFail($page_id);
-
+        $page->widgets = unserialize($page->widgets);
         $lang_code = $code;
 
         return view('core::pages.page.widgets', compact('page', 'lang_code'));
@@ -138,116 +138,113 @@ class PageController extends Controller
     {
 
 
-        $widgets = $request->widgets ?? [];
-
-        $widgetTypes = array_map(function ($widget) {
-            return $widget['widget_type'] ?? null; // Safely get widget_type
-        }, $widgets);
-
-
-        foreach($widgetTypes as $item){
-            if($item == 'header-1'){
-                $rules = [
-                    'widgets.*.widget_data.menu' => 'nullable|exists:menus,id',
-                    'widgets.*.widget_data.logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-                    'widgets.*.widget_data.account' => 'required|array',
-                    'widgets.*.widget_data.account.icon' => 'required|array',
-                    'widgets.*.widget_data.account.icon.icon_type' => 'required|string',
-                    'widgets.*.widget_data.account.icon.icon_content' => 'required|array',
-                    'widgets.*.widget_data.account.icon.icon_content.image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-                    'widgets.*.widget_data.account.icon.icon_content.image_db' => 'nullable|string',
-                    'widgets.*.widget_data.account.icon.icon_content.svg' => 'nullable|string',
-
-                    'widgets.*.widget_data.account.lang' => 'required|array',
-                    'widgets.*.widget_data.account.lang.*.text' => 'nullable|string',
-                    'widgets.*.widget_data.account.url' => 'nullable|string',
-                    'widgets.*.widget_data.account.target' => 'nullable|string',
-                    'widgets.*.widget_data.account.follow' => 'nullable|string',
-
-                    'widgets.*.widget_data.button' => 'required|array',
-                    'widgets.*.widget_data.button.lang' => 'required|array',
-                    'widgets.*.widget_data.button.lang.*.text' => 'nullable|string',
-                    'widgets.*.widget_data.button.url' => 'nullable|string',
-                    'widgets.*.widget_data.button.target' => 'nullable|string',
-                    'widgets.*.widget_data.button.follow' => 'nullable|string',
-
-
-                    'widgets.*.widget_data.repeater' => 'required|array',
-                    'widgets.*.widget_data.repeater.*.url' => 'nullable|string',
-                    'widgets.*.widget_data.repeater.*.lang' => 'required|array',
-                    'widgets.*.widget_data.repeater.*.lang.*.text' => 'nullable|array',
-                    'widgets.*.widget_data.repeater.*.icon' => 'required|array',
-                    'widgets.*.widget_data.repeater.*.icon.icon_type' => 'required|string',
-                    'widgets.*.widget_data.repeater.*.icon.icon_content' => 'required|array',
-                    'widgets.*.widget_data.repeater.*.icon.icon_content.image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-                    'widgets.*.widget_data.repeater.*.icon.icon_content.image_db' => 'nullable|string',
-                    'widgets.*.widget_data.repeater.*.icon.icon_content.svg' => 'nullable|string',
-
-
-                ];
-
-                if($request->hasFile("widgets.*.widget_data.account.icon.icon_content.image")){
-                    $rules['widgets.*.widget_data.account.icon.icon_content.image'] = "nullable|image|mimes:jpeg,png,jpg|max:2048";
-                }   
-
-                if($request->hasFile("widgets.*.widget_data.repeater.*.icon.icon_content.image")){
-                    $rules['widgets.*.widget_data.repeater.*.icon.icon_content.image'] = "nullable|image|mimes:jpeg,png,jpg|max:2048";
-                }
-
-                $messages = [
-                    'widgets.*.widget_data.menu.exists' => 'Menu not found.',
-                    'widgets.*.widget_data.logo.image' => 'The logo must be an image.',
-                    'widgets.*.widget_data.logo.mimes' => 'The logo must be a file of type: jpeg, png, jpg.',
-                    'widgets.*.widget_data.logo.max' => 'The logo may not be greater than 2048 kilobytes.',
-                    'widgets.*.widget_data.account.required' => 'The account field is required.',
-                    'widgets.*.widget_data.account.icon.required' => 'The icon field is required.',
-                    'widgets.*.widget_data.account.icon.icon_type.required' => 'The icon type field is required.',
-                    'widgets.*.widget_data.account.icon.icon_content.required' => 'The icon content field is required.',
-                    'widgets.*.widget_data.account.icon.icon_content.image.image' => 'The icon content image must be an image.',
-                    'widgets.*.widget_data.account.icon.icon_content.image.mimes' => 'The icon content image must be a file of type: jpeg, png, jpg.',
-                    'widgets.*.widget_data.account.icon.icon_content.image.max' => 'The icon content image may not be greater than 2048 kilobytes.',
-                    'widgets.*.widget_data.account.icon.icon_content.image_db.string' => 'The icon content image db must be a string.',
-                    'widgets.*.widget_data.account.icon.icon_content.svg.string' => 'The icon content svg must be a string.',
-                    'widgets.*.widget_data.account.lang.required' => 'The account lang field is required.',
-                    'widgets.*.widget_data.account.lang.*.text.string' => 'The account text must be a string.',
-                    'widgets.*.widget_data.account.url.string' => 'The account url must be a string.',
-                    'widgets.*.widget_data.account.target.string' => 'The account target must be a string.',
-                    'widgets.*.widget_data.account.follow.string' => 'The account follow must be a string.',
-                    'widgets.*.widget_data.button.required' => 'The button field is required.',
-                    'widgets.*.widget_data.button.lang.required' => 'The button lang field is required.',
-                    'widgets.*.widget_data.button.lang.*.text.string' => 'The button text must be a string.',
-                    'widgets.*.widget_data.button.url.string' => 'The button url must be a string.',
-                    'widgets.*.widget_data.button.target.string' => 'The button target must be a string.',
-                    'widgets.*.widget_data.button.follow.string' => 'The button follow must be a string.',
-                    'widgets.*.widget_data.repeater.required' => 'The repeater field is required.',
-                    'widgets.*.widget_data.repeater.*.url.string' => 'The repeater url must be a string.',
-                    'widgets.*.widget_data.repeater.*.lang.required' => 'The repeater lang field is required.',
-                    'widgets.*.widget_data.repeater.*.lang.*.text.string' => 'The repeater text must be a string.',
-                    'widgets.*.widget_data.repeater.*.icon.required' => 'The repeater icon field is required.',
-                    'widgets.*.widget_data.repeater.*.icon.icon_type.required' => 'The repeater icon type field is required.',
-                    'widgets.*.widget_data.repeater.*.icon.icon_content.required' => 'The repeater icon content field is required.',
-                    'widgets.*.widget_data.repeater.*.icon.icon_content.image.image' => 'The repeater icon content image must be an image.',
-                    'widgets.*.widget_data.repeater.*.icon.icon_content.image.mimes' => 'The repeater icon content image must be a file of type: jpeg, png, jpg.',
-                    'widgets.*.widget_data.repeater.*.icon.icon_content.image.max' => 'The repeater icon content image may not be greater than 2048 kilobytes.',
-                    'widgets.*.widget_data.repeater.*.icon.icon_content.image_db.string' => 'The repeater icon content image db must be a string.',
-                    'widgets.*.widget_data.repeater.*.icon.icon_content.svg.string' => 'The repeater icon content svg must be a string.',
-
-                ];
-
-                $request->validate($rules, $messages);
-            }
-        }
-
         $rules = [];
+        $messages = [];
 
         $rules['widgets.*.widget_type'] = 'nullable|string';
         $rules['widgets.*.widget_data'] = 'nullable|array';
 
-
-
-        $messages = [];
         $messages['widgets.*.widget_type.string'] = 'The widget type must be a string.';
         $messages['widgets.*.widget_data.array'] = 'The widget data must be an array.';
+
+        
+        foreach ($request->input('widgets', []) as $index => $widget) {
+            if ($widget['widget_type'] == 'header-1') {
+                $rules["widgets.$index.widget_data.menu"] = 'nullable|exists:menus,id';
+                $rules["widgets.$index.widget_data.logo"] = 'nullable|image|mimes:jpeg,png,jpg|max:2048';
+                $rules["widgets.$index.widget_data.account"] = 'required|array';
+                $rules["widgets.$index.widget_data.account.icon"] = 'required|array';
+                $rules["widgets.$index.widget_data.account.icon.icon_type"] = 'required|string';
+                $rules["widgets.$index.widget_data.account.icon.icon_content"] = 'required|array';
+                $rules["widgets.$index.widget_data.account.icon.icon_content.image"] = 'nullable|image|mimes:jpeg,png,jpg|max:2048';
+                $rules["widgets.$index.widget_data.account.icon.icon_content.image_db"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.account.icon.icon_content.svg"] = 'nullable|string';
+        
+                $rules["widgets.$index.widget_data.account.lang"] = 'required|array';
+                $rules["widgets.$index.widget_data.account.lang.*.text"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.account.url"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.account.target"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.account.follow"] = 'nullable|string';
+        
+                $rules["widgets.$index.widget_data.button"] = 'required|array';
+                $rules["widgets.$index.widget_data.button.lang"] = 'required|array';
+                $rules["widgets.$index.widget_data.button.lang.*.text"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.button.url"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.button.target"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.button.follow"] = 'nullable|string';
+        
+                $rules["widgets.$index.widget_data.repeater"] = 'required|array';
+                $rules["widgets.$index.widget_data.repeater.*.url"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.repeater.*.lang"] = 'required|array';
+                $rules["widgets.$index.widget_data.repeater.*.lang.*.text"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.repeater.*.icon"] = 'required|array';
+                $rules["widgets.$index.widget_data.repeater.*.icon.icon_type"] = 'required|string';
+                $rules["widgets.$index.widget_data.repeater.*.icon.icon_content"] = 'required|array';
+                $rules["widgets.$index.widget_data.repeater.*.icon.icon_content.image"] = 'nullable|image|mimes:jpeg,png,jpg|max:2048';
+                $rules["widgets.$index.widget_data.repeater.*.icon.icon_content.image_db"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.repeater.*.icon.icon_content.svg"] = 'nullable|string';
+            }
+
+            if($widget['widget_type'] == 'facilities'){
+
+                $rules["widgets.$index.widget_data.lang"] = 'required|array';
+                $rules["widgets.$index.widget_data.lang.*.section_title"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.lang.*.section_subtitle"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.lang.*.section_description"] = 'nullable|string';
+
+                $rules["widgets.$index.widget_data.repeater"] = 'required|array';
+                $rules["widgets.$index.widget_data.repeater.*.lang"] = 'required|array';
+                $rules["widgets.$index.widget_data.repeater.*.lang.*.title"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.repeater.*.url"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.repeater.*.image"] = 'nullable|image|mimes:jpeg,png,jpg|max:2048';
+                $rules["widgets.$index.widget_data.repeater.*.image_db"] = 'nullable|string';
+
+                // messages
+                $messages["widgets.$index.widget_data.lang.*.section_title.string"] = 'The section title must be a string.';
+                $messages["widgets.$index.widget_data.lang.*.section_subtitle.string"] = 'The section subtitle must be a string.';
+                $messages["widgets.$index.widget_data.lang.*.section_description.string"] = 'The section description must be a string.';
+                $messages["widgets.$index.widget_data.repeater.*.lang.*.title.string"] = 'The title must be a string.';
+                $messages["widgets.$index.widget_data.repeater.*.url.string"] = 'The url must be a string.';
+
+                $messages["widgets.$index.widget_data.repeater.*.image.image"] = 'The image must be an image.';
+                $messages["widgets.$index.widget_data.repeater.*.image.mimes"] = 'The image must be a file of type: jpeg, png, jpg.';
+                $messages["widgets.$index.widget_data.repeater.*.image.max"] = 'The image may not be greater than 2048 kilobytes.';
+                $messages["widgets.$index.widget_data.repeater.*.image_db.string"] = 'The image DB must be a string.';
+            }
+            
+            if($widget['widget_type'] == 'slider-1'){
+
+
+                $rules["widgets.$index.widget_data.lang"] = 'required|array';
+                $rules["widgets.$index.widget_data.lang.*.subtitle"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.lang.*.title"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.button"] = 'required|array';
+                $rules["widgets.$index.widget_data.button.lang"] = 'required|array';
+                $rules["widgets.$index.widget_data.button.lang.*.text"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.button.url"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.button.target"] = 'nullable|string';
+                $rules["widgets.$index.widget_data.button.follow"] = 'nullable|string';
+
+                $rules["widgets.$index.widget_data.repeater"] = 'required|array';
+                $rules["widgets.$index.widget_data.repeater.*.image"] = 'nullable|image|mimes:jpeg,png,jpg|max:2048';
+                $rules["widgets.$index.widget_data.repeater.*.image_db"] = 'nullable|string';
+
+                // messages
+                $messages["widgets.$index.widget_data.lang.*.subtitle.string"] = 'The subtitle must be a string.';
+                $messages["widgets.$index.widget_data.lang.*.title.string"] = 'The title must be a string.';
+                $messages["widgets.$index.widget_data.button.lang.*.text.string"] = 'The button text must be a string.';
+                $messages["widgets.$index.widget_data.button.url.string"] = 'The url must be a string.';
+                $messages["widgets.$index.widget_data.button.target.string"] = 'The target must be a string.';
+                $messages["widgets.$index.widget_data.button.follow.string"] = 'The follow must be a string.';
+
+
+                $messages["widgets.$index.widget_data.repeater.*.image.image"] = 'The image must be an image.';
+                $messages["widgets.$index.widget_data.repeater.*.image.mimes"] = 'The image must be a file of type: jpeg, png, jpg.';
+                $messages["widgets.$index.widget_data.repeater.*.image.max"] = 'The image may not be greater than 2048 kilobytes.';
+                $messages["widgets.$index.widget_data.repeater.*.image_db.string"] = 'The image DB must be a string.';
+            }
+        }
+        
 
         $request->validate($rules, $messages);
 
@@ -257,6 +254,18 @@ class PageController extends Controller
             foreach ($data as $key => $value) {
                 // header -1 validation
                 if($value['widget_type'] == 'header-1'){
+
+    
+                    if($request->hasFile("widgets.*.widget_data.account.icon.icon_content.image")){
+                        $rules['widgets.*.widget_data.account.icon.icon_content.image'] = "nullable|image|mimes:jpeg,png,jpg|max:2048";
+                    }   
+    
+                    if($request->hasFile("widgets.*.widget_data.repeater.*.icon.icon_content.image")){
+                        $rules['widgets.*.widget_data.repeater.*.icon.icon_content.image'] = "nullable|image|mimes:jpeg,png,jpg|max:2048";
+                    }
+    
+
+
                     foreach($value['widget_data'] as $k => $item){
 
                         // LANGUAGE SWITCH
@@ -338,13 +347,14 @@ class PageController extends Controller
                         // LOGO
                         // ------------------------------------------------
                         if(array_key_exists('logo_db', $data[$key]['widget_data'])){
+                           
                             if($k == 'logo' && $request->hasFile("widgets.$key.widget_data.logo")){
                                 $logo_path = updateMedia($request->file("widgets.$key.widget_data.logo"), $value['widget_data']['logo_db'], 'page');
                                 $data[$key]['widget_data']['logo'] = $logo_path;
+                                $data[$key]['widget_data']['logo_db'] = $logo_path;
                                
                             }else{
                                 $data[$key]['widget_data']['logo'] = $data[$key]['widget_data']['logo_db'];
-                                
                             }
                         }else{
                             return response()->json(['message' => 'Some Fields are missing in Logo', 'status' => false], 422);
@@ -385,21 +395,65 @@ class PageController extends Controller
                         }
                     }
                 }
-                
-                // facilities validation
 
-                // if($value['widget_type'] == 'facilities'){
-                //     foreach($value['widget_data'] & $k => $item){
+                // FACILITIES
+                if($value['widget_type'] == 'facilities'){
+                    foreach($value['widget_data'] as $k => $item){
+                        if($k == 'repeater'){
+                            foreach($item as $rep => $rep_item){
+                                
+                                if(!array_key_exists('lang', $rep_item) || !array_key_exists('en', $rep_item['lang']) || !array_key_exists('title', $rep_item['lang']['en']) || !array_key_exists('image_db', $rep_item)){
+                                    return response()->json(['message' => 'Some Fields are missing in Facilities Items', 'status' => false], 422);
+                                }
 
-                //     }
-                // }
+                                if($request->hasFile("widgets.$key.widget_data.repeater.$rep.image")){
+                                    $image_path = updateMedia($request->file("widgets.$key.widget_data.repeater.$rep.image"), $rep_item['image_db'], 'page');
+                                    $data[$key]['widget_data']['repeater'][$rep]['image'] = $image_path;
+                                    $data[$key]['widget_data']['repeater'][$rep]['image_db'] = $image_path;
+                                    
+                                }else{
+                                    $data[$key]['widget_data']['repeater'][$rep]['image'] = $data[$key]['widget_data']['repeater'][$rep]['image_db'];
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // SLIDER 1
+                if($value['widget_type'] == 'slider-1'){
+                    foreach($value['widget_data'] as $k => $item){
+
+                        // button data
+                        if($k == 'button'){
+                            if(array_key_exists('target', $data[$key]['widget_data']['button'])){
+                                $data[$key]['widget_data']['button']['target'] = 1;
+                                $data[$key]['widget_data']['button']['follow'] = 1;
+                            }else{
+                                $data[$key]['widget_data']['button']['target'] = 0;
+                                $data[$key]['widget_data']['button']['follow'] = 0;
+                            }
+                        }
+
+                        if($k == 'repeater'){
+                            foreach($item as $rep => $rep_item){
+                                if($request->hasFile("widgets.$key.widget_data.repeater.$rep.image")){
+                                    $image_path = updateMedia($request->file("widgets.$key.widget_data.repeater.$rep.image"), $rep_item['image_db'], 'page');
+                                    $data[$key]['widget_data']['repeater'][$rep]['image'] = $image_path;
+                                    $data[$key]['widget_data']['repeater'][$rep]['image_db'] = $image_path;
+                                    
+                                }else{
+                                    $data[$key]['widget_data']['repeater'][$rep]['image'] = $data[$key]['widget_data']['repeater'][$rep]['image_db'];
+                                }
+                            }
+                        }
+                    }
+                }
             }
-
         }
 
 
         $page = Page::findOrFail($id);
-        $page->widgets = $data ?? [];
+        $page->widgets = serialize($data) ?? [];
         $page->save();
         
        

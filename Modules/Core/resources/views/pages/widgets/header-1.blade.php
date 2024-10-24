@@ -168,7 +168,6 @@
                                             <x-core::form.input value="{{$account_icon_image}}" accept="image/*" type="file" id="account_icon_image" name="widgets[widget-{{$id}}][widget_data][account][icon][icon_content][image]" class="image-input" data-target=".account-icon-image" data-reset=".account-icon-image-reset" hidden />
                                         </label>
                                         <button type="button" class="btn btn-sm btn-label-secondary account-icon-image-reset image-reset d-none" data-target=".account-icon-image">Reset</button>
-
                                     </div>
 
                                 </div>
@@ -209,7 +208,6 @@
                             </div>
                             
 
-        
                             <div class="mb-3">
                                 <x-core::form.input-label class="d-block" :value="'URL'" />
                                 <x-core::form.input type="text" id="button" name="widgets[widget-{{$id}}][widget_data][button][url]" value="{{$data['button']['url'] ?? ''}}" />
@@ -233,6 +231,11 @@
                                 @forelse ($data['repeater'] as $key => $item)
                                 @php
                                     $loop_count = $loop->iteration;
+                                    
+                                    $item_image = '';
+                                    if(array_key_exists('icon', $item) && $item['icon']['icon_type'] == 'image'){
+                                        $item_image = !empty($item['icon']['icon_content']['image']) ? asset('storage/'.$item['icon']['icon_content']['image']) : '';
+                                    }
                                     
                                 @endphp
                                 <div class="repeater-form-fields pb-4">
@@ -292,14 +295,23 @@
                                                         </select>
                                                     </div>
                                                     
+
                                                     <div class="mb-3">
                                                         <!-- Image Upload Field -->
-                                                        <div data-type="image" class="icon-upload-field">
-                                                            <x-core::form.input-label :value="'Image'" />
+                                                        <div data-type="image" class="icon-upload-field conca-image-upload-container">
+                                                            <div>
+                                                                <x-core::form.input-label :value="'Image'" />
+                                                                <img src="{{$item_image}}" class="img-thumbnail image-preview" alt="item-image" data-default="{{$item_image}}">
+                                                            </div>
+
                                                             <input type="hidden" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop_count}}][icon][icon_content][image_db]" hidden value="{{$item['icon']['icon_type'] == 'image' ? $item['icon']['icon_content']['image'] : ''}}">
-                                                            <x-core::form.input type="file" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop_count}}][icon][icon_content][image]" />
+                                                            <input type="file" hidden class="image-input" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-{{$loop_count}}][icon][icon_content][image]">
+                                                            
+                                                            <button class="btn btn-sm btn-label-primary conca-image-upload-btn" data-id="[repeater-item-1]">Upload</button>
+                                                            <button class="btn btn-sm btn-label-secondary conca-image-reset-btn d-none" data-id="[repeater-item-1]">Reset</button>
                                                         </div>
                                                     </div>
+
                                                    
                                                     <div class="mb-3">
                                                         <!-- SVG Code Field -->
@@ -377,8 +389,18 @@
                                                     
                                                     <div class="mb-3">
                                                         <!-- Image Upload Field -->
-                                                        <x-core::form.input-label :value="'Image'" />
-                                                        <x-core::form.input type="file" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1][icon][icon_content][image]" />
+                                                        <div data-type="image" class="icon-upload-field conca-image-upload-container">
+                                                            <div>
+                                                                <x-core::form.input-label :value="'Image'" />
+                                                                <img src="" class="img-thumbnail image-preview" alt="item-image" data-default="">
+                                                            </div>
+        
+                                                            <input type="hidden" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1][icon][icon_content][image_db]">
+                                                            <input type="file" hidden class="image-input" name="widgets[widget-{{$id}}][widget_data][repeater][repeater-item-1][icon][icon_content][image]">
+
+                                                            <button class="btn btn-sm btn-label-primary conca-image-upload-btn" data-id="[repeater-item-1]">Upload</button>
+                                                            <button class="btn btn-sm btn-label-secondary conca-image-reset-btn d-none" data-id="[repeater-item-1]">Reset</button>
+                                                        </div>
                                                     </div>
                                                     
                                                     <div class="mb-3">
